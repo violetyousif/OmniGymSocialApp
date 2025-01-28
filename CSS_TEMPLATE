@@ -1,0 +1,49 @@
+/*
+File: styles.css
+Purpose: Stylesheet for the mobile app concept.
+
+Changelog:
+    DATE        NAME        VERSION     CHANGES
+    ----------  ----------  ---------   -----------------------------------
+    YYYY-MM-DD  Your Name   0.1.0       Initial file creation.
+
+*/
+
+/* Base styling */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+    color: #333;
+}
+
+/* Header styling */
+header {
+    background-color: #007BFF;
+    color: white;
+    text-align: center;
+    padding: 1rem;
+}
+
+/* Main content styling */
+main {
+    padding: 1rem;
+}
+
+#content {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+/* Footer styling */
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 0.5rem;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
