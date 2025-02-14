@@ -1,0 +1,47 @@
+<ion-content class="login-container">
+  <!-- Background Layers -->
+  <div class="background-container">
+    <div class="grey-background"></div>
+    <div class="orange-oval"></div>
+    <div class="white-oval"></div>
+  </div>
+
+  <!-- Logo -->
+  <div class="logo-container">
+    <h1 class="logo">omnigym.</h1>
+    <img src="assets/Omnigym_Logo.png" alt="OmniGym Logo" class="logo-image" />
+  </div>
+
+  <!-- Login Form -->
+  <div class="login-box">
+    <form>
+      <!-- Email Input -->
+      <div class="input-container">
+        <label for="email-field" class="input-label">Email</label>
+        <input type="email" id="email-field" name="email" class="input-field" placeholder="Enter your email" required />
+      </div>
+
+      <!-- Password Input -->
+      <div class="input-container">
+        <label for="password-field" class="input-label">Password</label>
+        <div class="password-wrapper">
+          <input type="password" id="password-field" name="password" class="input-field" placeholder="Enter your password" required />
+          <button type="button" id="toggle-password" (click)="togglePasswordVisibility()">
+            <svg id="eye-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 5C7 5 3.73 8.11 2 12C3.73 15.89 7 19 12 19C17 19 20.27 15.89 22 12C20.27 8.11 17 5 12 5ZM12 17C9 17 6.5 15 5 12C6.5 9 9 7 12 7C15 7 17.5 9 19 12C17.5 15 15 17 12 17ZM12 9C10.34 9 9 10.34 9 12C9 13.66 10.34 15 12 15C13.66 15 15 13.66 15 12C15 10.34 13.66 9 12 9ZM12 13C11.45 13 11 12.55 11 12C11 11.45 11.45 11 12 11C12.55 11 13 11.45 13 12C13 12.55 12.55 13 12 13Z" fill="#777"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="button-container">
+        <button class="sign-in-button">Sign in</button>
+        <ion-button expand="full" class="register-button" routerLink="/register-gym">Register</ion-button>
+      </div>
+
+      <!-- Forgot Password -->
+      <button class="forgot-password">Forgot Password?</button>
+    </form>
+  </div>
+</ion-content>

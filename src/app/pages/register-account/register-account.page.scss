@@ -1,0 +1,210 @@
+/* Fullscreen Background */
+ion-content {
+  --background: #3a3a3a;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Background Layer Container */
+.background-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: -1;
+}
+
+/* Dark Grey Background */
+.grey-background {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: #3a3a3a;
+  z-index: 0;
+}
+
+/* Large Orange Gradient Oval */
+.orange-oval {
+  position: absolute;
+  top: -10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 150%;
+  height: 45%;
+  background: radial-gradient(circle, #E97451 0%, rgba(255, 122, 14, 0.884) 80%);
+  border-radius: 50%;
+  z-index: 1;
+}
+
+/* White Oval */
+.white-oval {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 140%; 
+  height: 80%; 
+  background: white;
+  border-radius: 50%;
+  z-index: 2;
+}
+
+/* Register Form Box */
+.register-box {
+  width: 85%; 
+  max-width: 330px; 
+  padding: 20px; 
+  text-align: center;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+}
+
+/* Logo Inside Form */
+.logo-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 5px; 
+}
+
+.logo-image {
+  width: 80px; 
+  height: auto;
+}
+
+/* Title */
+.title {
+  font-size: 1.4rem; 
+  font-weight: bold;
+  margin-bottom: 15px;
+  text-align: center;
+  color: black;
+}
+
+/* Input Fields */
+.input-container {
+  width: 100%;
+  text-align: left;
+  margin-bottom: 12px; 
+}
+
+.input-container label {
+  display: block;
+  font-size: 13px; 
+  color: #333;
+  font-weight: bold;
+  margin-bottom: 4px; 
+}
+
+.input-field {
+  width: 100%;
+  padding: 8px; 
+  border: 1px solid #ccc;
+  border-radius: 6px; 
+  font-size: 14px; 
+  color: black;
+  background: white;
+}
+
+/* Terms Checkbox */
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+}
+
+.checkbox-container input {
+  margin-right: 5px;
+}
+
+.checkbox-container label {
+  font-size: 13px;
+  color: black;
+  font-weight: bold;
+}
+
+/* Buttons */
+.button-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* Submit Button */
+.submit-button {
+  width: 100%;
+  background: #ED7446 !important;
+  color: white !important;
+  font-size: 13px; 
+  font-weight: bold;
+  padding: 8px; 
+  border-radius: 15px; 
+  transition: transform 0.1s ease-in-out;
+  margin-bottom: 6px; 
+}
+
+/* Submit Button Effects */
+.submit-button:hover {
+  background: #eb4f11 !important;
+  transform: scale(1.05);
+}
+
+.submit-button:active {
+  background: #eb4f11 !important;
+  transform: scale(0.95);
+}
+
+/* Previous Button */
+.previous-button {
+  width: 100%;
+  text-align: left;
+  color: #6c6c6c;
+  font-size: 13px;
+  font-weight: bold;
+  background: transparent;
+  padding-left: 10px;
+  transition: transform 0.1s ease-in-out;
+}
+
+/* Previous Button Effects */
+.previous-button:hover {
+  color: black;
+  transform: scale(1.05);
+}
+
+.previous-button:active {
+  color: black;
+  transform: scale(0.95);
+}
+
+/* Style for Required Asterisk */
+.required {
+  color: red;
+  font-weight: bold;
+}
+
+/* Default Error Message Style */
+.error-message {
+  font-size: 12px;
+  font-weight: bold;
+  margin-top: 4px;
+  display: block;
+  color: red; 
+}
+/* If there's an error, make it red */
+.input-field:invalid + .error-message {
+  color: red;
+}

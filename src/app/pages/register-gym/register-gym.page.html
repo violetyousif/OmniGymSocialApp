@@ -1,0 +1,56 @@
+<ion-content class="register-container">
+  <!-- Background Layers -->
+  <div class="background-container">
+    <div class="grey-background"></div>
+    <div class="orange-oval"></div>
+    <div class="white-oval"></div>
+  </div>
+
+  <!-- Register Gym Form -->
+  <div class="register-box">
+    <div class="logo-container">
+      <img src="assets/OrangeLogo.PNG" alt="OmniGym Logo" class="logo-image" />
+    </div>
+
+    <h2 class="title">Register Gym</h2>
+    
+    <form>
+      <!-- State Dropdown -->
+      <div class="input-container">
+        <label for="state">State</label>
+        <select id="state" name="state" class="input-field">
+          <option value="" disabled selected>Select State</option>
+          <option *ngFor="let state of states" [value]="state">{{ state }}</option>
+        </select>
+      </div>
+
+      <!-- Gym Dropdown -->
+      <div class="input-container">
+        <label for="gym">Gym</label>
+        <select id="gym" name="gym" class="input-field">
+          <option value="" disabled selected>Select Gym</option>
+          <option *ngFor="let gym of gyms" [value]="gym">{{ gym }}</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <!-- Location Input -->
+      <div class="input-container">
+        <label for="location">Location</label>
+        <input type="text" id="location" name="location" class="input-field" placeholder="Enter area" />
+      </div>
+
+      <!-- Membership ID Input -->
+      <div class="input-container">
+        <label for="membership">Membership ID</label>
+        <input type="text" id="membership" name="membership" class="input-field" placeholder="Gym Membership ID" />
+      </div>
+
+      <!-- Buttons -->
+      <div class="button-container">
+        <ion-button expand="full" class="submit-button" routerLink="/register-account">Submit</ion-button>
+        <ion-button class="previous-button" fill="clear" routerLink="/login">← Previous</ion-button>
+      </div>
+    </form>
+  </div>
+</ion-content>
