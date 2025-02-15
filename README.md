@@ -105,7 +105,70 @@ _All the following info is required to successfully register or else an error is
 
 ## INSTRUCTIONS:
 <br><br>
-[ Instructions go here on how to run download and run program + any plugins that are needed ]
+# Setting up the environment
+Download the github repo and open it in the VSCode (or your preferred IDE).
+In the terminal, enter the following command:
+cd fullstack
+
+Reference: https://ionicframework.com/docs/intro/environment
+
+##Installing Ionic Framework on Your System
+
+###Step 1: Install Node.js and npm
+Ionic requires Node.js and npm (Node Package Manager) to be installed. To check if they are already installed, run:
+
+node -v
+npm -v
+If Node.js is not installed, download and install it from Node.js official website.
+
+Alternatively, you can install it using a package manager:
+
+macOS (Homebrew)
+brew install node
+Linux (Ubuntu/Debian)
+sudo apt update && sudo apt install -y nodejs npm
+Windows Download the installer from Node.js official website and follow the installation instructions.
+
+###Step 2: Install Ionic CLI and Angular CLI
+Install the Ionic CLI and Angular CLI globally:
+
+npm install -g @ionic/cli @angular/cli
+
+Verify installation:
+
+ionic -v
+ng version
+
+###Step 3: Install Cordova and Capacitor (For Native Mobile Development)
+To build Android and iOS apps, install Cordova (optional) and Capacitor (required):
+
+npm install -g cordova
+npm install -g @capacitor/cli
+Verify installation:
+
+cordova -v
+npx cap --version
+
+###Step 4: Create a New Ionic Project
+Navigate to your desired directory and create a new Ionic project:
+
+ionic start myApp blank
+You will be prompted to choose a framework. Select React, Angular, or Vue, based on your preference.
+
+Example for Angular:
+
+ionic start myApp blank --type=angular
+Example for React:
+
+ionic start myApp blank --type=react
+###Step 5: Navigate to the Project Folder
+cd myApp
+###Step 6: Serve the Ionic App
+Run the following command to launch the development server:
+
+ionic serve
+This will open the app in your default web browser.
+
 <br><br><br><br>
 
 
@@ -194,6 +257,3 @@ _All info is optional here, so allow NULL_
   13. running_time
   14. running_dist
 
-
-
-Testing
