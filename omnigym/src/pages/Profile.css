@@ -1,0 +1,86 @@
+/* Background */
+ion-content::part(background) {
+    background: radial-gradient(#FAF9F6, #b2b2b2 );
+
+}
+
+/* Top container for logo and message button*/
+.top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Pushes logo left, button right */
+    width: 100%;
+    padding: 10px 15px; /* Adjust padding as needed */
+}
+
+/* 'og' Logo */
+.logo-image {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+/* Message button */
+.message-button {
+    color: #FAF9F6;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    box-shadow: none;
+}
+
+/* Ensures the icon inside the button is properly sized */
+.message-button ion-icon {
+    font-size: 24px; /* Adjust icon size */
+}
+
+.profile-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    margin-bottom: 30px;
+    text-align: center;
+  }
+
+  .profile-image {
+    width: 300px; /* Adjust size as needed */
+    height: 300px;
+    border-radius: 50%; /* Makes it circular */
+    object-fit: cover;
+    cursor: pointer;
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .profile-image:hover {
+    transform: scale(1.1);
+  }
+  
+  .modal-image {
+    width: 100%;
+    height: auto;
+    max-width: 600px; /* Adjust for modal size */
+    display: block;
+    margin: 0 auto;
+    border-radius: 10px;
+  }
+
+  .profile-name {
+    text-align: center;
+    font-size: 25px;
+    font-weight: bold;
+    font-family: Arial, Helvetica, sans-serif;
+    margin-top: 10px; /* Adjust spacing as needed */
+    color: #585858; /* Adjust color to fit your theme */
+
+  }
+
+  .content-container {
+    width: 100%; /* Adjust width as needed */
+    max-width: 600px; /* Prevents it from stretching too wide */
+    margin-top: 15px; /* Space between profile name and accordion */
+    padding: 10px;
+    background-color: #D8D7D4; /* Light background color */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
