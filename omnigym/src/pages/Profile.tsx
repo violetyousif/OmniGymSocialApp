@@ -1,20 +1,22 @@
-
-/**
- * The Profile page represents users profile on the OmniGym Social App.
- * It uses Ionic components to structure the page layout.
- */
-
-import React, { useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonButton, IonModal, IonButtons, 
-  createAnimation, IonAccordion, IonAccordionGroup, IonItem, IonLabel, IonIcon } from '@ionic/react';
+  createAnimation, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonIcon } from '@ionic/react';
+import { useHistory } from 'react-router-dom'; // For navigation after sign-out
 import { chatbubbleEllipsesOutline } from 'ionicons/icons';
-import ExploreContainer from '../components/ExploreContainer';
 import './Profile.css';
-
 
 const Profile: React.FC = () => {
   const modalEl = useRef<HTMLIonModalElement>(null);
-  const accordionGroup = useRef<null | HTMLIonAccordionGroupElement>(null);
+  const history = useHistory(); // Hook for navigation
+
+  // const [fullName, setFullName] = useState<string>(firstName, lastName) => {
+  //   // Replace with actual logic to fetch user's name from imported table data
+  //   const userName = "Jane Doe" || fullName; // Example user name
+  //   return userName;
+  // });
+
+  // State to track which content is displayed in the card
+  const [activeTab, setActiveTab] = useState<'about' | 'stats' | 'gym friends'>('about');
 
   const enterAnimation = (baseEl: HTMLElement) => {
     const root = baseEl.shadowRoot!;
@@ -49,15 +51,13 @@ const Profile: React.FC = () => {
     modalEl.current?.dismiss();
   };
 
-  const toggleAccordion = () => {
-    if (!accordionGroup.current) return;
-    const nativeEl = accordionGroup.current;
+  // Logout User Function
+  const logoutUser = () => {
+    // Add authentication sign-out logic here (if using Firebase, Auth0, etc.)
+    console.log("User logged out");
 
-    if (nativeEl.value === 'second') {
-      nativeEl.value = undefined;
-    } else {
-      nativeEl.value = 'second';
-    }
+    // Redirect to Home (Sign In) page after sign-out
+    history.push('/home');
   };
 
   return (
@@ -65,9 +65,16 @@ const Profile: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonTitle>Omnigym.</IonTitle>
+          {/* Logout User Button aligned to the right */}
+          <IonButtons slot="end">
+            <IonButton onClick={logoutUser} className="logout-button">
+              Logout
+            </IonButton>
+          </IonButtons>
         </IonToolbar>
       </IonHeader>
 
+      {/* Top Icons on Profile: short logo and message button */}
       <IonContent className="ion-padding" fullscreen>
         <div className="top-bar">
           <img src="/src/pages/images/DarkGreyLogo.png" alt="logo" className="logo-image" />
@@ -76,8 +83,7 @@ const Profile: React.FC = () => {
           </IonButton>
         </div>
 
-
-        {/* Clickable Profile Image */}
+        {/* Profile Section */}
         <div className="profile-container">
           <img
             src="/src/pages/images/profilepicture.jpg"
@@ -88,7 +94,7 @@ const Profile: React.FC = () => {
           <h1 className="profile-name">Jane Doe</h1>
         </div>
 
-        {/* Modal for Enlarged Image */}
+        {/* Modal for Enlarging Image */}
         <IonModal ref={modalEl} enterAnimation={enterAnimation} leaveAnimation={leaveAnimation}>
           <IonHeader>
             <IonToolbar>
@@ -103,37 +109,57 @@ const Profile: React.FC = () => {
           </IonContent>
         </IonModal>
 
-        {/* Accordion Section */}
-        <div className="content-container">
-          <p>gedgnd</p>
-        <IonAccordionGroup ref={accordionGroup}>
-          <IonAccordion value="first">
-            <IonItem slot="header" color="light">
-              <IonLabel>About Me</IonLabel>
-            </IonItem>
-            <div className="ion-padding" slot="content">
-              First Content
+        {/* Single Card that Changes Content Based on Button Click */}
+        <div className="card-container">
+          <IonCard>
+            {/* Buttons to Switch Between Different Tabs */}
+            <div className="card-buttons">
+              <IonButton fill="clear" onClick={() => setActiveTab('about')}>About</IonButton>
+              <IonButton fill="clear" onClick={() => setActiveTab('stats')}>Fitness Stats</IonButton>
+              <IonButton fill="clear" onClick={() => setActiveTab('gym friends')}>Friends</IonButton>
             </div>
-          </IonAccordion>
+            <IonCardHeader>
+              <IonCardTitle className="ion-card-title">
+                {activeTab === 'about' && 'About'}
+                {activeTab === 'stats' && 'Fitness Stats'}
+                {activeTab === 'gym friends' && 'Friends List'}
+              </IonCardTitle>
+              <IonCardSubtitle className="ion-card-subtitle">
+                {activeTab === 'about' && 'Open to being approached: Sometimes.'}
+                {activeTab === 'stats' && 'My Progress'}
+                {activeTab === 'gym friends' && 'Friends List'}
+              </IonCardSubtitle>
+            </IonCardHeader>
 
-          <IonAccordion value="second">
-            <IonItem slot="header" color="light">
-              <IonLabel>Gym Stats</IonLabel>
-            </IonItem>
-            <div className="ion-padding" slot="content">
-              Second Content
-            </div>
-          </IonAccordion>
+            {/* About Section: Change values based on imported table data */}
+            <IonCardContent className="ion-card-content">
+              {activeTab === 'about' && (
+                <div className="about-section">
+                  <p className="about-caption">Hi, I'm Jane! I love fitness and helping others reach their goals.</p>
+                  <p>Gym Goal:</p><span id="gym-goal">Strength Training</span>
+                  <p>PR Song:</p><span id="pr-song">GODDESS by Written by Wolves</span>
+                  <p>Favorite Exercise:</p><span id="favorite-exercise">Deadlifts</span>
+                  <p>Wilks 2 Score:</p><span id="wilks 2 score">366</span>
+                </div>
+              )}
+              {activeTab === 'stats' && (
+                <div className="stats-section">
+                  <p>Trophies:</p><span className="trophies">2 won</span>
+                  <p>PR Deadlift: </p><span id="pr-deadlift-weight">245lbs</span>
+                  <p>PR Deadlift Reps: </p><span id="pr-deadlift-reps">6</span>
+                  <p>PR Deadlift: </p><span id="pr-benchpress-weight">105lbs</span>
+                  <p>PR Deadlift Reps: </p><span id="pr-benchpress-reps">4</span>
+                  <p>PR Deadlift: </p><span id="pr-squats-weight">155lbs</span>
+                  <p>PR Deadlift Reps: </p><span id="pr-squats-reps">10</span>
+                </div>
+              )}
+              {activeTab === 'gym friends' && (
+                <p>Become Jane's first friend!</p>
+              )}
+            </IonCardContent>
 
-          <IonAccordion value="third">
-            <IonItem slot="header" color="light">
-              <IonLabel>Third Accordion</IonLabel>
-            </IonItem>
-            <div className="ion-padding" slot="content">
-              Third Content
-            </div>
-          </IonAccordion>
-        </IonAccordionGroup>
+
+          </IonCard>
         </div>
       </IonContent>
     </IonPage>
