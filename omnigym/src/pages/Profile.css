@@ -87,7 +87,7 @@ ion-content::part(background) {
   background: #FAF9F6; /* Light background */
   border-radius: 15px; /* Rounded corners */
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-  padding: 15px;
+  padding: 5px;
   transition: transform 0.2s ease-in-out;
 }
 
@@ -99,7 +99,7 @@ ion-content::part(background) {
 .ion-card-title {
   font-size: 22px;
   text-align: center;
-  color: #333;
+  color: #585858;
   font-weight: bold;
 }
 
@@ -114,21 +114,26 @@ ion-content::part(background) {
 /* Card Content Styling */
 .ion-card-content {
   font-size: 12px;
-  color: #444;
-  text-align: center;
+  color: #585858;
+  text-align: left;
   line-height: 1.5;
   padding: 10px 15px;
+  margin: 0px 15px 10px 15px;
 }
 
 /* Buttons inside the card */
 .card-buttons {
   display: flex;
-  justify-content: space-around;
-  padding: 5px;
+  justify-content: space-evenly;
+  padding: 3px;
 }
 
 /* Style for each button */
 .card-buttons .ion-button {
   font-weight: bold;
-  font-size: .5vw;
+  font-size: 10px;
+}
+
+.stats-section {
+  text-align: center;
 }

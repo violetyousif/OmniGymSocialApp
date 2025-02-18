@@ -17,15 +17,24 @@ import {
   IonRouterLink,
   IonToast,
   IonIcon,
+  IonCheckbox,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonButtons,
+
 } from "@ionic/react";
 import { useHistory } from "react-router-dom";
 import "./RegisterGym.css";
 import { eye, eyeOff } from "ionicons/icons";
+import termsAndConditions from "./extras/UserAgreement"; // Import Terms from Separate File
+
 
 const RegisterGym: React.FC = () => {
   const history = useHistory();
 
   // Form State
+  const [email, setEmail] = useState("");   // TODO: (1.) I added this because "email" wasn't declared anywhere. Not sure where setEmail would be set though.
   const [membershipId, setMembershipId] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -73,9 +82,9 @@ const RegisterGym: React.FC = () => {
 
   const validateMembershipId = (id: string) => {
     if (selectedGym && validGymMembers[selectedGym]?.includes(id)) {
-      setIsValidMembershipId(true);
+        setIsValidMembershipId(true);
     } else {
-      setIsValidMembershipId(false);
+        setIsValidMembershipId(false);
     }
     setMembershipId(id);
   };
@@ -107,7 +116,6 @@ const RegisterGym: React.FC = () => {
     const cleaned = value.replace(/\D/g, "");
     return cleaned.length === 10;
   };
-  
 
   const validate = (
     event: Event,
@@ -187,13 +195,19 @@ const RegisterGym: React.FC = () => {
     return isBirthdayPassed ? age >= 18 : age - 1 >= 18;
   };
   
+    // Sets Terms & Conditions Check
+    const [isTermsChecked, setIsTermsChecked] = useState(false);
+    const [showTermsModal, setShowTermsModal] = useState(false);
+
   const handleRegister = () => {
-    setIsValidEmail(!!validateEmail(membershipId)); 
+    setIsValidEmail(!!validateEmail(email));    // TODO: (2.) This was mixed with membershipID and email. I think this is where the errors in membershipID and email are coming from.
     setIsValidPassword(validatePassword(password));
     setIsValidPhoneNumber(validatePhoneNumber(phoneNumber));
     setIsValidFirstName(validateName(firstName));
     setIsValidLastName(validateName(lastName));
     setIsValidBirthDate(validateBirthDate(birthDate));
+    // setIsValidMembershipId(!!validateMembershipId(membershipId)); 
+
   
     // Check if all validations pass
     if (
@@ -210,7 +224,8 @@ const RegisterGym: React.FC = () => {
       !isValidEmail || 
       !isValidPassword ||
       !selectedGym ||
-      isValidMembershipId === false  
+      !isTermsChecked ||
+      isValidMembershipId === false
     ) {
       alert("Please fill in all required fields correctly, including a valid Gym and Membership ID!");
       return;
@@ -229,7 +244,7 @@ const RegisterGym: React.FC = () => {
   return (
     <IonPage>
       <IonContent className="ion-padding" fullscreen>
-        <h1 className="omni-gym-title">Omni Gym</h1>
+        <h1 className="omnigym-title">Omnigym.</h1>
         <div className="centered-container">
           <IonCard className="login-box">
             <IonCardContent>
@@ -246,9 +261,9 @@ const RegisterGym: React.FC = () => {
                     placeholder="Gym"
                     className="DropdownFont"
                   >
-                    <IonSelectOption value="Planet">Planet</IonSelectOption>
-                    <IonSelectOption value="Golds">Gold's</IonSelectOption>
-                    <IonSelectOption value="LA">LA</IonSelectOption>
+                    <IonSelectOption value="Planet">Planet Fitness</IonSelectOption>    {/* Abbreviation for Table: PF */}
+                    <IonSelectOption value="Golds">Gold's Fitness</IonSelectOption>     {/* Abbreviation for Table: GF */}
+                    <IonSelectOption value="LA">Lifetime Fitness</IonSelectOption>    {/* Abbreviation for Table: LF */}
                   </IonSelect>
                 </IonItem>
               </IonCol>
@@ -343,7 +358,8 @@ const RegisterGym: React.FC = () => {
                 label="Email *"
                 labelPlacement="floating"
                 errorText="Invalid email"
-                onIonInput={(event) => validate(event, "email")}
+                value={email}
+                onIonInput={(event) => validate(event, "email")}    // TODO: (3.) This might be where setEmail should be used?
                 onIonBlur={() => setIsTouchedEmail(true)}
               />
 
@@ -431,18 +447,53 @@ const RegisterGym: React.FC = () => {
                 </IonSelect>
               </IonItem>
             </IonCardContent>
-            <IonLabel className="Agree">By clicking submit button you agree to our Terms & Conditions</IonLabel>
-            {/* Buttons */}
+
+
+
+            {/* Terms & Conditions Checkbox */}
+            <div className="terms-checkbox-container">
+              <IonCard className="terms-card">
+                <IonCardContent>
+                  <IonItem>
+                    <IonCheckbox checked={isTermsChecked} onIonChange={(e) => setIsTermsChecked(e.detail.checked)} />
+                    <IonLabel>
+                      By clicking submit, you agree to our{" "}
+                      <strong className="terms-link" onClick={() => setShowTermsModal(true)}>
+                        Terms & Conditions
+                      </strong>.
+                    </IonLabel>
+                  </IonItem>
+                </IonCardContent>
+              </IonCard>
+            </div>
+
+            {/* Terms & Conditions Modal */}
+            <IonModal isOpen={showTermsModal} onDidDismiss={() => setShowTermsModal(false)}>
+              <IonHeader>
+                <IonToolbar>
+                  <IonTitle>Terms & Conditions</IonTitle>
+                  <IonButtons slot="end">
+                    <IonButton onClick={() => setShowTermsModal(false)}>Close</IonButton>
+                  </IonButtons>
+                </IonToolbar>
+              </IonHeader>
+              <IonContent className="terms-modal-content">
+                <div dangerouslySetInnerHTML={{ __html: termsAndConditions.replace(/\n/g, "<br/>") }} />
+              </IonContent>
+            </IonModal>
+
+            {/* Submit Button & Sign-in Link */}
             <div className="button-container">
-              <IonButton expand="block" className="sign-in-button" onClick={handleRegister}>
+              <IonButton expand="block" className="submit-button" onClick={handleRegister}>
                 Submit
               </IonButton>
               <IonRouterLink href="/home" className="signin-link">
                 Already have an account? <strong>Sign In</strong>
               </IonRouterLink>
-            </div>
+              </div> 
           </IonCard>
         </div>
+
           {/* Success Toast Message */}
           <IonToast
             isOpen={showToast}

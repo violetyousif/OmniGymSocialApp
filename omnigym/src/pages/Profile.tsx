@@ -1,14 +1,22 @@
 import React, { useState, useRef } from 'react';
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonButton, IonModal, IonButtons, 
   createAnimation, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonIcon } from '@ionic/react';
+import { useHistory } from 'react-router-dom'; // For navigation after sign-out
 import { chatbubbleEllipsesOutline } from 'ionicons/icons';
 import './Profile.css';
 
 const Profile: React.FC = () => {
   const modalEl = useRef<HTMLIonModalElement>(null);
+  const history = useHistory(); // Hook for navigation
+
+  // const [fullName, setFullName] = useState<string>(firstName, lastName) => {
+  //   // Replace with actual logic to fetch user's name from imported table data
+  //   const userName = "Jane Doe" || fullName; // Example user name
+  //   return userName;
+  // });
 
   // State to track which content is displayed in the card
-  const [activeTab, setActiveTab] = useState<'about' | 'stats' | 'info'>('about');
+  const [activeTab, setActiveTab] = useState<'about' | 'stats' | 'gym friends'>('about');
 
   const enterAnimation = (baseEl: HTMLElement) => {
     const root = baseEl.shadowRoot!;
@@ -43,11 +51,26 @@ const Profile: React.FC = () => {
     modalEl.current?.dismiss();
   };
 
+  // Logout User Function
+  const logoutUser = () => {
+    // Add authentication sign-out logic here (if using Firebase, Auth0, etc.)
+    console.log("User logged out");
+
+    // Redirect to Home (Sign In) page after sign-out
+    history.push('/home');
+  };
+
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
           <IonTitle>Omnigym.</IonTitle>
+          {/* Logout User Button aligned to the right */}
+          <IonButtons slot="end">
+            <IonButton onClick={logoutUser} className="logout-button">
+              Logout
+            </IonButton>
+          </IonButtons>
         </IonToolbar>
       </IonHeader>
 
@@ -92,31 +115,46 @@ const Profile: React.FC = () => {
             {/* Buttons to Switch Between Different Tabs */}
             <div className="card-buttons">
               <IonButton fill="clear" onClick={() => setActiveTab('about')}>About</IonButton>
-              <IonButton fill="clear" onClick={() => setActiveTab('stats')}>Stats</IonButton>
-              <IonButton fill="clear" onClick={() => setActiveTab('info')}>Workout Partners</IonButton>
+              <IonButton fill="clear" onClick={() => setActiveTab('stats')}>Fitness Stats</IonButton>
+              <IonButton fill="clear" onClick={() => setActiveTab('gym friends')}>Friends</IonButton>
             </div>
             <IonCardHeader>
               <IonCardTitle className="ion-card-title">
                 {activeTab === 'about' && 'About'}
-                {activeTab === 'stats' && 'Stats'}
-                {activeTab === 'info' && 'Friends'}
+                {activeTab === 'stats' && 'Fitness Stats'}
+                {activeTab === 'gym friends' && 'Friends List'}
               </IonCardTitle>
               <IonCardSubtitle className="ion-card-subtitle">
-                {activeTab === 'about' && 'Personal Bio'}
+                {activeTab === 'about' && 'Open to being approached: Sometimes.'}
                 {activeTab === 'stats' && 'My Progress'}
-                {activeTab === 'info' && 'Fitness Journey'}
+                {activeTab === 'gym friends' && 'Friends List'}
               </IonCardSubtitle>
             </IonCardHeader>
 
+            {/* About Section: Change values based on imported table data */}
             <IonCardContent className="ion-card-content">
               {activeTab === 'about' && (
-                <p>Hi, I'm Jane! I love fitness and helping others reach their goals.</p>
+                <div className="about-section">
+                  <p className="about-caption">Hi, I'm Jane! I love fitness and helping others reach their goals.</p>
+                  <p>Gym Goal:</p><span id="gym-goal">Strength Training</span>
+                  <p>PR Song:</p><span id="pr-song">GODDESS by Written by Wolves</span>
+                  <p>Favorite Exercise:</p><span id="favorite-exercise">Deadlifts</span>
+                  <p>Wilks 2 Score:</p><span id="wilks 2 score">366</span>
+                </div>
               )}
               {activeTab === 'stats' && (
-                <p>Workouts completed: 120 <br /> Best Lift: 250 lbs Deadlift</p>
+                <div className="stats-section">
+                  <p>Trophies:</p><span className="trophies">2 won</span>
+                  <p>PR Deadlift: </p><span id="pr-deadlift-weight">245lbs</span>
+                  <p>PR Deadlift Reps: </p><span id="pr-deadlift-reps">6</span>
+                  <p>PR Deadlift: </p><span id="pr-benchpress-weight">105lbs</span>
+                  <p>PR Deadlift Reps: </p><span id="pr-benchpress-reps">4</span>
+                  <p>PR Deadlift: </p><span id="pr-squats-weight">155lbs</span>
+                  <p>PR Deadlift Reps: </p><span id="pr-squats-reps">10</span>
+                </div>
               )}
-              {activeTab === 'info' && (
-                <p>I started my fitness journey 3 years ago and love trying new workouts.</p>
+              {activeTab === 'gym friends' && (
+                <p>Become Jane's first friend!</p>
               )}
             </IonCardContent>
 
