@@ -10,7 +10,7 @@ ion-content::part(background) {
     align-items: center;
     justify-content: space-between; /* Pushes logo left, button right */
     width: 100%;
-    padding: 10px 15px; /* Adjust padding as needed */
+    margin: 10px 15px; /* Adjust padding as needed */
 }
 
 /* 'og' Logo */
@@ -28,10 +28,6 @@ ion-content::part(background) {
     box-shadow: none;
 }
 
-/* Ensures the icon inside the button is properly sized */
-.message-button ion-icon {
-    font-size: 24px; /* Adjust icon size */
-}
 
 .profile-container {
     display: flex;
@@ -44,8 +40,8 @@ ion-content::part(background) {
   }
 
   .profile-image {
-    width: 300px; /* Adjust size as needed */
-    height: 300px;
+    width: 40vw; /* Adjust size as needed */
+    height: 40vw;
     border-radius: 50%; /* Makes it circular */
     object-fit: cover;
     cursor: pointer;
@@ -59,7 +55,7 @@ ion-content::part(background) {
   .modal-image {
     width: 100%;
     height: auto;
-    max-width: 600px; /* Adjust for modal size */
+    max-width: 600px;
     display: block;
     margin: 0 auto;
     border-radius: 10px;
@@ -70,17 +66,69 @@ ion-content::part(background) {
     font-size: 25px;
     font-weight: bold;
     font-family: Arial, Helvetica, sans-serif;
-    margin-top: 10px; /* Adjust spacing as needed */
-    color: #585858; /* Adjust color to fit your theme */
-
+    margin-top: 10px;
+    color: #585858; 
   }
 
-  .content-container {
-    width: 100%; /* Adjust width as needed */
-    max-width: 600px; /* Prevents it from stretching too wide */
-    margin-top: 15px; /* Space between profile name and accordion */
-    padding: 10px;
-    background-color: #D8D7D4; /* Light background color */
-    border-radius: 10px; /* Rounded corners */
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+
+/* Content Container - Holds the card */
+.card-container {
+  display: flex;
+  justify-content: center; /* Center the card */
+  align-items: center;
+  width: 100%;
+  margin-top: 20px;
+}
+
+/* Styling for the IonCard */
+.ion-card {
+  width: 95%; /* Make it responsive */
+  max-width: 600px; /* Prevent it from stretching too wide */
+  background: #FAF9F6; /* Light background */
+  border-radius: 15px; /* Rounded corners */
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  padding: 15px;
+  transition: transform 0.2s ease-in-out;
+}
+
+.ion-card:hover {
+  transform: scale(1.02); /* Slight hover effect */
+}
+
+/* Center and style the card title */
+.ion-card-title {
+  font-size: 22px;
+  text-align: center;
+  color: #333;
+  font-weight: bold;
+}
+
+/* Subtitle for additional info */
+.ion-card-subtitle {
+  text-align: center;
+  color: #777;
+  font-size: 10px;
+  margin-bottom: 10px;
+}
+
+/* Card Content Styling */
+.ion-card-content {
+  font-size: 12px;
+  color: #444;
+  text-align: center;
+  line-height: 1.5;
+  padding: 10px 15px;
+}
+
+/* Buttons inside the card */
+.card-buttons {
+  display: flex;
+  justify-content: space-around;
+  padding: 5px;
+}
+
+/* Style for each button */
+.card-buttons .ion-button {
+  font-weight: bold;
+  font-size: .5vw;
 }

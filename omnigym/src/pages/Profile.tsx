@@ -1,20 +1,14 @@
-
-/**
- * The Profile page represents users profile on the OmniGym Social App.
- * It uses Ionic components to structure the page layout.
- */
-
-import React, { useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonButton, IonModal, IonButtons, 
-  createAnimation, IonAccordion, IonAccordionGroup, IonItem, IonLabel, IonIcon } from '@ionic/react';
+  createAnimation, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonIcon } from '@ionic/react';
 import { chatbubbleEllipsesOutline } from 'ionicons/icons';
-import ExploreContainer from '../components/ExploreContainer';
 import './Profile.css';
-
 
 const Profile: React.FC = () => {
   const modalEl = useRef<HTMLIonModalElement>(null);
-  const accordionGroup = useRef<null | HTMLIonAccordionGroupElement>(null);
+
+  // State to track which content is displayed in the card
+  const [activeTab, setActiveTab] = useState<'about' | 'stats' | 'info'>('about');
 
   const enterAnimation = (baseEl: HTMLElement) => {
     const root = baseEl.shadowRoot!;
@@ -49,17 +43,6 @@ const Profile: React.FC = () => {
     modalEl.current?.dismiss();
   };
 
-  const toggleAccordion = () => {
-    if (!accordionGroup.current) return;
-    const nativeEl = accordionGroup.current;
-
-    if (nativeEl.value === 'second') {
-      nativeEl.value = undefined;
-    } else {
-      nativeEl.value = 'second';
-    }
-  };
-
   return (
     <IonPage>
       <IonHeader>
@@ -68,6 +51,7 @@ const Profile: React.FC = () => {
         </IonToolbar>
       </IonHeader>
 
+      {/* Top Icons on Profile: short logo and message button */}
       <IonContent className="ion-padding" fullscreen>
         <div className="top-bar">
           <img src="/src/pages/images/DarkGreyLogo.png" alt="logo" className="logo-image" />
@@ -76,8 +60,7 @@ const Profile: React.FC = () => {
           </IonButton>
         </div>
 
-
-        {/* Clickable Profile Image */}
+        {/* Profile Section */}
         <div className="profile-container">
           <img
             src="/src/pages/images/profilepicture.jpg"
@@ -88,7 +71,7 @@ const Profile: React.FC = () => {
           <h1 className="profile-name">Jane Doe</h1>
         </div>
 
-        {/* Modal for Enlarged Image */}
+        {/* Modal for Enlarging Image */}
         <IonModal ref={modalEl} enterAnimation={enterAnimation} leaveAnimation={leaveAnimation}>
           <IonHeader>
             <IonToolbar>
@@ -103,37 +86,42 @@ const Profile: React.FC = () => {
           </IonContent>
         </IonModal>
 
-        {/* Accordion Section */}
-        <div className="content-container">
-          <p>gedgnd</p>
-        <IonAccordionGroup ref={accordionGroup}>
-          <IonAccordion value="first">
-            <IonItem slot="header" color="light">
-              <IonLabel>About Me</IonLabel>
-            </IonItem>
-            <div className="ion-padding" slot="content">
-              First Content
+        {/* Single Card that Changes Content Based on Button Click */}
+        <div className="card-container">
+          <IonCard>
+            {/* Buttons to Switch Between Different Tabs */}
+            <div className="card-buttons">
+              <IonButton fill="clear" onClick={() => setActiveTab('about')}>About</IonButton>
+              <IonButton fill="clear" onClick={() => setActiveTab('stats')}>Stats</IonButton>
+              <IonButton fill="clear" onClick={() => setActiveTab('info')}>Workout Partners</IonButton>
             </div>
-          </IonAccordion>
+            <IonCardHeader>
+              <IonCardTitle className="ion-card-title">
+                {activeTab === 'about' && 'About'}
+                {activeTab === 'stats' && 'Stats'}
+                {activeTab === 'info' && 'Friends'}
+              </IonCardTitle>
+              <IonCardSubtitle className="ion-card-subtitle">
+                {activeTab === 'about' && 'Personal Bio'}
+                {activeTab === 'stats' && 'My Progress'}
+                {activeTab === 'info' && 'Fitness Journey'}
+              </IonCardSubtitle>
+            </IonCardHeader>
 
-          <IonAccordion value="second">
-            <IonItem slot="header" color="light">
-              <IonLabel>Gym Stats</IonLabel>
-            </IonItem>
-            <div className="ion-padding" slot="content">
-              Second Content
-            </div>
-          </IonAccordion>
+            <IonCardContent className="ion-card-content">
+              {activeTab === 'about' && (
+                <p>Hi, I'm Jane! I love fitness and helping others reach their goals.</p>
+              )}
+              {activeTab === 'stats' && (
+                <p>Workouts completed: 120 <br /> Best Lift: 250 lbs Deadlift</p>
+              )}
+              {activeTab === 'info' && (
+                <p>I started my fitness journey 3 years ago and love trying new workouts.</p>
+              )}
+            </IonCardContent>
 
-          <IonAccordion value="third">
-            <IonItem slot="header" color="light">
-              <IonLabel>Third Accordion</IonLabel>
-            </IonItem>
-            <div className="ion-padding" slot="content">
-              Third Content
-            </div>
-          </IonAccordion>
-        </IonAccordionGroup>
+
+          </IonCard>
         </div>
       </IonContent>
     </IonPage>
