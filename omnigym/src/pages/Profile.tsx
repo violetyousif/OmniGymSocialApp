@@ -139,7 +139,7 @@ const Profile: React.FC = () => {
                   <p>Gym Goal:</p><span id="gym-goal">Strength Training</span>
                   <p>PR Song:</p><span id="pr-song">GODDESS by Written by Wolves</span>
                   <p>Favorite Exercise:</p><span id="favorite-exercise">Deadlifts</span>
-                  <p>Wilks 2 Score:</p><span id="wilks 2 score">366</span>
+                  <p>Wilks 2 Score:</p><span id="wilks2-score">366</span>
                 </div>
               )}
               {activeTab === 'stats' && (
