@@ -24,7 +24,7 @@ http://ionicframework.com/docs/theming/ */
             --ion-color-contrast: var(--ion-color-primary) !important;
         }
       } */
-
+/* 
     .ion-color-primary {
         --ion-color-base: #F9A826;
         --ion-color-contrast: #FFFFFF;
@@ -38,4 +38,4 @@ http://ionicframework.com/docs/theming/ */
         --ion-color-contrast-rgb: 255, 255, 255;
         --ion-color-shade: #585858;
         --ion-color-tint: #585858;
-    }
+    } */
