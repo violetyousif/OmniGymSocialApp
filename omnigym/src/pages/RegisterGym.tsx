@@ -1,4 +1,13 @@
 import React, { useState } from "react";
+import axios from "axios";
+interface ValidationResponse {
+  valid: boolean;
+}
+interface RegistrationResponse {
+  success: boolean;
+  message?: string;
+}
+
 import {
   IonPage,
   IonContent,
@@ -22,26 +31,24 @@ import {
   IonToolbar,
   IonTitle,
   IonButtons,
-
 } from "@ionic/react";
 import { useHistory } from "react-router-dom";
 import "./RegisterGym.css";
 import { eye, eyeOff } from "ionicons/icons";
-import termsAndConditions from "./extras/UserAgreement"; // Import Terms from Separate File
-
+import termsAndConditions from "../extras/UserAgreement";
 
 const RegisterGym: React.FC = () => {
   const history = useHistory();
 
   // Form State
-  const [email, setEmail] = useState("");   // TODO: (1.) I added this because "email" wasn't declared anywhere. Not sure where setEmail would be set though.
+  const [email, setEmail] = useState("");
   const [membershipId, setMembershipId] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [birthDate, setBirthDate] = useState<string | null>(null);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [gender, setGender] = useState<string | undefined>();
-  const [showDateModal, setShowDateModal] = useState(false); 
+  const [showDateModal, setShowDateModal] = useState(false);
   const [isTouchedEmail, setIsTouchedEmail] = useState(false);
   const [isValidEmail, setIsValidEmail] = useState<boolean>();
 
@@ -74,19 +81,23 @@ const RegisterGym: React.FC = () => {
     );
   };
 
-  const validGymMembers: Record<string, string[]> = {
-    Planet: ["11223", "22334", "33445"],
-    Golds: ["44556", "55667", "66778"], 
-    LA: ["77889", "88990", "99001"], 
-  };
-
-  const validateMembershipId = (id: string) => {
-    if (selectedGym && validGymMembers[selectedGym]?.includes(id)) {
-        setIsValidMembershipId(true);
-    } else {
-        setIsValidMembershipId(false);
+  const validateMembershipId = async (id: string) => {
+    if (!selectedGym || !id) {
+      setIsValidMembershipId(undefined);
+      return;
     }
-    setMembershipId(id);
+
+    try {
+      const response = await axios.post<ValidationResponse>("http://localhost:5000/api/validate-member", {
+
+        gym_name: selectedGym,
+        member_id: id
+      });
+      setIsValidMembershipId(response.data.valid);
+    } catch (error) {
+      console.error("Validation error:", error);
+      setIsValidMembershipId(false);
+    }
   };
 
   const validatePassword = (password: string) => {
@@ -117,101 +128,44 @@ const RegisterGym: React.FC = () => {
     return cleaned.length === 10;
   };
 
-  const validate = (
-    event: Event,
-    field: "email" | "password" | "phonenumber" | "membershipId" | "gym" | "firstname" | "lastname"
-  ) => {
-    const value = (event.target as HTMLInputElement).value;
-  
-    if (field === "email") {
-      setIsValidEmail(undefined);
-      if (value === "") return;
-      setIsValidEmail(validateEmail(value) !== null);
-    } else if (field === "password") {
-      setIsValidPassword(undefined);
-      if (value === "") return;
-      setIsValidPassword(validatePassword(value));
-    } else if (field === "phonenumber") {
-      setIsValidPhoneNumber(undefined);
-      if (value === "") return;
-      setIsValidPhoneNumber(validatePhoneNumber(value));
-    } else if (field === "firstname") {
-      setIsValidFirstName(undefined);
-      if (value === "") return;
-      setIsValidFirstName(validateName(value));
-    } else if (field === "lastname") {
-      setIsValidLastName(undefined);
-      if (value === "") return;
-      setIsValidLastName(validateName(value));
-    } else if (field === "membershipId") {
-      setMembershipId(value);
-      if (selectedGym && validGymMembers[selectedGym]?.includes(value)) {
-        setIsValidMembershipId(true);
-      } else {
-        setIsValidMembershipId(false);
-      }
-    } else if (field === "gym") {
-      setSelectedGym(value);
-      if (membershipId && validGymMembers[value]?.includes(membershipId)) {
-        setIsValidMembershipId(true);
-      } else {
-        setIsValidMembershipId(false);
-      }
-    }
-  };
-
   const formatPhoneNumber = (value: string) => {
-    // Remove all non-numeric characters
-    let cleaned = value.replace(/\D/g, "").substring(0, 10); 
-    // Apply formatting XXX-XXX-XXXX
+    let cleaned = value.replace(/\D/g, "").substring(0, 10);
     let formatted = cleaned;
     if (cleaned.length > 6) {
       formatted = `${cleaned.slice(0, 3)}-${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
     } else if (cleaned.length > 3) {
       formatted = `${cleaned.slice(0, 3)}-${cleaned.slice(3)}`;
     }
-  
     return formatted;
   };
   
-  
   const validateName = (name: string) => {
-    return !/\d/.test(name); 
+    return !/\d/.test(name);
   };
   
   const validateBirthDate = (date: string | null) => {
     if (!date) return false;
-  
     const today = new Date();
     const birthDate = new Date(date);
     const age = today.getFullYear() - birthDate.getFullYear();
-  
-    // Adjust age if birthday hasn't occurred yet this year
     const isBirthdayPassed = (
       today.getMonth() > birthDate.getMonth() ||
       (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate())
     );
-  
     return isBirthdayPassed ? age >= 18 : age - 1 >= 18;
   };
-  
-    // Sets Terms & Conditions Check
-    const [isTermsChecked, setIsTermsChecked] = useState(false);
-    const [showTermsModal, setShowTermsModal] = useState(false);
 
-  const handleRegister = () => {
-    setIsValidEmail(!!validateEmail(email));    // TODO: (2.) This was mixed with membershipID and email. I think this is where the errors in membershipID and email are coming from.
+  const [isTermsChecked, setIsTermsChecked] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
+
+  const handleRegister = async () => {
     setIsValidPassword(validatePassword(password));
     setIsValidPhoneNumber(validatePhoneNumber(phoneNumber));
     setIsValidFirstName(validateName(firstName));
     setIsValidLastName(validateName(lastName));
     setIsValidBirthDate(validateBirthDate(birthDate));
-    // setIsValidMembershipId(!!validateMembershipId(membershipId)); 
 
-  
-    // Check if all validations pass
     if (
-      !membershipId ||
       !firstName ||
       !lastName ||
       !birthDate ||
@@ -221,25 +175,52 @@ const RegisterGym: React.FC = () => {
       !isValidFirstName ||  
       !isValidLastName ||   
       !gender ||
-      !isValidEmail || 
       !isValidPassword ||
       !selectedGym ||
-      !isTermsChecked ||
-      isValidMembershipId === false
+      !isTermsChecked
     ) {
-      alert("Please fill in all required fields correctly, including a valid Gym and Membership ID!");
+      alert("Please fill in all required fields correctly!");
       return;
     }
 
-    // Show success toast
-    setShowToast(true);
+    try {
+      const validationResponse = await axios.post<ValidationResponse>("http://localhost:5000/api/validate-member", {
 
-    // Redirect to home after 2 seconds
-    setTimeout(() => {
-      history.push("/home");
-    }, 2000);
+        gym_name: selectedGym,
+        member_id: membershipId
+      });
+
+      if (!validationResponse.data.valid) {
+        alert("Invalid membership ID for the selected gym");
+        return;
+      }
+
+      const registrationResponse = await axios.post<RegistrationResponse>("http://localhost:5000/api/register", {
+
+        email: email,
+        password: password,
+        gym_name: selectedGym,
+        member_id: membershipId,
+        first_name: firstName,
+        last_name: lastName,
+        phone_number: phoneNumber,
+        gender: gender,
+        birth_date: birthDate
+      });
+
+      if (registrationResponse.data.success) {
+        setShowToast(true);
+        setTimeout(() => {
+          history.push("/home");
+        }, 2000);
+      } else {
+        alert(registrationResponse.data.message || "Registration failed");
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      alert("An error occurred during registration. Please try again.");
+    }
   };
-  
 
   return (
     <IonPage>
@@ -248,49 +229,54 @@ const RegisterGym: React.FC = () => {
         <div className="centered-container">
           <IonCard className="login-box">
             <IonCardContent>
-            <IonRow className="name-row">
-              {/* GYM Selection */}
-              <IonCol size="6" className="name-col">
-                <IonItem className="faded-label">
-                  <IonSelect
-                    value={selectedGym}
-                    onIonChange={(event) => {
-                      setSelectedGym(event.detail.value);
-                      validateMembershipId(membershipId);
-                    }}
-                    placeholder="Gym"
-                    className="DropdownFont"
-                  >
-                    <IonSelectOption value="Planet">Planet Fitness</IonSelectOption>    {/* Abbreviation for Table: PF */}
-                    <IonSelectOption value="Golds">Gold's Fitness</IonSelectOption>     {/* Abbreviation for Table: GF */}
-                    <IonSelectOption value="LA">Lifetime Fitness</IonSelectOption>    {/* Abbreviation for Table: LF */}
-                  </IonSelect>
-                </IonItem>
-              </IonCol>
-
-              {/* Membership ID Input */}
-              <IonCol size="6" className="name-col FontMember">
-                <IonInput
-                  type="text"
-                  fill="solid"
-                  label="Membership ID *"
-                  labelPlacement="floating"
-                  value={membershipId}
-                  onIonInput={(event) => validateMembershipId(event.detail.value!)}
-                  className={`${isValidMembershipId ? "ion-valid" : isValidMembershipId === false ? "ion-invalid" : ""}`}
-                />
-                {isValidMembershipId && (
-                  <IonLabel color="success" className="success-text">Valid Membership ID</IonLabel>
-                )}
-                {isValidMembershipId === false && (
-                  <IonLabel color="danger" className="error-text">Invalid Membership ID</IonLabel>
-                )}
-              </IonCol>
-            </IonRow>
-
-              {/* Name Row */}
               <IonRow className="name-row">
-                {/* First Name Input */}
+                <IonCol size="6" className="name-col">
+                  <IonItem className="faded-label">
+                    <IonSelect
+                      value={selectedGym}
+                      onIonChange={(event) => {
+                        const gym = event.detail.value;
+                        setSelectedGym(gym);
+                        if (gym && membershipId) {
+                          validateMembershipId(membershipId);
+                        }
+                      }}
+                      placeholder="Gym"
+                      className="DropdownFont"
+                    >
+                      <IonSelectOption value="Planet Fitness">Planet Fitness</IonSelectOption>
+                      <IonSelectOption value="Gold Gym">Gold's Fitness</IonSelectOption>
+                      <IonSelectOption value="Lifetime Fitness">Lifetime Fitness</IonSelectOption>
+                    </IonSelect>
+                  </IonItem>
+                </IonCol>
+
+                <IonCol size="6" className="name-col FontMember">
+                  <IonInput
+                    type="text"
+                    fill="solid"
+                    label="Membership ID *"
+                    labelPlacement="floating"
+                    value={membershipId}
+                    onIonInput={(event) => {
+                      const value = event.detail.value!;
+                      setMembershipId(value);
+                      if (selectedGym && value) {
+                        validateMembershipId(value);
+                      }
+                    }}
+                    className={`${isValidMembershipId ? "ion-valid" : isValidMembershipId === false ? "ion-invalid" : ""}`}
+                  />
+                  {isValidMembershipId && (
+                    <IonLabel color="success" className="success-text">Valid Membership ID</IonLabel>
+                  )}
+                  {isValidMembershipId === false && membershipId && (
+                    <IonLabel color="danger" className="error-text">Invalid Membership ID</IonLabel>
+                  )}
+                </IonCol>
+              </IonRow>
+
+              <IonRow className="name-row">
                 <IonCol size="6" className="name-col">
                   <IonInput
                     type="text"
@@ -301,7 +287,7 @@ const RegisterGym: React.FC = () => {
                     onIonInput={(event) => {
                       const value = event.detail.value!;
                       setFirstName(value);
-                      setIsValidFirstName(/^[A-Za-z\s]+$/.test(value)); 
+                      setIsValidFirstName(/^[A-Za-z\s]+$/.test(value));
                     }}
                     className={`${isValidFirstName ? "ion-valid" : ""} ${isValidFirstName === false ? "ion-invalid" : ""}`}
                   />
@@ -310,7 +296,6 @@ const RegisterGym: React.FC = () => {
                   )}
                 </IonCol>
 
-                {/* Last Name Input */}
                 <IonCol size="6" className="name-col">
                   <IonInput
                     type="text"
@@ -321,7 +306,7 @@ const RegisterGym: React.FC = () => {
                     onIonInput={(event) => {
                       const value = event.detail.value!;
                       setLastName(value);
-                      setIsValidLastName(/^[A-Za-z\s]+$/.test(value)); 
+                      setIsValidLastName(/^[A-Za-z\s]+$/.test(value));
                     }}
                     className={`${isValidLastName ? "ion-valid" : ""} ${isValidLastName === false ? "ion-invalid" : ""}`}
                   />
@@ -331,7 +316,6 @@ const RegisterGym: React.FC = () => {
                 </IonCol>
               </IonRow>
 
-              {/* Phone Number */}
               <IonInput
                 type="tel"
                 fill="solid"
@@ -342,30 +326,29 @@ const RegisterGym: React.FC = () => {
                 onIonInput={(event) => {
                   const formattedNumber = formatPhoneNumber(event.detail.value!);
                   setPhoneNumber(formattedNumber);
-                  validate(event, "phonenumber");
                 }}
                 onIonBlur={() => setIsTouchedPhoneNumber(true)}
                 className={`${isValidPhoneNumber && "ion-valid"} ${isValidPhoneNumber === false && "ion-invalid"} ${isTouchedPhoneNumber && "ion-touched"}`}
                 maxlength={12}
               />
-              {/* Email Input */}
+
               <IonInput
-                className={`${isValidEmail && "ion-valid"} ${
-                  isValidEmail === false && "ion-invalid"
-                } ${isTouchedEmail && "ion-touched"}`}
+                className={`${isValidEmail && "ion-valid"} ${isValidEmail === false && "ion-invalid"} ${isTouchedEmail && "ion-touched"}`}
                 type="email"
                 fill="solid"
                 label="Email *"
                 labelPlacement="floating"
                 errorText="Invalid email"
                 value={email}
-                onIonInput={(event) => validate(event, "email")}    // TODO: (3.) This might be where setEmail should be used?
+                onIonInput={(event) => {
+                  const value = event.detail.value!;
+                  setEmail(value);
+                  setIsValidEmail(!!validateEmail(value));
+                }}
                 onIonBlur={() => setIsTouchedEmail(true)}
               />
 
-              {/* Password Input */}
               <IonItem>
-                
                 <IonInput
                   type={passwordVisible ? "text" : "password"}
                   value={password}
@@ -375,43 +358,42 @@ const RegisterGym: React.FC = () => {
                     const value = e.detail.value!;
                     setPassword(value);
                     validatePassword(value);
-                    setShowValidation(true); 
+                    setShowValidation(true);
                   }}
                   onIonBlur={() => {
-                    setShowValidation(false); 
+                    setShowValidation(false);
                   }}
                 />
                 <IonButton fill="clear" onClick={() => setPasswordVisible(!passwordVisible)}>
                   <IonIcon icon={passwordVisible ? eyeOff : eye} />
                 </IonButton>
-                </IonItem>
+              </IonItem>
 
-                {showValidation && (
-                  <IonCard className="password-checklist">
-                    <IonCardContent>
-                      <p>Password must contain:</p>
-                      <ul>
-                        <li style={{ color: passwordStrength.minLength ? "green" : "red" }}>
-                          {passwordStrength.minLength ? "✔" : "✖"} At least 8 characters
-                        </li>
-                        <li style={{ color: passwordStrength.hasLowercase ? "green" : "red" }}>
-                          {passwordStrength.hasLowercase ? "✔" : "✖"} Lowercase letter (a-z)
-                        </li>
-                        <li style={{ color: passwordStrength.hasUppercase ? "green" : "red" }}>
-                          {passwordStrength.hasUppercase ? "✔" : "✖"} Uppercase letter (A-Z)
-                        </li>
-                        <li style={{ color: passwordStrength.hasNumber ? "green" : "red" }}>
-                          {passwordStrength.hasNumber ? "✔" : "✖"} Number (0-9)
-                        </li>
-                        <li style={{ color: passwordStrength.hasSpecialChar ? "green" : "red" }}>
-                          {passwordStrength.hasSpecialChar ? "✔" : "✖"} Special character (!@#$%^&*)
-                        </li>
-                      </ul>
-                    </IonCardContent>
-                  </IonCard>
-                )}
+              {showValidation && (
+                <IonCard className="password-checklist">
+                  <IonCardContent>
+                    <p>Password must contain:</p>
+                    <ul>
+                      <li style={{ color: passwordStrength.minLength ? "green" : "red" }}>
+                        {passwordStrength.minLength ? "✔" : "✖"} At least 8 characters
+                      </li>
+                      <li style={{ color: passwordStrength.hasLowercase ? "green" : "red" }}>
+                        {passwordStrength.hasLowercase ? "✔" : "✖"} Lowercase letter (a-z)
+                      </li>
+                      <li style={{ color: passwordStrength.hasUppercase ? "green" : "red" }}>
+                        {passwordStrength.hasUppercase ? "✔" : "✖"} Uppercase letter (A-Z)
+                      </li>
+                      <li style={{ color: passwordStrength.hasNumber ? "green" : "red" }}>
+                        {passwordStrength.hasNumber ? "✔" : "✖"} Number (0-9)
+                      </li>
+                      <li style={{ color: passwordStrength.hasSpecialChar ? "green" : "red" }}>
+                        {passwordStrength.hasSpecialChar ? "✔" : "✖"} Special character (!@#$%^&*)
+                      </li>
+                    </ul>
+                  </IonCardContent>
+                </IonCard>
+              )}
 
-              {/* Birthdate Field (Matches IonInput Styles) */}
               <IonItem button onClick={() => setShowDateModal(true)} className="faded-label">
                 <IonLabel className={birthDate ? "floating-label active" : "floating-label"}>Birthdate*</IonLabel>
                 <IonInput value={birthDate ? new Date(birthDate).toLocaleDateString() : ""} readonly />
@@ -423,7 +405,7 @@ const RegisterGym: React.FC = () => {
                   onIonChange={(event) => {
                     const selectedDate = event.detail.value ? String(event.detail.value) : null;
                     setBirthDate(selectedDate);
-                    setIsValidBirthDate(validateBirthDate(selectedDate)); 
+                    setIsValidBirthDate(validateBirthDate(selectedDate));
                     setShowDateModal(false);
                   }}
                 />
@@ -434,7 +416,6 @@ const RegisterGym: React.FC = () => {
                 <IonLabel color="danger" className="error-text">You must be at least 18 years old to sign up.</IonLabel>
               )}
 
-              {/* Gender Selection */}
               <IonItem className="faded-label">
                 <IonLabel className="floating-label">Gender *</IonLabel>
                 <IonSelect
@@ -448,9 +429,6 @@ const RegisterGym: React.FC = () => {
               </IonItem>
             </IonCardContent>
 
-
-
-            {/* Terms & Conditions Checkbox */}
             <div className="terms-checkbox-container">
               <IonCard className="terms-card">
                 <IonCardContent>
@@ -467,7 +445,6 @@ const RegisterGym: React.FC = () => {
               </IonCard>
             </div>
 
-            {/* Terms & Conditions Modal */}
             <IonModal isOpen={showTermsModal} onDidDismiss={() => setShowTermsModal(false)}>
               <IonHeader>
                 <IonToolbar>
@@ -482,7 +459,6 @@ const RegisterGym: React.FC = () => {
               </IonContent>
             </IonModal>
 
-            {/* Submit Button & Sign-in Link */}
             <div className="button-container">
               <IonButton expand="block" className="submit-button" onClick={handleRegister}>
                 Submit
@@ -490,18 +466,17 @@ const RegisterGym: React.FC = () => {
               <IonRouterLink href="/home" className="signin-link">
                 Already have an account? <strong>Sign In</strong>
               </IonRouterLink>
-              </div> 
+            </div>
           </IonCard>
         </div>
 
-          {/* Success Toast Message */}
-          <IonToast
-            isOpen={showToast}
-            onDidDismiss={() => setShowToast(false)}
-            message="Account registered successfully!"
-            duration={2000} 
-            position="top"
-            color="success"
+        <IonToast
+          isOpen={showToast}
+          onDidDismiss={() => setShowToast(false)}
+          message="Account registered successfully!"
+          duration={2000}
+          position="top"
+          color="success"
         />
       </IonContent>
     </IonPage>
