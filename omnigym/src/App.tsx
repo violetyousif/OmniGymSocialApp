@@ -15,7 +15,7 @@ import Profile from './pages/Profile';
 import Routine from './pages/Routine';
 import Settings from './pages/Settings';
 import Home from './pages/Home';  // Import your Home page
-import RegisterGym from './pages/RegisterGym'; // Import the RegisterGym page
+import RegisterGym from './pages/RegisterGym'; // Ensure this path is correct and the file exists
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
