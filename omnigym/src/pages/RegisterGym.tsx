@@ -159,6 +159,7 @@ const RegisterGym: React.FC = () => {
   const [showTermsModal, setShowTermsModal] = useState(false);
 
   const handleRegister = async () => {
+    // setIsValidEmail(validate(email));
     setIsValidPassword(validatePassword(password));
     setIsValidPhoneNumber(validatePhoneNumber(phoneNumber));
     setIsValidFirstName(validateName(firstName));
