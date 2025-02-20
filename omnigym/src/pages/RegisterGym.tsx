@@ -195,6 +195,7 @@ const RegisterGym: React.FC = () => {
         alert("Invalid membership ID for the selected gym");
         return;
       }
+      
 
       const registrationResponse = await axios.post<RegistrationResponse>("http://localhost:5000/api/register", {
 
@@ -461,7 +462,7 @@ const RegisterGym: React.FC = () => {
             </IonModal>
 
             <div className="button-container">
-              <IonButton expand="block" className="submit-button" onClick={handleRegister}>
+              <IonButton expand="block" className="submit-button" onClick={() => history.push("/home")}>
                 Submit
               </IonButton>
               <IonRouterLink href="/home" className="signin-link">
