@@ -102,13 +102,13 @@ _All the following info is required to successfully register or else an error is
      - Technical help (includes contact info)
      - Account help (e.g.: If user changes gyms, they can submit a ticket to change gyms in account)
 
+<br><br><br><br>
 
-## INSTRUCTIONS:
-<br><br>
-# Setting up the environment
+
+## SETUP INSTRUCTIONS:
 This guide will help you download the project, install dependencies, and run the app using Ionic with React. You can compile and view the app on web, Android, and iOS simulators.
 
-## Installation Instructions for OmniGymSocialApp
+## Installing OmniGymSocialApp
 To begin, you will download the github repo and open it in the VSCode or your preferred code editor.
 
 1. **Clone the Repository**
