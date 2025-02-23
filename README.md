@@ -106,69 +106,120 @@ _All the following info is required to successfully register or else an error is
 ## INSTRUCTIONS:
 <br><br>
 # Setting up the environment
-Download the github repo and open it in the VSCode (or your preferred IDE).
-In the terminal, enter the following command:
-cd fullstack
+This guide will help you download the project, install dependencies, and run the app using Ionic with React. You can compile and view the app on web, Android, and iOS simulators.
 
-Reference: https://ionicframework.com/docs/intro/environment
+## Installation Instructions for OmniGymSocialApp
+To begin, you will download the github repo and open it in the VSCode or your preferred code editor.
 
-##Installing Ionic Framework on Your System
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/yourusername/OmniGymSocialApp.git
+   cd OmniGymSocialApp
+   ```
 
-###Step 1: Install Node.js and npm
-Ionic requires Node.js and npm (Node Package Manager) to be installed. To check if they are already installed, run:
+2. **Set Up the Backend**
+   - Navigate to the backend directory:
+     ```bash
+     cd Fullstack/Backend
+     ```
+   - Create a virtual environment (optional but recommended):
+     ```bash
+     python3 -m venv venv
+     source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+     ```
+   - Install the required Python packages:
+     ```bash
+     pip install -r requirements.txt
+     ```
 
-node -v
-npm -v
-If Node.js is not installed, download and install it from Node.js official website.
+3. **Ionic with React Setup Guide**
 
-Alternatively, you can install it using a package manager:
+## Prerequisites
 
-macOS (Homebrew)
-brew install node
-Linux (Ubuntu/Debian)
-sudo apt update && sudo apt install -y nodejs npm
-Windows Download the installer from Node.js official website and follow the installation instructions.
+Before getting started with frontend, please ensure you have the following installed:
 
-###Step 2: Install Ionic CLI and Angular CLI
-Install the Ionic CLI and Angular CLI globally:
+- **Node.js and npm**  
+  Verify installation:
+  ```bash
+  node --version
+  npm --version
 
-npm install -g @ionic/cli @angular/cli
+If not installed, download from [nodejs.org](https://nodejs.org/en).
 
-Verify installation:
+**Ionic Cli**
+   Install the Ionic CLI globally:
+     ```bash
+      npm install -g @ionic/cli
+      ```
+   Verify installation:
+      ```bash
+      ionic --version
+      ```
 
-ionic -v
-ng version
+**Native Development Tools:**
+- Android: Install [Android Studio](https://developer.android.com/studio) (ensure the Android SDK is installed).
+- iOS (Mac only): Install [Xcode](https://developer.apple.com/xcode/) from the Mac App Store.
 
-###Step 3: Install Cordova and Capacitor (For Native Mobile Development)
-To build Android and iOS apps, install Cordova (optional) and Capacitor (required):
+## App Setup
+1. Download the Project if you haven't already.
+   Clone the repository or download the ZIP file from GitHub. Then, open the project in your preferred code editor.
 
-npm install -g cordova
-npm install -g @capacitor/cli
-Verify installation:
+2. Navigate to the App directory:
+   The main application code is located in the omnigym folder. Navigate to this folder:
+      ```bash
+      cd OmniGymSocialApp/omnigym
+      ```
+3. Install dependencies:
+   Install the required packages by running:
+      ```bash
+      npm install
+      ```
 
-cordova -v
-npx cap --version
+## Running the App
+### Web Simulator
+To compile and run the app in your web browser, use:
+      ```bash
+      ionic serve
+      ```
+This command will compile your project and automatically open it in your default browser.
 
-###Step 4: Create a New Ionic Project
-Navigate to your desired directory and create a new Ionic project:
+### Preparing for Native Development (Android & iOS)
+The project uses Capacitor for native builds.
+1. Build the Project
+   Before adding any native platforms, ensure the project is built:
+      ```bash
+      ionic build
+      ```
+2. Add and Sync Native Platforms
+   Android:
+      ```bash
+      ionic capacitor add android
+      ionic capacitor copy android
+      ionic capacitor open android
+      ```
+      The last command will open the Android project in Android Studio, where you can run the app on an emulator or device.
+   iOS (Mac only):
+      ```bash
+      ionic capacitor add ios
+      ionic capacitor copy ios
+      ionic capacitor open ios
+      ```
+      The last command will open the iOS project in Xcode, where you can run the app on the iOS simulator or a connected device.
 
-ionic start myApp blank
-You will be prompted to choose a framework. Select React, Angular, or Vue, based on your preference.
-
-Example for Angular:
-
-ionic start myApp blank --type=angular
-Example for React:
-
-ionic start myApp blank --type=react
-###Step 5: Navigate to the Project Folder
-cd myApp
-###Step 6: Serve the Ionic App
-Run the following command to launch the development server:
-
-ionic serve
-This will open the app in your default web browser.
-
+## Optional: Version Checks and Updates
+- Verify Capacitor Version:
+      ```bash
+      npx cap --version
+      ```
+- Update Ionic CLI and Capacitor:
+      ```bash
+      npm install -g @ionic/cli
+      npm install @capacitor/core @capacitor/cli
+      ```
+## Troubleshooting:
+- Ensure your Node.js and npm versions meet the minimum requirements.
+- Confirm that Android Studio and Xcode are correctly installed and configured.
+- For further assistance, refer to the [Ionic Documentation](https://ionic.io/docs/appflow) and [Ionic Capacitor Documentation](https://ionicframework.com/docs/cli/commands/build).
 <br><br><br><br>
 
 
@@ -256,4 +307,3 @@ _All info is optional here, so allow NULL_
   12. squats_reps
   13. running_time
   14. running_dist
-
