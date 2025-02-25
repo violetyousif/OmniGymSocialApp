@@ -2,8 +2,138 @@
 ### Purpose:
 An app to build a community for its gym members.
 
-## MAIN PAGES
+## WEBSITE LINK
+**To preview website intro in HTML pages:**
+1. Navigate to the _omnigymWebsite_ folder
+2. Right click _iterations1.html_ or _Omni2.html_ depending on purpose.
+   - _Iterations1.html_ will link the iterations to the github and has a tab for the "App Home" (_Omni2.html_). Since the app is mobile-based, we were unable to link the file type directly to the tabs.
 
+   - _Omni2.html_ is the omnigym intro site and will describe omnigym's purpose. (Refer to footnote for terms.)
+<br><br>
+
+## SETUP INSTRUCTIONS
+This guide will help you download the project, install dependencies, and run the app using Ionic with React. You can compile and view the app on web, Android, and iOS simulators.
+
+## Installing OmniGymSocialApp Project
+To begin, you will download the github repo and open it in the VSCode or your preferred code editor.
+
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/yourusername/OmniGymSocialApp.git
+   cd OmniGymSocialApp
+   ```
+
+2. **Set Up the Backend**
+   - Navigate to the backend directory:
+     ```bash
+     cd Fullstack/Backend
+     ```
+   - Create a virtual environment (optional but recommended):
+     ```bash
+     python3 -m venv venv
+     source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+     ```
+   - Install the required Python packages:
+     ```bash
+     pip install -r requirements.txt
+     ```
+
+3. **Ionic with React Setup Guide**
+
+## Prerequisites
+
+Before getting started with frontend, please ensure you have the following installed:
+
+- **Node.js and npm**  
+  Verify installation:<br>
+  ```
+  node --version
+  npm --version
+  ```
+
+If not installed, download from [nodejs.org](https://nodejs.org/en).
+
+- **Ionic Cli** <br>
+   Install the Ionic CLI globally: <br>
+      ```
+         npm install -g @ionic/cli
+      ```
+   <br><br>Verify installation:<br>
+      ```
+         ionic --version
+      ```
+
+**Native Development Tools:**
+- Android: Install [Android Studio](https://developer.android.com/studio) (ensure the Android SDK is installed).
+- iOS (Mac only): Install [Xcode](https://developer.apple.com/xcode/) from the Mac App Store.
+
+## App Setup
+1. Download the Project if you haven't already.
+   Clone the repository or download the ZIP file from GitHub. Then, open the project in your preferred code editor.
+
+2. Navigate to the App directory:
+   The main application code is located in the omnigym folder. Navigate to this folder:
+      ```bash
+      cd OmniGymSocialApp/omnigym
+      ```
+3. Install dependencies:
+   Install the required packages by running:
+      ```bash
+      npm install
+      ```
+
+## Running the App
+### Web Simulator
+To compile and run the app in your web browser, use: <br>
+      ```bash
+      ionic serve
+      ```
+<br>This command will compile your project and automatically open it in your default browser.
+
+### Preparing for Native Development (Android & iOS)
+The project uses Capacitor for native builds.
+1. Build the Project
+   Before adding any native platforms, ensure the project is built:
+      ```bash
+      ionic build
+      ```
+2. Add and Sync Native Platforms
+   Android:
+      ```bash
+      ionic capacitor add android
+      ionic capacitor copy android
+      ionic capacitor open android
+      ```
+      The last command will open the Android project in Android Studio, where you can run the app on an emulator or device.
+   iOS (Mac only):
+      ```bash
+      ionic capacitor add ios
+      ionic capacitor copy ios
+      ionic capacitor open ios
+      ```
+      The last command will open the iOS project in Xcode, where you can run the app on the iOS simulator or a connected device.
+
+## Optional: Version Checks and Updates
+- Verify Capacitor Version:<br>
+      ```
+      npx cap --version
+      ```
+  <br>
+- Update Ionic CLI and Capacitor:<br>
+      ```
+      npm install -g @ionic/cli
+      npm install @capacitor/core @capacitor/cli
+      ```
+  <br>
+## Troubleshooting:
+- Ensure your Node.js and npm versions meet the minimum requirements.
+- Confirm that Android Studio and Xcode are correctly installed and configured.
+- For further assistance, refer to the [Ionic Documentation](https://ionic.io/docs/appflow) and [Ionic Capacitor Documentation](https://ionicframework.com/docs/cli/commands/build).
+<br><br><br><br>
+
+
+
+# OMNIGYM APP PAGES
 ### Login Page:
 1. Enter email
 2. Enter password
@@ -105,124 +235,6 @@ _All the following info is required to successfully register or else an error is
 <br><br><br><br>
 
 
-## SETUP INSTRUCTIONS:
-This guide will help you download the project, install dependencies, and run the app using Ionic with React. You can compile and view the app on web, Android, and iOS simulators.
-
-## Installing OmniGymSocialApp
-To begin, you will download the github repo and open it in the VSCode or your preferred code editor.
-
-1. **Clone the Repository**
-   ```bash
-   git clone https://github.com/yourusername/OmniGymSocialApp.git
-   cd OmniGymSocialApp
-   ```
-
-2. **Set Up the Backend**
-   - Navigate to the backend directory:
-     ```bash
-     cd Fullstack/Backend
-     ```
-   - Create a virtual environment (optional but recommended):
-     ```bash
-     python3 -m venv venv
-     source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-     ```
-   - Install the required Python packages:
-     ```bash
-     pip install -r requirements.txt
-     ```
-
-3. **Ionic with React Setup Guide**
-
-## Prerequisites
-
-Before getting started with frontend, please ensure you have the following installed:
-
-- **Node.js and npm**  
-  Verify installation:
-  ```bash
-  node --version
-  npm --version
-
-If not installed, download from [nodejs.org](https://nodejs.org/en).
-
-**Ionic Cli**
-   Install the Ionic CLI globally:
-     ```bash
-      npm install -g @ionic/cli
-      ```
-   Verify installation:
-      ```bash
-      ionic --version
-      ```
-
-**Native Development Tools:**
-- Android: Install [Android Studio](https://developer.android.com/studio) (ensure the Android SDK is installed).
-- iOS (Mac only): Install [Xcode](https://developer.apple.com/xcode/) from the Mac App Store.
-
-## App Setup
-1. Download the Project if you haven't already.
-   Clone the repository or download the ZIP file from GitHub. Then, open the project in your preferred code editor.
-
-2. Navigate to the App directory:
-   The main application code is located in the omnigym folder. Navigate to this folder:
-      ```bash
-      cd OmniGymSocialApp/omnigym
-      ```
-3. Install dependencies:
-   Install the required packages by running:
-      ```bash
-      npm install
-      ```
-
-## Running the App
-### Web Simulator
-To compile and run the app in your web browser, use:
-      ```bash
-      ionic serve
-      ```
-This command will compile your project and automatically open it in your default browser.
-
-### Preparing for Native Development (Android & iOS)
-The project uses Capacitor for native builds.
-1. Build the Project
-   Before adding any native platforms, ensure the project is built:
-      ```bash
-      ionic build
-      ```
-2. Add and Sync Native Platforms
-   Android:
-      ```bash
-      ionic capacitor add android
-      ionic capacitor copy android
-      ionic capacitor open android
-      ```
-      The last command will open the Android project in Android Studio, where you can run the app on an emulator or device.
-   iOS (Mac only):
-      ```bash
-      ionic capacitor add ios
-      ionic capacitor copy ios
-      ionic capacitor open ios
-      ```
-      The last command will open the iOS project in Xcode, where you can run the app on the iOS simulator or a connected device.
-
-## Optional: Version Checks and Updates
-- Verify Capacitor Version:
-      ```bash
-      npx cap --version
-      ```
-- Update Ionic CLI and Capacitor:
-      ```bash
-      npm install -g @ionic/cli
-      npm install @capacitor/core @capacitor/cli
-      ```
-## Troubleshooting:
-- Ensure your Node.js and npm versions meet the minimum requirements.
-- Confirm that Android Studio and Xcode are correctly installed and configured.
-- For further assistance, refer to the [Ionic Documentation](https://ionic.io/docs/appflow) and [Ionic Capacitor Documentation](https://ionicframework.com/docs/cli/commands/build).
-<br><br><br><br>
-
-
 ## DATA COLLECTION
 ### Data Collected From User Registration (frontend):
 **During Registration:**
@@ -259,7 +271,7 @@ The project uses Capacitor for native builds.
       - Lifting coefficients: Wilk's score https://strengthlevel.com/wilks-calculator#wilksScoreResults
 
 **Note:** <br>
-[Lift Weight + reps] or [time + dist] for PR exercises is necessary when calculating their scores with coefficient formulas.<br>
+[Lift Weight + reps] or [time + dist] for PR exercises is necessary when calculating their Wilks 2 scores with the coefficient formulas.<br>
 Gender and user's weight is also necessary, so "other" or NULL should result in an error.
 
 
