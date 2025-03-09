@@ -1,4 +1,4 @@
-# OmniGymSocialApp
+# Omnigym Social App
 ### Purpose:
 An app to build a community for its gym members.
 
