@@ -52,7 +52,7 @@ const RegisterGym = () => {
     if (validMemberships[selectedGym]?.includes(membershipKey)) {
       console.log("Membership valid:", membershipKey);
       setErrorMessage(""); // Clear error
-      router.push("/(tabs)/auth/RegisterAccount"); 
+      router.push("/auth/RegisterAccount"); 
 
 
     } else {
