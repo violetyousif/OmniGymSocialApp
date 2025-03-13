@@ -83,20 +83,49 @@ const RegisterAccount: React.FC = () => {
 
   // Birthdate Function for handle slicling
   const handleBirthDateChange = (text: string) => {
+    // Remove non-numeric characters and limit to 8 digits (MMDDYYYY)
     const formattedText = text.replace(/[^0-9]/g, "").slice(0, 8);
     let formattedDate = formattedText;
+  
     if (formattedText.length >= 4) {
       formattedDate = formattedText.slice(0, 2) + "/" + formattedText.slice(2, 4) + "/" + formattedText.slice(4);
     } else if (formattedText.length >= 2) {
       formattedDate = formattedText.slice(0, 2) + "/" + formattedText.slice(2);
     }
-
+  
     setBirthDate(formattedDate);
-
-    // Makes sure they are 18>
+  
     if (formattedDate.length === 10) {
+      const [month, day, year] = formattedDate.split("/").map(Number);
+  
+      // Validate month
+      if (month < 1 || month > 12) {
+        alert("Invalid month. Please enter a value between 01 and 12.");
+        setBirthDate("");
+        return;
+      }
+  
+      // Validate year range
+      if (year < 1900 || year > 2099) {
+        alert("Invalid year. Please enter a value between 1900 and 2099.");
+        setBirthDate("");
+        return;
+      }
+  
+      // Days in each month (Leap year handling included)
+      const daysInMonth = new Date(year, month, 0).getDate();
+  
+      // Validate day
+      if (day < 1 || day > daysInMonth) {
+        alert(`Invalid day. ${month}/${year} only has ${daysInMonth} days.`);
+        setBirthDate("");
+        return;
+      }
+  
+      // Validate age (must be at least 18 years old)
       const birthMoment = moment(formattedDate, "MM/DD/YYYY");
-      const age = moment().diff(birthMoment, 'years');
+      const age = moment().diff(birthMoment, "years");
+  
       if (age < 18) {
         alert("You must be at least 18 years old to register.");
         setBirthDate("");
@@ -163,7 +192,7 @@ const RegisterAccount: React.FC = () => {
       gender,
     });
   
-    router.push("/"); // ROUTES TO THE NEXT PAGE
+    router.push("../"); // ROUTES TO THE NEXT PAGE
   };
 
   /**
@@ -181,7 +210,7 @@ const RegisterAccount: React.FC = () => {
       {/* Logo/Title */}
       <View style={styles.container}>
         <Image
-          source={require("../../../assets/images/RegisterAcccountLogo.png")}
+          source={require("../../assets/images/RegisterAcccountLogo.png")}
           style={styles.logo}
         />
 
@@ -308,6 +337,11 @@ const RegisterAccount: React.FC = () => {
         {/* Submit Button */}
         <TouchableOpacity style={styles.button} onPress={handleSubmit}>
           <Text style={styles.buttonText}>Submit</Text>
+        </TouchableOpacity>
+
+        {/* Back Button */}
+        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+          <Text style={styles.backText}>← Previous</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>

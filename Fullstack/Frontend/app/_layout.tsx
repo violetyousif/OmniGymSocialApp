@@ -28,9 +28,24 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'light' ? { ...DarkTheme, colors: { ...DarkTheme.colors, background: 'transparent' } } : { ...DefaultTheme, colors: { ...DefaultTheme.colors, background: 'transparent' } }}>
+    <ThemeProvider
+      value={
+        colorScheme === 'light'
+          ? { ...DarkTheme, colors: { ...DarkTheme.colors, background: 'transparent' } }
+          : { ...DefaultTheme, colors: { ...DefaultTheme.colors, background: 'transparent' } }
+      }
+    >
       <Stack>
+        {/* Hide header for Welcome & Authentication Screens */}
+        <Stack.Screen name="welcome" options={{ headerShown: false }} />
+        <Stack.Screen name="auth" options={{ headerShown: false }} />
+        <Stack.Screen name="auth/RegisterAccount" options={{ headerShown: false }} />
+        <Stack.Screen name="auth/RegisterGym" options={{ headerShown: false }} />
+
+        {/* Bottom Tabs (Main App) */}
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+
+        {/* Not Found Page */}
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="auto" />
