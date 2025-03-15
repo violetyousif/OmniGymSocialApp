@@ -96,7 +96,7 @@ const LoginScreen = () => {
     */
   
     // Temporary front-end test: Redirect to Profile
-    router.replace('/(tabs)/Profile'); 
+    router.replace('/(tabs)/screens/Profile'); 
   };
   
   return (

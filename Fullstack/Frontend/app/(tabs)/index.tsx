@@ -1,32 +1,32 @@
-import React, { useState } from 'react';
-
+import React, { useEffect } from 'react';
 import { 
   StyleSheet, 
   Text, 
   TouchableOpacity, 
   View, 
-  Dimensions, 
+  Image, 
+  Dimensions 
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useNavigation } from '@react-navigation/native';
-import { useEffect } from 'react';
 
-// Get users screen size
-const { width, height } = Dimensions.get('window'); 
+// Get screen size
+const { width } = Dimensions.get('window'); 
 
-const LoginScreen = () => {
+const WelcomeScreen = () => {
   const navigation = useNavigation();
+  const router = useRouter();
 
   useEffect(() => {
     navigation.setOptions({ headerShown: false });
   }, [navigation]);
 
-  const router = useRouter();
-
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>omnigym.</Text>
+      {/* Logo */}
+      <Image source={require('../../assets/images/WelcomeLogo.png')} style={styles.logo} />
 
+      {/* Welcome Text Box */}
       <View style={styles.textBox}>
         <Text style={styles.boldText}>
           Welcome to <Text style={styles.bold}>omnigym.</Text>
@@ -36,52 +36,55 @@ const LoginScreen = () => {
         </Text>
       </View>
 
-      <TouchableOpacity style={styles.button} onPress={() => router.replace('/Login')}>
+      {/* Get Started Button */}
+      <TouchableOpacity style={styles.button} onPress={() => router.replace('/(tabs)/Login')}>
         <Text style={styles.buttonText}>Get started</Text>
       </TouchableOpacity>
     </View>
   );
 };
 
-
+// Styles
 const styles = StyleSheet.create({
-  // Background
   container: {
     flex: 1,
-    backgroundColor: '#333333',
+    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 20,
   },
 
-  // Title
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    color: 'white',
+  // Logo Styling
+  logo: {
+    width: width * 0.9, 
+    height: width * 0.6, 
+    resizeMode: 'contain',
+    marginBottom: 30,
   },
 
-  // Text Box
+  // Welcome Text Box
   textBox: {
     borderWidth: 1,
-    padding: 20,
-    marginBottom: 20,
-    width: '80%',
-    alignItems: 'center',
+    borderColor: '#333',
+    padding: 30,
+    width: '85%',
     backgroundColor: '#fff',
     borderRadius: 10,
+    alignItems: 'center',
+    marginBottom: 20,
   },
 
   // Bold Text
   boldText: {
     fontSize: 18,
     fontWeight: '400',
+    textAlign: 'center',
   },
   bold: {
     fontWeight: 'bold',
   },
 
-  // Subtitle
+  // Subtitle Text
   subtitle: {
     fontSize: 14,
     textAlign: 'center',
@@ -89,13 +92,13 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
 
-  // Button
+  // Get Started Button
   button: {
     backgroundColor: '#EB6841',
     paddingVertical: 15,
-    paddingHorizontal: 50,
+    width: '85%',
+    alignItems: 'center',
     borderRadius: 10,
-    marginTop: 20,
   },
   buttonText: {
     color: '#fff',
@@ -104,5 +107,4 @@ const styles = StyleSheet.create({
   },
 });
 
-
-export default LoginScreen;
+export default WelcomeScreen;

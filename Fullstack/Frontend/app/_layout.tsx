@@ -35,15 +35,15 @@ export default function RootLayout() {
           : { ...DefaultTheme, colors: { ...DefaultTheme.colors, background: 'transparent' } }
       }
     >
-      <Stack>
+      <Stack screenOptions={{ headerShown: false }}>
         {/* Hide header for Welcome & Authentication Screens */}
-        <Stack.Screen name="welcome" options={{ headerShown: false }} />
-        <Stack.Screen name="auth" options={{ headerShown: false }} />
-        <Stack.Screen name="auth/RegisterAccount" options={{ headerShown: false }} />
-        <Stack.Screen name="auth/RegisterGym" options={{ headerShown: false }} />
+        <Stack.Screen name="welcome" />
+        <Stack.Screen name="auth" />
+        <Stack.Screen name="auth/RegisterAccount" />
+        <Stack.Screen name="auth/RegisterGym" />
 
-        {/* Bottom Tabs (Main App) */}
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        {/* ✅ Ensure Bottom Tabs Load After Login */}
+        <Stack.Screen name="(tabs)" />
 
         {/* Not Found Page */}
         <Stack.Screen name="+not-found" />
