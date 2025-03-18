@@ -8,6 +8,17 @@ import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 
+// Import screen components
+// import SplashScreenComponent from './(tabs)/SplashScreen';
+// import WelcomeScreen from './(tabs)/Welcome';
+// import RegisterAccountScreen from './auth/RegisterAccount';
+// import RegisterGymScreen from './auth/RegisterGym';
+// import HomeScreen from './(tabs)/screens/Home';
+// import InboxScreen from './(tabs)/screens/Inbox';
+// import ProfileScreen from './(tabs)/screens/Profile';
+// import SettingsScreen from './(tabs)/screens/Settings';
+// import NotFoundScreen from './+not-found';
+
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
@@ -37,18 +48,40 @@ export default function RootLayout() {
     >
       <Stack screenOptions={{ headerShown: false }}>
         {/* Hide header for Welcome & Authentication Screens */}
-        <Stack.Screen name="welcome" />
-        <Stack.Screen name="auth" />
-        <Stack.Screen name="auth/RegisterAccount" />
-        <Stack.Screen name="auth/RegisterGym" />
+        {/* <Stack.Screen name="/SplashScreen" /> */}
+        <Stack.Screen name="/(tabs)/Welcome" />
+        <Stack.Screen name="/(tabs)/Login" />
+        <Stack.Screen name="/auth/RegisterAccount" />
+        <Stack.Screen name="/auth/RegisterGym" />
 
-        {/* ✅ Ensure Bottom Tabs Load After Login */}
-        <Stack.Screen name="(tabs)" />
+        {/* Ensure Bottom Tabs Load After Login */}
+        <Stack.Screen name="/(tabs)/screens" />
+        {/* <Stack.Screen name="/(tabs)/screens/_layout" />
+        <Stack.Screen name="/(tabs)/screens/Home" />
+        <Stack.Screen name="/(tabs)/screens/Inbox" />
+        <Stack.Screen name="/(tabs)/screens/Profile" />
+        <Stack.Screen name="/(tabs)/screens/Settings" /> */}
 
         {/* Not Found Page */}
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="auto" />
+
+
+        {/* Hide header for Welcome & Authentication Screens 
+        <Stack.Screen name="SplashScreen" component={SplashScreen} />
+        <Stack.Screen name="welcome" />
+        <Stack.Screen name="auth" />
+        <Stack.Screen name="auth/RegisterAccount" />
+        <Stack.Screen name="auth/RegisterGym" />*/}
+
+        {/* ✅ Ensure Bottom Tabs Load After Login 
+        <Stack.Screen name="(tabs)" />*/}
+
+        {/* Not Found Page 
+        <Stack.Screen name="+not-found" />
+      </Stack>
+      <StatusBar style="auto" />*/}
     </ThemeProvider>
   );
 }

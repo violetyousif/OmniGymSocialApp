@@ -19,7 +19,7 @@ import { Ionicons } from "@expo/vector-icons";
    * 
    * 
    * 
-   *  JAVA
+   *  JAVASCRIPT
    * 
    * 
    * 

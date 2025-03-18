@@ -6,6 +6,9 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Picker } from "@react-native-picker/picker";
@@ -19,9 +22,8 @@ const RegisterGym = () => {
 
   // Simulated membership database ---- THIS IS USED FOR THE FRONTEND TESTING
   const validMemberships: Record<string, string[]> = {
-    goldsgym: ["GG112233", "GG445566", "GG778899"],
-    planetfitness: ["PL112233", "PL998877", "PL554433"],
-    anytimefitness: ["AF112233", "AF443322", "AF667788"],
+    lifetimefitness: ["LTF112233", "LTF443322", "LTF667788"],
+    planetfitness: ["PF112233", "PF998877", "PF554433"],
   };
 
   // Function to validate gym membership -- FRONTEND TESTING
@@ -33,9 +35,8 @@ const RegisterGym = () => {
 
     // Map gym name to gym code
     const gymCodeMap: Record<string, string> = {
-      goldsgym: "GG",
-      planetfitness: "PL",
-      anytimefitness: "AF",
+      lifetimefitness: "LTF",
+      planetfitness: "PF",
     };
 
     const gymPrefix = gymCodeMap[selectedGym];
@@ -80,6 +81,7 @@ const RegisterGym = () => {
   };
 
   return (
+
     <View style={styles.container}>
       {/* Logo */}
       <Image
@@ -87,6 +89,7 @@ const RegisterGym = () => {
         style={styles.logo}
       />
 
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       {/* Gym Dropdown */}
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Gym</Text>
@@ -96,14 +99,16 @@ const RegisterGym = () => {
             onValueChange={(itemValue) => setSelectedGym(itemValue)}
             style={styles.picker}
             dropdownIconColor="#333"
+            mode={Platform.OS === "ios" ? "dropdown" : "dialog"} // Force dropdown on iOS
           >
             <Picker.Item label="Select Gym" value="" />
-            <Picker.Item label="Gold's Gym" value="goldsgym" />
+            {/* <Picker.Item label="Gold's Gym" value="goldsgym" /> */}
+            <Picker.Item label="Lifetime Fitness" value="lifetimefitness" />
             <Picker.Item label="Planet Fitness" value="planetfitness" />
-            <Picker.Item label="Anytime Fitness" value="anytimefitness" />
           </Picker>
         </View>
       </View>
+    </TouchableWithoutFeedback>
 
       {/* Membership ID Input */}
       <View style={styles.inputContainer}>
@@ -170,6 +175,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: "white",
     overflow: "hidden",
+    height: 50,
   },
   picker: {
     width: "100%",
