@@ -17,12 +17,16 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from '@react-navigation/native';
 import { useEffect } from 'react';
+import { Platform } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context'; // Safe Area Insets for iOS
+
 
 // Get users screen size
 const { width, height } = Dimensions.get('window'); 
 
 const LoginScreen = () => {
   const navigation = useNavigation();
+  const insets = useSafeAreaInsets(); // Safe Area Handling for iOS
 
   useEffect(() => {
     navigation.setOptions({ headerShown: false });
@@ -105,12 +109,13 @@ const LoginScreen = () => {
 
         {/* Dismiss Keyboard when tapping outside */}
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
 
+          {/* Main Inner Container */}
+          <View style={styles.innerContainer}>
             {/* Large Gradient Circle */}
             <LinearGradient 
               colors={['#E97451', '#8B4513']} 
-              style={[styles.circle, styles.largeCircle]} 
+              style={[styles.circle, { top: insets.top + 20 }]} // Dynamic Safe Area Adjustment
             />
 
             {/* Login Box */}
@@ -157,10 +162,7 @@ const LoginScreen = () => {
               <View style={styles.ButtonStyle}>
                 <Button title="Sign In" color="#ED7446" onPress={handleLogin}/>
               </View>
-              <TouchableOpacity onPress={() => router.push('/auth/RegisterGym')}>
-                <Text style={styles.registerText}>Don't have an account? Register</Text>
-              </TouchableOpacity>
-
+              <Text>Don't have an account? <Text onPress={() => router.push('../auth/RegisterGym')} style={styles.registerText}>Register</Text></Text>
               <TouchableOpacity>
                 <Text style={styles.registerText}>Forgot Password?</Text>
               </TouchableOpacity>
@@ -177,10 +179,20 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#333333',
-    justifyContent: 'center',
+  },
+  innerContainer: {
+    flex: 1,
+    justifyContent: 'flex-start',
     alignItems: 'center',
   },
-
+    // Large Circle
+  circle: {
+    width: width * 1.5,
+    height: width * 1.5,
+    borderRadius: 500,
+    zIndex: 1,
+    marginTop: Platform.OS === 'ios' ? height * 0.04 : height * 0.09, // Adjusted marginTop for iOS and Android
+  },
   // Form Box
   form: {
     width: 320,
@@ -188,9 +200,13 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 20,
     alignItems: 'center',
-    elevation: 5,
+    elevation: 5, // Android shadow
+    shadowColor: '#000', // iOS shadow
+    shadowOffset: { width: 0, height: 2 }, // iOS shadow
+    shadowOpacity: 0.25, // iOS shadow
+    shadowRadius: 3.84, // iOS shadow
     zIndex: 3, 
-    marginTop: 20, 
+    marginTop: Platform.OS === 'ios' ? height * -0.53 : height * -0.56, // Adjusted marginTop for iOS and Android
   },
   // Input Margins
   input: {
@@ -224,19 +240,7 @@ const styles = StyleSheet.create({
     width: '50%',
     alignSelf: 'center',
     marginTop: 10,
-  },
-  // Circle Styles
-  circle: {
-    position: 'absolute',
-    borderRadius: 500, 
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  largeCircle: {
-    width: width * 1.5,
-    height: width * 1.5,
-    top: height * 0.15,
-    zIndex: 1, 
+    marginBottom: 10,
   },
   // Logo above form
   logo: {
@@ -269,7 +273,6 @@ const styles = StyleSheet.create({
     paddingBottom: 0,
     textAlignVertical: "center",
   },
-  
   eyeIcon: {
     position: "absolute",
     right: 10,

@@ -2,7 +2,6 @@ import { Tabs } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 
-
 // THIS IS THE CODE FOR THE NAV HOME, INBOX, PROFILE, ROUTINE, AND SETTINGS
 export default function TabsLayout() {
   return (
@@ -14,7 +13,7 @@ export default function TabsLayout() {
           borderTopWidth: 1,
           borderTopColor: '#ddd',
           height: 60,
-          paddingBottom: 5,
+          paddingBottom: 10,
         },
         tabBarActiveTintColor: '#E97451', 
         tabBarInactiveTintColor: 'gray',
