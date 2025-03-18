@@ -88,27 +88,30 @@ const RegisterGym = () => {
         source={require("../../assets/images/RegisterGymLogo.png")}
         style={styles.logo}
       />
+      {/* Title */}
 
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      {/* Gym Dropdown */}
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Gym</Text>
-        <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={selectedGym}
-            onValueChange={(itemValue) => setSelectedGym(itemValue)}
-            style={styles.picker}
-            dropdownIconColor="#333"
-            mode={Platform.OS === "ios" ? "dropdown" : "dialog"} // Force dropdown on iOS
-          >
-            <Picker.Item label="Select Gym" value="" />
-            {/* <Picker.Item label="Gold's Gym" value="goldsgym" /> */}
-            <Picker.Item label="Lifetime Fitness" value="lifetimefitness" />
-            <Picker.Item label="Planet Fitness" value="planetfitness" />
-          </Picker>
-        </View>
-      </View>
-    </TouchableWithoutFeedback>
+      <Text style={styles.title}>Register Account</Text>
+
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        {/* Gym Dropdown */}
+        {/* <View style={styles.inputContainer}> */}
+          <Text style={styles.label}>Gym</Text>
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={selectedGym}
+              onValueChange={(itemValue) => setSelectedGym(itemValue)}
+              style={styles.picker}
+              dropdownIconColor="#333"
+              mode={Platform.OS === "ios" ? "dropdown" : "dialog"} // Force dropdown on iOS
+            >
+              <Picker.Item label="Select Gym" value="" />
+              {/* <Picker.Item label="Gold's Gym" value="goldsgym" /> */}
+              <Picker.Item label="Lifetime Fitness" value="lifetimefitness" />
+              <Picker.Item label="Planet Fitness" value="planetfitness" />
+            </Picker>
+          </View>
+        {/* </View> */}
+      </TouchableWithoutFeedback>
 
       {/* Membership ID Input */}
       <View style={styles.inputContainer}>
@@ -139,6 +142,7 @@ const RegisterGym = () => {
 };
 
 const styles = StyleSheet.create({
+  // Main Container
   container: {
     flex: 1,
     alignItems: "center",
@@ -146,25 +150,27 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     paddingHorizontal: 20,
   },
+  // Logo Styling
   logo: {
     width: 200,
     height: 200,
     resizeMode: "contain",
     marginBottom: 20,
   },
+  // Title
   title: {
     fontSize: 22,
     fontWeight: "bold",
     marginBottom: 20,
-    color: "#000",
+    color: "#E97451",
   },
   inputContainer: {
     width: "70%",
     marginBottom: 20,
   },
   label: {
-    fontSize: 16,
-    fontWeight: "500",
+    fontSize: 18,
+    fontWeight: 'bold',
     marginBottom: 5,
     color: "#000",
   },
@@ -175,7 +181,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: "white",
     overflow: "hidden",
-    height: 50,
+    height: 80,
   },
   picker: {
     width: "100%",
@@ -210,11 +216,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   backButton: {
+    paddingTop: 40,
     marginTop: 20,
   },
   backText: {
     color: "#000",
-    fontSize: 14,
+    fontSize: 18,
   },
 });
 

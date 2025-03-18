@@ -19,6 +19,8 @@ import { useNavigation } from '@react-navigation/native';
 import { useEffect } from 'react';
 import { Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context'; // Safe Area Insets for iOS
+// import { ThemedText } from '../../components/ThemedText'; // Adjust the import path as necessary
+
 
 
 // Get users screen size
@@ -159,11 +161,12 @@ const LoginScreen = () => {
               )}
 
               {/* Buttons Sign in, Register, Forgot Password */}
-              <View style={styles.ButtonStyle}>
-                <Button title="Sign In" color="#ED7446" onPress={handleLogin}/>
-              </View>
-              <Text>Don't have an account? <Text onPress={() => router.push('../auth/RegisterGym')} style={styles.registerText}>Register</Text></Text>
-              <TouchableOpacity>
+              <TouchableOpacity style={styles.ButtonStyle} onPress={handleLogin}>
+                <Text style={styles.buttonText}>Sign In</Text>
+              </TouchableOpacity>
+              {/* Register and Forgot Password */}
+              <ThemedText>Don't have an account? <Text onPress={() => router.push('../auth/RegisterGym')} style={styles.registerText}>Register </Text></ThemedText>
+                <TouchableOpacity onPress={() => router.push('../auth/ForgotPassword')}>
                 <Text style={styles.registerText}>Forgot Password?</Text>
               </TouchableOpacity>
             </View>
@@ -180,6 +183,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#333333',
   },
+  // Inner Container
   innerContainer: {
     flex: 1,
     justifyContent: 'flex-start',
@@ -206,7 +210,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25, // iOS shadow
     shadowRadius: 3.84, // iOS shadow
     zIndex: 3, 
-    marginTop: Platform.OS === 'ios' ? height * -0.53 : height * -0.56, // Adjusted marginTop for iOS and Android
+    marginTop: Platform.OS === 'ios' ? height * -0.53 : height * -0.58, // Adjusted marginTop for iOS and Android
   },
   // Input Margins
   input: {
@@ -218,38 +222,53 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 10,
     marginBottom: 10,
-    fontSize: 16,
+    fontSize: 18,
   },
   inputError: {
     borderColor: 'red', 
   },
   errorText: {
     color: 'red',
-    fontSize: 14,
+    fontSize: 16,
     alignSelf: 'flex-start',
     marginBottom: 10,
   },
-  // Register and Forgot Password
-  registerText: {
-    color: '#007bff',
-    textAlign: 'center',
-    marginTop: 10,
-  },
   // Button Styling
   ButtonStyle: {
-    width: '50%',
+    backgroundColor: '#ED7446',
+    width: '40%',
     alignSelf: 'center',
+    marginTop: 20,
+    marginBottom: 20,
+    padding: 5,
+    borderRadius: 7,
+    boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.015,
+  },
+  // Button Text
+  buttonText: {
+    color: 'white',
+    fontSize: 18,
+    textAlign: 'center',
+    margin: 5,
+    fontWeight: 'bold',
+  },
+  // Register and Forgot Password
+  registerText: {
+    color: '#ED7446',
+    textAlign: 'center',
     marginTop: 10,
-    marginBottom: 10,
+    marginBottom: 20,
+    fontSize: 18,
   },
   // Logo above form
   logo: {
     width: width * 0.5, 
     height: width * 0.5,
     resizeMode: 'contain', 
-    marginBottom: 20,
   },
-  
+  // Password Styling
   // Password eye
   passwordContainer: {
     flexDirection: "row",
@@ -267,7 +286,7 @@ const styles = StyleSheet.create({
     flex: 1,
     borderWidth: 0,
     backgroundColor: "transparent",
-    fontSize: 16,
+    fontSize: 18,
     height: "100%",
     paddingTop: 8,
     paddingBottom: 0,
