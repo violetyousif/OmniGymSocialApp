@@ -69,7 +69,6 @@ export default function RootLayout() {
 
 
         {/* Hide header for Welcome & Authentication Screens 
-        <Stack.Screen name="SplashScreen" component={SplashScreen} />
         <Stack.Screen name="welcome" />
         <Stack.Screen name="auth" />
         <Stack.Screen name="auth/RegisterAccount" />

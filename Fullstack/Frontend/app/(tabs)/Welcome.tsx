@@ -1,4 +1,4 @@
-
+// Purpose: Welcome screen for the app, displays the logo and a brief description of the app.
 
 import React, { useEffect } from 'react';
 import { 
@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useNavigation } from '@react-navigation/native';
+import { ThemedText } from '../../components/ThemedText'; // Adjust the import path as necessary
 
 // Get screen size
 const { width } = Dimensions.get('window'); 
@@ -30,12 +31,12 @@ const Welcome = () => {
 
       {/* Welcome Text Box */}
       <View style={styles.textBox}>
-        <Text style={styles.boldText}>
+        <Text style={styles.subtitle}>
           Welcome to <Text style={styles.bold}>Omnigym.</Text>
         </Text>
-        <Text style={styles.subtitle}>
+        <ThemedText>
           A place to meet, link, motivate, and create friendly competition with your fellow gym community.
-        </Text>
+        </ThemedText>
       </View>
 
       {/* Get Started Button */}
@@ -54,6 +55,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
+    bottom: -80,
   },
 
   // Logo Styling
@@ -67,13 +69,16 @@ const styles = StyleSheet.create({
   // Welcome Text Box
   textBox: {
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#D8D7D4',
     padding: 30,
     width: '85%',
-    backgroundColor: '#fff',
+    backgroundColor: '#FAF9F6',
     borderRadius: 10,
     alignItems: 'center',
     marginBottom: 20,
+    boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
   },
 
   // Bold Text
@@ -101,6 +106,9 @@ const styles = StyleSheet.create({
     width: '85%',
     alignItems: 'center',
     borderRadius: 10,
+    boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
   },
   buttonText: {
     color: '#fff',
