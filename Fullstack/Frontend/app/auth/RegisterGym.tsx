@@ -11,14 +11,21 @@ import {
   Keyboard,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { Picker } from "@react-native-picker/picker";
+import { SelectList } from "react-native-dropdown-select-list";
 //import { db, doc, getDoc } from "../../firebaseConfig"; // Firebase commented out
 
 const RegisterGym = () => {
   const router = useRouter();
+
   const [selectedGym, setSelectedGym] = useState("");
   const [membershipID, setMembershipID] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
+  // Dropdown list for gyms ---- THIS IS USED FOR THE FRONTEND TESTING
+  const gymList = [
+    {key: "lifetimefitness", value: "Lifetime Fitness"},
+    {key: "planetfitness", value: "Planet Fitness"},
+   ];
 
   // Simulated membership database ---- THIS IS USED FOR THE FRONTEND TESTING
   const validMemberships: Record<string, string[]> = {
@@ -54,14 +61,12 @@ const RegisterGym = () => {
       console.log("Membership valid:", membershipKey);
       setErrorMessage(""); // Clear error
       router.push("/auth/RegisterAccount"); 
-
-
     } else {
       console.log("Invalid Membership:", membershipKey);
-      setErrorMessage("Invalid Member/Gym ID. Please try again.");
+      setErrorMessage("Invalid Gym Member ID. Please try again.");
     }
 
-    // Commented out Firebase database logic  --- GENEREATD LOGIC FROM CHATGPT FOR DATABASE MAKE SURE TO UNCOMMENT THE INMPORT LINE 12
+    // Commented out Firebase database logic  --- GENERATED LOGIC FROM CHATGPT FOR DATABASE MAKE SURE TO UNCOMMENT THE INMPORT LINE 12
     /*
     try {
       const memberRef = doc(db, "memberships", membershipKey);
@@ -85,44 +90,45 @@ const RegisterGym = () => {
     <View style={styles.container}>
       {/* Logo */}
       <Image
-        source={require("../../assets/images/RegisterGymLogo.png")}
+        source={require("../../assets/images/OrangeLogo.png")}
         style={styles.logo}
       />
       {/* Title */}
+      <Text style={styles.title}>
+        Gym Member{"\n"}
+        Verification
+      </Text>
 
-      <Text style={styles.title}>Register Account</Text>
-
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         {/* Gym Dropdown */}
-        {/* <View style={styles.inputContainer}> */}
+        <View style={styles.inputContainer}>
           <Text style={styles.label}>Gym</Text>
-          <View style={styles.pickerContainer}>
-            <Picker
-              selectedValue={selectedGym}
-              onValueChange={(itemValue) => setSelectedGym(itemValue)}
-              style={styles.picker}
-              dropdownIconColor="#333"
-              mode={Platform.OS === "ios" ? "dropdown" : "dialog"} // Force dropdown on iOS
-            >
-              <Picker.Item label="Select Gym" value="" />
-              {/* <Picker.Item label="Gold's Gym" value="goldsgym" /> */}
-              <Picker.Item label="Lifetime Fitness" value="lifetimefitness" />
-              <Picker.Item label="Planet Fitness" value="planetfitness" />
-            </Picker>
-          </View>
-        {/* </View> */}
-      </TouchableWithoutFeedback>
+          <SelectList
+            setSelected={(val: string) => setSelectedGym(val)}
+            data={(gymList as unknown) as {key: string, value: string}[]}
+            save="key"
+            placeholder="Select Gym"
+            boxStyles={{ 
+              borderColor: '#ccc', // border color
+              borderRadius: 8, // border radius
+              height: 50 // height
+            }} 
+            dropdownTextStyles={{ color: '#252422', fontSize: 16 }} // dropdown text color and size
+            inputStyles={{ color: '#252422', fontSize: 16 }} // placeholder text color and size
+          />
+        </View>
 
       {/* Membership ID Input */}
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Membership ID</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter Membership ID"
-          placeholderTextColor="#999"
-          value={membershipID}
-          onChangeText={setMembershipID}
-        />
+          <View style={styles.dropdownContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter Membership ID"
+            placeholderTextColor="#999"
+            value={membershipID}
+            onChangeText={setMembershipID}
+          />
+        </View>
       </View>
 
       {/* Error Message */}
@@ -152,57 +158,59 @@ const styles = StyleSheet.create({
   },
   // Logo Styling
   logo: {
-    width: 200,
-    height: 200,
+    width: 150,
+    height: 150,
     resizeMode: "contain",
     marginBottom: 20,
   },
   // Title
   title: {
-    fontSize: 22,
+    fontSize: 28,
+    textAlign: "center",
     fontWeight: "bold",
     marginBottom: 20,
-    color: "#E97451",
+    color: "#252422",
+    lineHeight: 40,
   },
+  // Input Container
   inputContainer: {
     width: "70%",
     marginBottom: 20,
   },
+  // Labels/input headers
   label: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 5,
     color: "#000",
   },
-  pickerContainer: {
+  // dropdown Container
+  dropdownContainer: {
     width: "100%",
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: '#D8D7D4',
     borderRadius: 8,
-    backgroundColor: "white",
     overflow: "hidden",
-    height: 80,
   },
-  picker: {
-    width: "100%",
-    height: 50,
-    color: "#333",
-  },
+  // Input field
   input: {
     width: "100%",
     height: 50,
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: "#D8D7D4",
     borderRadius: 8,
     paddingHorizontal: 10,
     fontSize: 16,
     color: "#333",
   },
+  // Error Message
   errorText: {
     color: "red",
     fontSize: 14,
     marginBottom: 10,
   },
+  
+  // Submit Button
   button: {
     backgroundColor: "#E97451",
     paddingVertical: 12,
@@ -215,13 +223,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
+
+  // Previous/back Button
   backButton: {
     paddingTop: 40,
     marginTop: 20,
   },
   backText: {
     color: "#000",
-    fontSize: 18,
+    fontSize: 14,
   },
 });
 
