@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   StyleSheet, 
   Text, 
@@ -9,17 +9,18 @@ import {
   Dimensions, 
   Image, 
   Keyboard, 
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
+  Platform
 } from 'react-native';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from '@react-navigation/native';
-import { useEffect } from 'react';
-import { Platform } from 'react-native';
+// import { useEffect } from 'react';
+// import { Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context'; // Safe Area Insets for iOS
-// import { ThemedText } from '../../components/ThemedText'; // Adjust the import path as necessary
+// import ThemedText from '../../components/ThemedText'; // Adjust the import path as necessary
 
 
 
@@ -165,8 +166,8 @@ const LoginScreen = () => {
                 <Text style={styles.buttonText}>Sign In</Text>
               </TouchableOpacity>
               {/* Register and Forgot Password */}
-              <ThemedText>Don't have an account? <Text onPress={() => router.push('../auth/RegisterGym')} style={styles.registerText}>Register </Text></ThemedText>
-                <TouchableOpacity onPress={() => router.push('../auth/ForgotPassword')}>
+              <Text style={styles.default}>Don't have an account? <Text onPress={() => router.push('../auth/RegisterGym')} style={styles.registerText}>Register</Text></Text>
+              <TouchableOpacity>
                 <Text style={styles.registerText}>Forgot Password?</Text>
               </TouchableOpacity>
             </View>
@@ -195,7 +196,7 @@ const styles = StyleSheet.create({
     height: width * 1.5,
     borderRadius: 500,
     zIndex: 1,
-    marginTop: Platform.OS === 'ios' ? height * 0.04 : height * 0.09, // Adjusted marginTop for iOS and Android
+    marginTop: Platform.OS === 'ios' ? height * 0.05 : height * 0.09, // Adjusted marginTop for iOS and Android
   },
   // Form Box
   form: {
@@ -210,14 +211,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25, // iOS shadow
     shadowRadius: 3.84, // iOS shadow
     zIndex: 3, 
-    marginTop: Platform.OS === 'ios' ? height * -0.53 : height * -0.58, // Adjusted marginTop for iOS and Android
+    marginTop: Platform.OS === 'ios' ? height * -0.55 : height * -0.59, // Adjusted marginTop for iOS and Android
   },
   // Input Margins
   input: {
     width: '100%',
     height: 50,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: '#D8D7D4',
     borderRadius: 8,
     paddingHorizontal: 15,
     paddingVertical: 10,
@@ -255,6 +256,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   // Register and Forgot Password
+  default: {
+    fontSize: 18,
+    color: '#252422',
+  },
   registerText: {
     color: '#ED7446',
     textAlign: 'center',
@@ -274,11 +279,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: "#D8D7D4",
     borderRadius: 8,
     backgroundColor: "#fff",
     width: "100%",
-    height: 45,
+    height: 50,
     paddingRight: 40,
     paddingVertical: 0,
   },
