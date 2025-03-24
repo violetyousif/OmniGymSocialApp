@@ -32,11 +32,11 @@ const Welcome = () => {
       {/* Welcome Text Box */}
       <View style={styles.textBox}>
         <Text style={styles.subtitle}>
-          Welcome to <Text style={styles.bold}>Omnigym.</Text>
+          Welcome to <Text style={styles.boldText}>Omnigym.</Text>
         </Text>
-        <ThemedText>
+        <Text>
           A place to meet, link, motivate, and create friendly competition with your fellow gym community.
-        </ThemedText>
+        </Text>
       </View>
 
       {/* Get Started Button */}
@@ -81,13 +81,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
   },
 
+  Text: {
+    fontSize: 18,
+    textAlign: 'center',
+    color: '#585858',
+  },
+
   // Bold Text
   boldText: {
-    fontSize: 18,
-    fontWeight: '400',
-    textAlign: 'center',
-  },
-  bold: {
     fontWeight: 'bold',
   },
 
@@ -97,6 +98,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '585858',
     marginTop: 10,
+    marginVertical: 10,
   },
 
   // Get Started Button
