@@ -17,9 +17,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from '@react-navigation/native';
-// import { useEffect } from 'react';
-// import { Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context'; // Safe Area Insets for iOS
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+
 // import ThemedText from '../../components/ThemedText'; // Adjust the import path as necessary
 
 
@@ -118,7 +118,8 @@ const LoginScreen = () => {
             {/* Large Gradient Circle */}
             <LinearGradient 
               colors={['#E97451', '#8B4513']} 
-              style={[styles.circle, { top: insets.top + 20 }]} // Dynamic Safe Area Adjustment
+              // style={[styles.circle, { top: insets.top + 20 }]} // Dynamic Safe Area Adjustment
+              style={styles.circle}
             />
 
             {/* Login Box */}
@@ -190,29 +191,60 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
   },
-    // Large Circle
-  circle: {
-    width: width * 1.5,
-    height: width * 1.5,
-    borderRadius: 500,
-    zIndex: 1,
-    marginTop: Platform.OS === 'ios' ? height * 0.05 : height * 0.09, // Adjusted marginTop for iOS and Android
-  },
-  // Form Box
-  form: {
-    width: 320,
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 20,
-    alignItems: 'center',
-    elevation: 5, // Android shadow
-    shadowColor: '#000', // iOS shadow
-    shadowOffset: { width: 0, height: 2 }, // iOS shadow
-    shadowOpacity: 0.25, // iOS shadow
-    shadowRadius: 3.84, // iOS shadow
-    zIndex: 3, 
-    marginTop: Platform.OS === 'ios' ? height * -0.55 : height * -0.59, // Adjusted marginTop for iOS and Android
-  },
+// Large Circle
+circle: {
+  width: wp('160%'),
+  height: wp('160%'),
+  borderRadius: wp('90%'),
+  backgroundColor: '#F15A29',
+  position: 'absolute',
+  top: hp('12%'),
+  // left: wp('%'),
+  zIndex: 1,
+},
+
+// Form Box
+form: {
+  width: wp('80%'),
+  backgroundColor: 'white',
+  padding: 20,
+  borderRadius: 20,
+  alignItems: 'center',
+  elevation: 5,
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.25,
+  shadowRadius: 3.84,
+  position: 'absolute',
+  top: hp('19%'),
+  alignSelf: 'center',
+  zIndex: 3,
+},
+  //   // Large Circle
+  // circle: {
+  //   width: width * 1.5,
+  //   height: width * 1.5,
+  //   borderRadius: 500,
+  //   zIndex: 1,
+  //   marginTop: Platform.OS === 'ios' ? height * 0.05 : height * 0.09, // Adjusted marginTop for iOS and Android
+  // },
+  // // Form Box
+  // form: {
+  //   // width: 320,
+  //   width: '80%',
+  //   height: width * 1.3,
+  //   backgroundColor: 'white',
+  //   padding: 20,
+  //   borderRadius: 20,
+  //   alignItems: 'center',
+  //   elevation: 5, // Android shadow
+  //   shadowColor: '#000', // iOS shadow
+  //   shadowOffset: { width: 0, height: 2 }, // iOS shadow
+  //   shadowOpacity: 0.25, // iOS shadow
+  //   shadowRadius: 3.84, // iOS shadow
+  //   zIndex: 3, 
+  //   marginTop: Platform.OS === 'ios' ? height * -0.55 : height * -0.59, // Adjusted marginTop for iOS and Android
+  // },
   // Input Margins
   input: {
     width: '100%',
