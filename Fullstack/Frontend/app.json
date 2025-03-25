@@ -1,0 +1,54 @@
+{
+  "expo": {
+    "name": "omnigym",
+    "description": "An app for linking gym members to their gym community",
+    "slug": "OmnigymSocial",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/OrangeLogo.png",
+    "splash": {
+      "image": "./assets/images/OrangeLogo.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#ffffff"
+    },
+    "scheme": "myapp",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "backgroundColor": "#ffffff"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/OrangeLogo.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/DarkGreyLogo.png"
+    },
+    // "plugins": [
+    //   "expo-router",
+    //   [
+    //     "SplashScreen",
+    //     {
+    //       "ios": {
+    //         "backgroundColor": "#ffffff",
+    //         "image": "./assets/images/OrangeLogo.png",
+    //         "resizeMode": "cover"
+    //       },
+    //       "android": {
+    //         "backgroundColor": "#ffffff",
+    //         "image": "./assets/images/OrangeLogo.png",
+    //         "imageWidth": 150
+    //         }
+    //       }
+    //   ]
+    // ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
