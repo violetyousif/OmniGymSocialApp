@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useNavigation } from '@react-navigation/native';
-import { ThemedText } from '../../components/ThemedText'; // Adjust the import path as necessary
+import { supabase } from '../../lib/supabase'
 
 // Get screen size
 const { width } = Dimensions.get('window'); 

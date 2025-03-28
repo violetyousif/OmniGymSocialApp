@@ -9,6 +9,8 @@ import {
   Dimensions 
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { supabase } from '../../../lib/supabase'
+import { Session } from '@supabase/supabase-js'
 
 const { width, height } = Dimensions.get('window'); 
 

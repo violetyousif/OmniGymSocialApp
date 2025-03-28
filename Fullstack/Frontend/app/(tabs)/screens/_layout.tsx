@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
-
+import { supabase } from '../../../lib/supabase'
 
 // THIS IS THE CODE FOR THE NAV HOME, INBOX, PROFILE, ROUTINE, AND SETTINGS
 export default function TabsLayout() {
