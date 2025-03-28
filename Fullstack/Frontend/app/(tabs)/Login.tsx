@@ -10,7 +10,7 @@ import {
   Image, 
   Keyboard, 
   TouchableWithoutFeedback,
-  Platform
+  Platform,
 } from 'react-native';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -19,9 +19,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context'; // Safe Area Insets for iOS
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-
-// import ThemedText from '../../components/ThemedText'; // Adjust the import path as necessary
-
+import { supabase } from '../../lib/supabase'
 
 
 // Get users screen size
@@ -53,9 +51,9 @@ const LoginScreen = () => {
     );
   };
 
-  // Password Validation (Must be at least 12 characters)
+  // Password Validation (Must be at least8 characters)
   const validatePassword = (password: string) => {
-    return password.length >= 12;
+    return password.length >= 8;
   };
 
   // Handle Email Input Change
@@ -74,38 +72,69 @@ const LoginScreen = () => {
     setIsValidPassword(validatePassword(text));
   };
 
-  const handleLogin = () => {
-    // TODO: Replace with real SQL authentication logic
-    // Example of how SQL authentication might look (Commented Out)
+  // const handleLogin = () => {
+  //   // TODO: Replace with real SQL authentication logic
+  //   // Example of how SQL authentication might look (Commented Out)
+  //   /*
+  //   fetch('https://your-sql-api.com/login', {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: JSON.stringify({
+  //       email,
+  //       password,
+  //     }),
+  //   })
+  //   .then(response => response.json())
+  //   .then(data => {
+  //     if (data.success) {
+  //       router.replace('/(tabs)/Profile');
+  //     } else {
+  //       alert('Invalid login credentials');
+  //     }
+  //   })
+  //   .catch(error => {
+  //     console.error('Error:', error);
+  //   });
+  //   */
+  //   // Temporary front-end test: Redirect to Profile
+  //   router.replace('/(tabs)/screens/Profile'); 
+  // };
+  
+  const handleLogin = async () => {
+    // Mark fields as touched to show errors if needed
+    setIsTouchedEmail(true);
+    setIsTouchedPassword(true);
+  
+    // Validate before making a request
+    const emailIsValid = validateEmail(email);
+    const passwordIsValid = validatePassword(password);
     
-    /*
-    fetch('https://your-sql-api.com/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
+    if (!emailIsValid || !passwordIsValid) {
+      return;
+    }
+  
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
-      }),
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        router.replace('/(tabs)/Profile');
-      } else {
-        alert('Invalid login credentials');
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-    });
-    */
+      });
   
-    // Temporary front-end test: Redirect to Profile
-    router.replace('/(tabs)/screens/Profile'); 
+      if (error) {
+        console.error("Login error:", error.message);
+        alert("Login failed: " + error.message);
+      } else {
+        console.log("Signed in:", data);
+        router.replace('/(tabs)/screens/Profile');    // Navigate after successful login
+      }
+    } catch (err) {
+      console.error("Unexpected login error:", err);
+      alert("Something went wrong. Please try again.");
+    }
   };
   
+
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
@@ -151,7 +180,9 @@ const LoginScreen = () => {
                   secureTextEntry={!isPasswordVisible} // Toggles visibility
                   style={[styles.input, styles.passwordInput]}
                   value={password}
-                  onChangeText={setPassword}
+                  // onChangeText={setPassword}
+                  onChangeText={handlePasswordChange}
+                  onBlur={() => setIsTouchedPassword(true)}
                 />
                 {/* Eye Icon to Toggle Visibility */}
                 <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)} style={styles.eyeIcon}>
@@ -159,7 +190,7 @@ const LoginScreen = () => {
                 </TouchableOpacity>
               </View>
               {isTouchedPassword && isValidPassword === false && (
-                <Text style={styles.errorText}>Password must be at least 12 characters</Text>
+                <Text style={styles.errorText}>Password must be at least 8 characters</Text>
               )}
 
               {/* Buttons Sign in, Register, Forgot Password */}
@@ -220,31 +251,6 @@ form: {
   alignSelf: 'center',
   zIndex: 3,
 },
-  //   // Large Circle
-  // circle: {
-  //   width: width * 1.5,
-  //   height: width * 1.5,
-  //   borderRadius: 500,
-  //   zIndex: 1,
-  //   marginTop: Platform.OS === 'ios' ? height * 0.05 : height * 0.09, // Adjusted marginTop for iOS and Android
-  // },
-  // // Form Box
-  // form: {
-  //   // width: 320,
-  //   width: '80%',
-  //   height: width * 1.3,
-  //   backgroundColor: 'white',
-  //   padding: 20,
-  //   borderRadius: 20,
-  //   alignItems: 'center',
-  //   elevation: 5, // Android shadow
-  //   shadowColor: '#000', // iOS shadow
-  //   shadowOffset: { width: 0, height: 2 }, // iOS shadow
-  //   shadowOpacity: 0.25, // iOS shadow
-  //   shadowRadius: 3.84, // iOS shadow
-  //   zIndex: 3, 
-  //   marginTop: Platform.OS === 'ios' ? height * -0.55 : height * -0.59, // Adjusted marginTop for iOS and Android
-  // },
   // Input Margins
   input: {
     width: '100%',
