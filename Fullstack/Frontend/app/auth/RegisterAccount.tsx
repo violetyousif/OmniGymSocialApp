@@ -17,7 +17,7 @@ import moment from "moment";
 import { Ionicons } from "@expo/vector-icons";
 import { SelectList } from "react-native-dropdown-select-list";
 import TermsModal from "../../components/TermsModal"; // Import the modal component
-
+import { supabase } from '../../lib/supabase'
 
 
   /**

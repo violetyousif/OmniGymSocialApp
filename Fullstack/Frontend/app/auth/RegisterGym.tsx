@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { SelectList } from "react-native-dropdown-select-list";
-//import { db, doc, getDoc } from "../../firebaseConfig"; // Firebase commented out
+import { supabase } from '../../lib/supabase'
 
 const RegisterGym = () => {
   const router = useRouter();

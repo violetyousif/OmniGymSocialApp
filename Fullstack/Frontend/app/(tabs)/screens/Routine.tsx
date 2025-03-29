@@ -1,5 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { supabase } from '../../../lib/supabase'
+import { Session } from '@supabase/supabase-js'
+
 
 const Routine = () => {
   return (
