@@ -6,22 +6,31 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { Picker } from "@react-native-picker/picker";
-//import { db, doc, getDoc } from "../../firebaseConfig"; // Firebase commented out
+import { SelectList } from "react-native-dropdown-select-list";
+import { supabase } from '../../lib/supabase'
 
 const RegisterGym = () => {
   const router = useRouter();
+
   const [selectedGym, setSelectedGym] = useState("");
   const [membershipID, setMembershipID] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
+  // Dropdown list for gyms ---- THIS IS USED FOR THE FRONTEND TESTING
+  const gymList = [
+    {key: "lifetimefitness", value: "Lifetime Fitness"},
+    {key: "planetfitness", value: "Planet Fitness"},
+   ];
+
   // Simulated membership database ---- THIS IS USED FOR THE FRONTEND TESTING
   const validMemberships: Record<string, string[]> = {
-    goldsgym: ["GG112233", "GG445566", "GG778899"],
-    planetfitness: ["PL112233", "PL998877", "PL554433"],
-    anytimefitness: ["AF112233", "AF443322", "AF667788"],
+    lifetimefitness: ["LTF112233", "LTF443322", "LTF667788"],
+    planetfitness: ["PF112233", "PF998877", "PF554433"],
   };
 
   // Function to validate gym membership -- FRONTEND TESTING
@@ -33,9 +42,8 @@ const RegisterGym = () => {
 
     // Map gym name to gym code
     const gymCodeMap: Record<string, string> = {
-      goldsgym: "GG",
-      planetfitness: "PL",
-      anytimefitness: "AF",
+      lifetimefitness: "LTF",
+      planetfitness: "PF",
     };
 
     const gymPrefix = gymCodeMap[selectedGym];
@@ -53,14 +61,12 @@ const RegisterGym = () => {
       console.log("Membership valid:", membershipKey);
       setErrorMessage(""); // Clear error
       router.push("/auth/RegisterAccount"); 
-
-
     } else {
       console.log("Invalid Membership:", membershipKey);
-      setErrorMessage("Invalid Member/Gym ID. Please try again.");
+      setErrorMessage("Invalid Gym Member ID. Please try again.");
     }
 
-    // Commented out Firebase database logic  --- GENEREATD LOGIC FROM CHATGPT FOR DATABASE MAKE SURE TO UNCOMMENT THE INMPORT LINE 12
+    // Commented out Firebase database logic  --- GENERATED LOGIC FROM CHATGPT FOR DATABASE MAKE SURE TO UNCOMMENT THE INMPORT LINE 12
     /*
     try {
       const memberRef = doc(db, "memberships", membershipKey);
@@ -80,41 +86,49 @@ const RegisterGym = () => {
   };
 
   return (
+
     <View style={styles.container}>
       {/* Logo */}
       <Image
-        source={require("../../assets/images/RegisterGymLogo.png")}
+        source={require("../../assets/images/OrangeLogo.png")}
         style={styles.logo}
       />
+      {/* Title */}
+      <Text style={styles.title}>
+        Gym Member{"\n"}
+        Verification
+      </Text>
 
-      {/* Gym Dropdown */}
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Gym</Text>
-        <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={selectedGym}
-            onValueChange={(itemValue) => setSelectedGym(itemValue)}
-            style={styles.picker}
-            dropdownIconColor="#333"
-          >
-            <Picker.Item label="Select Gym" value="" />
-            <Picker.Item label="Gold's Gym" value="goldsgym" />
-            <Picker.Item label="Planet Fitness" value="planetfitness" />
-            <Picker.Item label="Anytime Fitness" value="anytimefitness" />
-          </Picker>
+        {/* Gym Dropdown */}
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Gym</Text>
+          <SelectList
+            setSelected={(val: string) => setSelectedGym(val)}
+            data={(gymList as unknown) as {key: string, value: string}[]}
+            save="key"
+            placeholder="Select Gym"
+            boxStyles={{ 
+              borderColor: '#ccc', // border color
+              borderRadius: 8, // border radius
+              height: 50 // height
+            }} 
+            dropdownTextStyles={{ color: '#252422', fontSize: 16 }} // dropdown text color and size
+            inputStyles={{ color: '#252422', fontSize: 16 }} // placeholder text color and size
+          />
         </View>
-      </View>
 
       {/* Membership ID Input */}
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Membership ID</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter Membership ID"
-          placeholderTextColor="#999"
-          value={membershipID}
-          onChangeText={setMembershipID}
-        />
+          <View style={styles.dropdownContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter Membership ID"
+            placeholderTextColor="#999"
+            value={membershipID}
+            onChangeText={setMembershipID}
+          />
+        </View>
       </View>
 
       {/* Error Message */}
@@ -134,6 +148,7 @@ const RegisterGym = () => {
 };
 
 const styles = StyleSheet.create({
+  // Main Container
   container: {
     flex: 1,
     alignItems: "center",
@@ -141,56 +156,61 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     paddingHorizontal: 20,
   },
+  // Logo Styling
   logo: {
-    width: 200,
-    height: 200,
+    width: 150,
+    height: 150,
     resizeMode: "contain",
     marginBottom: 20,
   },
+  // Title
   title: {
-    fontSize: 22,
+    fontSize: 28,
+    textAlign: "center",
     fontWeight: "bold",
     marginBottom: 20,
-    color: "#000",
+    color: "#252422",
+    lineHeight: 40,
   },
+  // Input Container
   inputContainer: {
     width: "70%",
     marginBottom: 20,
   },
+  // Labels/input headers
   label: {
-    fontSize: 16,
-    fontWeight: "500",
+    fontSize: 18,
+    fontWeight: 'bold',
     marginBottom: 5,
     color: "#000",
   },
-  pickerContainer: {
+  // dropdown Container
+  dropdownContainer: {
     width: "100%",
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: '#D8D7D4',
     borderRadius: 8,
-    backgroundColor: "white",
     overflow: "hidden",
   },
-  picker: {
-    width: "100%",
-    height: 50,
-    color: "#333",
-  },
+  // Input field
   input: {
     width: "100%",
     height: 50,
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: "#D8D7D4",
     borderRadius: 8,
     paddingHorizontal: 10,
     fontSize: 16,
     color: "#333",
   },
+  // Error Message
   errorText: {
     color: "red",
     fontSize: 14,
     marginBottom: 10,
   },
+  
+  // Submit Button
   button: {
     backgroundColor: "#E97451",
     paddingVertical: 12,
@@ -203,7 +223,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
+
+  // Previous/back Button
   backButton: {
+    paddingTop: 40,
     marginTop: 20,
   },
   backText: {

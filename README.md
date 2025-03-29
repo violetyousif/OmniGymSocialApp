@@ -279,132 +279,131 @@ Gender and user's weight is also necessary, so "other" or NULL should result in 
 
 ### Database Tables to Store Data (backend):
 ```
-
 ----------------------------------------------------
 -- ---------------- ALL GYMS: ----------------------
 ----------------------------------------------------
 -- **PURPOSE: Gym support system
 CREATE TABLE OmnigymSupport (
-   ticketID INTEGER PRIMARY KEY AUTOINCREMENT,
+   ticketID SERIAL PRIMARY KEY,
    memberID TEXT NOT NULL,
    gymabbr VARCHAR(3) NOT NULL,
    category TEXT CHECK (category IN ('Feedback', 'Technical Help', 'Account Help')),
    description TEXT NOT NULL,
-   status VARCHAR(15) CHECK (status IN ('Open', 'In Progress', 'Resolved')) DEFAULT 'Open',
+   status VARCHAR(15) CHECK (status IN ('Open', 'In Progress', 'Resolved')) DEFAULT 'Open'
 );
+
 -- **PURPOSE: Stores affiliated gyms and their details
 CREATE TABLE affilGyms (
-    gymID INTEGER PRIMARY KEY AUTOINCREMENT,
-    gymAbbr VARCHAR(3) NOT NULL, -- Shortened gym name (LTF, CF, PF, etc.)
+    gymID SERIAL PRIMARY KEY,
+    gymAbbr VARCHAR(3) NOT NULL,
     gymName VARCHAR(20) NOT NULL,
-    gymCity VARCHAR(20) NOT NULL,  -- Maybe map APIs? Might change to int value
-    gymState VARCHAR(2) NOT NULL -- State/location would be necessary; excludes non-local locations or different owners
+    gymCity VARCHAR(20) NOT NULL,
+    gymState VARCHAR(2) NOT NULL
 );
+
 
 ----------------------------------------------------
 -- --------- GYM-SPECIFIC ADMIN ACCESS -------------
 ----------------------------------------------------
 -- **PURPOSE: Gym-specific events; This will be viewed on events page for each gym-specific user
 CREATE TABLE LTFEvents (
-   eventID INTEGER PRIMARY KEY AUTOINCREMENT,
+   eventID SERIAL PRIMARY KEY,
    gymCity VARCHAR(20),
    eventName VARCHAR(30) NOT NULL,
    eventDate VARCHAR(25),
    eventType VARCHAR(20) CHECK (eventType IN ('Local', 'Gym-Specific')),
    eventLocation VARCHAR(20) NOT NULL,
-   uploadDate DATETIME DEFAULT CURRENT_DATE,
+   uploadDate TIMESTAMP DEFAULT CURRENT_DATE,
    FOREIGN KEY (gymCity) REFERENCES LTFUsers(gymCity)
 );
 
 -- **PURPOSE: Table uploading/updating current active members by admin
 CREATE TABLE LifetimeFitnessDB (
    gymCity VARCHAR(20) NOT NULL,
-   memberID VARCHAR(15) PRIMARY KEY, -- Gym Member ID
+   memberID VARCHAR(15) PRIMARY KEY,
    lastName VARCHAR(20) NOT NULL,
    firstName VARCHAR(20) NOT NULL,
-   uploadDate DATETIME DEFAULT CURRENT_TIMESTAMP -- Date and time of last upload
+   uploadDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-
 ----------------------------------------------------
--- ------------ GYM-SPECIFIC USERS: ----------------
+-- ----- GYM-SPECIFIC USERS (LTF example): ---------
 ----------------------------------------------------
 -- During login, customers will need to be asked affiliated gym again to locate proper database
 -- Then we won't need to have a separate accounts table to locate them each.
 
--- **PURPOSE: Each gym gets a separate table for its members (Example: Lifetime Fitness)
+-- **PURPOSE: Each gym gets a separate table for its members 
 CREATE TABLE LTFUsers (
-   userID INTEGER AUTOINCREMENT,
-   memberID VARCHAR(15) UNIQUE PRIMARY KEY, -- Gym-provided unique membership ID
+   userID SERIAL PRIMARY KEY,
+   memberID VARCHAR(15) UNIQUE NOT NULL,
    gymAbbr VARCHAR(3) NOT NULL,
-   gymCity VARCHAR(20) NOT NULL,	-- this is necessary to use for gym events table and leaderboard
-   lastName VARCHAR(20) NOT NULL,  
+   gymCity VARCHAR(20) NOT NULL,
+   lastName VARCHAR(20) NOT NULL,
    firstName VARCHAR(20) NOT NULL,
    email VARCHAR(30) UNIQUE NOT NULL,
    password VARCHAR(20) NOT NULL,
-   dob VARCHAR(10) NOT NULL, -- Format: mm/dd/yyyy
-   phoneNum VARCHAR(12) NOT NULL, -- "xxx-xxx-xxxx"; may change if input box only accepts integers OR backend removes non-integers
+   dob VARCHAR(10) NOT NULL,
+   phoneNum VARCHAR(12) NOT NULL,
    gender VARCHAR(6) CHECK (gender IN ('Male', 'Female', 'Other')) NOT NULL,
    termsAccepted BOOLEAN DEFAULT FALSE,
    dateJoined DATE DEFAULT CURRENT_DATE,
-   activeAccnt BOOLEAN DEFAULT TRUE -- Marks if user is active in their gym
+   activeAccnt BOOLEAN DEFAULT TRUE
 );
 
-
--- **PURPOSE: Stores user settings per gym
+-- PURPOSE: **PURPOSE: Stores user settings per gym
 CREATE TABLE LTFUserSettings (
-   settingsID INTEGER AUTOINCREMENT,
-   memberID VARCHAR(15) PRIMARY KEY,
-   profilePublic BOOLEAN DEFAULT TRUE, -- Profile visibility
-   caption VARCHAR(50), -- Optional user bio
-   units VARCHAR(8) CHECK (units IN ('Metric', 'Imperial')) DEFAULT 'Imperial', -- Revisit this implementation in 3rd iteration
+   settingsID SERIAL PRIMARY KEY,
+   memberID VARCHAR(15) UNIQUE,
+   profilePublic BOOLEAN DEFAULT TRUE,
+   caption VARCHAR(50),
+   units VARCHAR(8) CHECK (units IN ('Metric', 'Imperial')) DEFAULT 'Imperial',
    fitnessGoal VARCHAR(30),
    age INTEGER,
-   wilks2Score DOUBLE DEFAULT NULL, -- Wilks 2 Score calculated from PRs, age, reps, weight.
-                                    -- Temp: We could link a site for this if we don't have time to implement it yet.
+   wilks2Score DOUBLE PRECISION DEFAULT NULL,
    prSong VARCHAR(50),
-   trophies BOOLEAN DEFAULT TRUE, -- Display trophies
+   trophies BOOLEAN DEFAULT TRUE,
    FOREIGN KEY (memberID) REFERENCES LTFUsers(memberID)
 );
 
 -- **PURPOSE: Stores fitness metrics (can be used eventually for Wilks 2 score)
 CREATE TABLE LTFMemMetrics (
-   metricsID INTEGER AUTOINCREMENT,
+   metricsID SERIAL PRIMARY KEY,
    memberID VARCHAR(15),
    gender VARCHAR(6) CHECK (gender IN ('Male', 'Female')) NOT NULL,
-   memberWeight DOUBLE,
-   height DOUBLE,
-   prBenchWeight DOUBLE,
+   memberWeight DOUBLE PRECISION,
+   height DOUBLE PRECISION,
+   prBenchWeight DOUBLE PRECISION,
    prBenchReps INTEGER,
-   prDeadliftWeight DOUBLE,
+   prDeadliftWeight DOUBLE PRECISION,
    prDeadliftReps INTEGER,
-   prSquatWeight DOUBLE,
+   prSquatWeight DOUBLE PRECISION,
    prSquatReps INTEGER,
-   runningTime VARCHAR(8), -- Format: HH:MM:SS
-   runningDist DOUBLE,
+   runningTime VARCHAR(8),
+   runningDist DOUBLE PRECISION,
    FOREIGN KEY (memberID) REFERENCES LTFUsers(memberID)
 );
 
--- **PURPOSE: Leaderboard for gym-specific competitions. Only approved submissions should be displayed on page.
+-- **PURPOSE: Leaderboard for gym-specific competitions. 
+-- Only approved submissions should be displayed on page.
 CREATE TABLE LTFLeaderboard (
-    leaderboardID INTEGER PRIMARY KEY AUTOINCREMENT,
+    leaderboardID SERIAL PRIMARY KEY,
     memberID VARCHAR(15),
     category VARCHAR(15) CHECK (category IN ('Deadlift', 'Bench Press', 'Squat', 'Running Time')),
-    memberWeight DOUBLE,
-    prWeight DOUBLE,
+    memberWeight DOUBLE PRECISION,
+    prWeight DOUBLE PRECISION,
     prReps INTEGER CHECK (prReps BETWEEN 1 AND 10),
-    submissionDate DATETIME DEFAULT CURRENT_DATE,
-    proofVideo BLOB, -- Optional video proof
-    approved BOOLEAN DEFAULT FALSE, -- Admin approval required for PRs
+    submissionDate DATE DEFAULT CURRENT_DATE,
+    proofVideo BYTEA,
+    approved BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (memberID) REFERENCES LTFUsers(memberID)
 );
 
 -- PURPOSE: Stores archived winners 
 CREATE TABLE LTFArchivedLeaderboards (
-    leaderboardID INTEGER PRIMARY KEY AUTOINCREMENT,
+    leaderboardID SERIAL PRIMARY KEY,
     memberID VARCHAR(15),
     category VARCHAR(15) CHECK (category IN ('Deadlift', 'Bench Press', 'Squat', 'Running Time')),
-    prWeight DOUBLE,
+    prWeight DOUBLE PRECISION,
     prReps INTEGER,
     submissionDate TEXT,
     archivedDate DATE DEFAULT CURRENT_DATE,
@@ -413,8 +412,8 @@ CREATE TABLE LTFArchivedLeaderboards (
 
 -- PURPOSE: Messaging system (Inbox) (research how to create inbox db)
 CREATE TABLE LTFMessages (
-   messageID INTEGER PRIMARY KEY AUTOINCREMENT,
-   senderID TEXT NOT NULL,
+   messageID SERIAL PRIMARY KEY,
+   senderID VARCHAR(15) NOT NULL,
    receiverID VARCHAR(20) NOT NULL,
    messageText TEXT NOT NULL,
    messageDate DATE DEFAULT CURRENT_DATE,
@@ -424,29 +423,26 @@ CREATE TABLE LTFMessages (
 
 -- PURPOSE: Stores workout plans
 CREATE TABLE LTFWorkoutPlans (
-    planID INTEGER PRIMARY KEY AUTOINCREMENT,
+    planID SERIAL PRIMARY KEY,
     memberID VARCHAR(15),
-    title VARCHAR(15) NOT NULL, -- "Back & Bi's", "Upper Body", etc.
-    dayOfWeek VARCHAR(7), 	-- Optional: (Su, M, T, W, Th, F, S)
-    exactDate VARCHAR(10), 	-- Optional: YYYY-MM-DD
+    title VARCHAR(15) NOT NULL,
+    dayOfWeek VARCHAR(7),
+    exactDate VARCHAR(10),
     FOREIGN KEY (memberID) REFERENCES LTFUsers(memberID)
 );
 
 -- PURPOSE: Stores exercises linked to a workout plan
 CREATE TABLE LTFExercises (
-   exerciseID INTEGER PRIMARY KEY AUTOINCREMENT,
+   exerciseID SERIAL PRIMARY KEY,
    planID INTEGER NOT NULL,
    exerciseName VARCHAR(30) NOT NULL,
-   sets INTEGER,	-- For lifting workouts
-   reps INTEGER,	-- For lifting workouts
-   weightAmnt DOUBLE,	-- For lifting workouts
-   duration VARCHAR(8), -- For cardio workouts
-   distance DOUBLE, -- For cardio workouts
+   sets INTEGER,
+   reps INTEGER,
+   weightAmnt DOUBLE PRECISION,
+   duration VARCHAR(8),
+   distance DOUBLE PRECISION,
    FOREIGN KEY (planID) REFERENCES LTFWorkoutPlans(planID)
 );
-
-
-
 
 
 ----------------------------------------------------
@@ -463,7 +459,9 @@ SET activeAccnt = FALSE
 WHERE memberID NOT IN (SELECT memberID FROM LifetimeFitnessDB);
 
 -- **PURPOSE: Backend call when logging user in to verify they are active and credentials are accurate.
-SELECT * FROM LTFUsers WHERE email LIKE ? AND password LIKE ? AND activeAccnt = TRUE;
+SELECT * FROM LTFUsers 
+WHERE email = $1 AND password = $2 AND activeAccnt = TRUE;
+
 ```
 
 

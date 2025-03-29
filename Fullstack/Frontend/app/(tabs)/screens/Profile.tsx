@@ -1,5 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, Button } from 'react-native';
+import { supabase } from '../../../lib/supabase'
+import { Session } from '@supabase/supabase-js'
+
 
 const Profile = () => {
   return (

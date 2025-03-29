@@ -7,19 +7,24 @@ import {
   StyleSheet,
   Image,
   ScrollView,
+  Platform,
+  // Checkbox,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { Picker } from "@react-native-picker/picker";
+// import { Picker } from "@react-native-picker/picker";
 import { Checkbox } from "react-native-paper";
 import moment from "moment";
 import { Ionicons } from "@expo/vector-icons";
+import { SelectList } from "react-native-dropdown-select-list";
+import TermsModal from "../../components/TermsModal"; // Import the modal component
+import { supabase } from '../../lib/supabase'
 
 
   /**
    * 
    * 
    * 
-   *  JAVA
+   *  JAVASCRIPT
    * 
    * 
    * 
@@ -27,16 +32,26 @@ import { Ionicons } from "@expo/vector-icons";
 
 const RegisterAccount: React.FC = () => {
   const router = useRouter();
+
+  // State for modal user agreement visibility
+  const [modalVisible, setModalVisible] = useState(false);
+
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
-  const [birthDate, setBirthDate] = useState<string>("");
+  const [birthDate, setBirthdate] = useState<string>("");
   const [phoneNumber, setPhoneNumber] = useState<string>("");
   const [gender, setGender] = useState<string>("");
   const [agreedToTerms, setAgreedToTerms] = useState<boolean>(false);
   const [showPasswordPopup, setShowPasswordPopup] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
+  const genderList = [
+    {key: 'F', value: "Female"},
+    {key: "M", value: "Male"},
+    {key: "O", value: "Other"},
+   ];
 
   // Validate to make sure it's an email
   const validateEmail = (email: string) => {
@@ -82,7 +97,8 @@ const RegisterAccount: React.FC = () => {
   };
 
   // Birthdate Function for handle slicling
-  const handleBirthDateChange = (text: string) => {
+
+  const handleBirthdateChange = (text: string) => {
     // Remove non-numeric characters and limit to 8 digits (MMDDYYYY)
     const formattedText = text.replace(/[^0-9]/g, "").slice(0, 8);
     let formattedDate = formattedText;
@@ -93,7 +109,7 @@ const RegisterAccount: React.FC = () => {
       formattedDate = formattedText.slice(0, 2) + "/" + formattedText.slice(2);
     }
   
-    setBirthDate(formattedDate);
+    setBirthdate(formattedDate);
   
     if (formattedDate.length === 10) {
       const [month, day, year] = formattedDate.split("/").map(Number);
@@ -101,14 +117,14 @@ const RegisterAccount: React.FC = () => {
       // Validate month
       if (month < 1 || month > 12) {
         alert("Invalid month. Please enter a value between 01 and 12.");
-        setBirthDate("");
+        setBirthdate("");
         return;
       }
   
       // Validate year range
       if (year < 1900 || year > 2099) {
         alert("Invalid year. Please enter a value between 1900 and 2099.");
-        setBirthDate("");
+        setBirthdate("");
         return;
       }
   
@@ -118,7 +134,7 @@ const RegisterAccount: React.FC = () => {
       // Validate day
       if (day < 1 || day > daysInMonth) {
         alert(`Invalid day. ${month}/${year} only has ${daysInMonth} days.`);
-        setBirthDate("");
+        setBirthdate("");
         return;
       }
   
@@ -128,18 +144,22 @@ const RegisterAccount: React.FC = () => {
   
       if (age < 18) {
         alert("You must be at least 18 years old to register.");
-        setBirthDate("");
+        setBirthdate("");
       }
     }
   };
 
-  // Phone Number Function to handle slicing and formate
+  // Phone Number Function to handle slicing and format
   const handlePhoneNumberChange = (text: string) => {
-    const formattedText = text.replace(/[^0-9]/g, "").slice(0, 10);
-    let formattedNum = formattedText;
-    if (formattedText.length >= 4) {
-      formattedNum = formattedText.slice(0, 3) + "-" + formattedText.slice(3, 6) + "-" + formattedText.slice(6);
+    const cleanedText = text.replace(/[^0-9]/g, "").slice(0, 10); // Limit to 10 digits
+    let formattedNum = cleanedText;
+  
+    if (cleanedText.length > 3 && cleanedText.length <= 6) {
+      formattedNum = cleanedText.slice(0, 3) + "-" + cleanedText.slice(3);
+    } else if (cleanedText.length > 6) {
+      formattedNum = cleanedText.slice(0, 3) + "-" + cleanedText.slice(3, 6) + "-" + cleanedText.slice(6);
     }
+  
     setPhoneNumber(formattedNum);
   };
 
@@ -192,7 +212,7 @@ const RegisterAccount: React.FC = () => {
       gender,
     });
   
-    router.push("../"); // ROUTES TO THE NEXT PAGE
+    router.push("../(tabs)/Login"); // ROUTES TO THE NEXT PAGE (Back to login)
   };
 
   /**
@@ -210,9 +230,14 @@ const RegisterAccount: React.FC = () => {
       {/* Logo/Title */}
       <View style={styles.container}>
         <Image
-          source={require("../../assets/images/RegisterAcccountLogo.png")}
-          style={styles.logo}
+        source={require("../../assets/images/OrangeLogo.png")}
+        style={styles.logo}
         />
+
+      {/* Title */}
+      <Text style={styles.title}>
+        Register Account
+      </Text>
 
         {/* Email Input */}
         <Text style={styles.label}>Email</Text>
@@ -221,20 +246,21 @@ const RegisterAccount: React.FC = () => {
           placeholder="your.email@example.com"
           placeholderTextColor="#999"
           value={email}
-          onChangeText={setEmail}
+          onChangeText={(text) => setEmail(text.replace(/\s/g, ""))} // Prevent spaces
           keyboardType="email-address"
           autoCapitalize="none"
         />
 
         {/* Password Input */}
         <Text style={styles.label}>Password</Text>
-        <View style={styles.passwordContainer}>
+        <View style={[styles.passwordContainer, { height: 50 }]}>
           <TextInput
             placeholder="Password"
             secureTextEntry={!isPasswordVisible} // Toggles visibility
-            style={[styles.input, styles.passwordInput]}
+            style={[styles.input, styles.passwordInput, { height: 50 }]}
             value={password}
-            onChangeText={setPassword}
+            // onChangeText={setPassword}
+            onChangeText={(text) => setPassword(text.replace(/\s/g, ""))} // Prevent spaces
             onFocus={() => setShowPasswordPopup(true)}
             onBlur={() => setShowPasswordPopup(false)}
           />
@@ -249,55 +275,41 @@ const RegisterAccount: React.FC = () => {
           <View style={styles.validationContainer}>
             <Text style={styles.validationTitle}>Your password must contain:</Text>
             <Text style={validation.isLongEnough ? styles.valid : styles.invalid}>
-              {validation.isLongEnough ? "✅" : "⚫"} At least 8 characters
+              {validation.isLongEnough ? "✓" : "✕"} At least 8 characters
             </Text>
             <Text style={validation.hasLower ? styles.valid : styles.invalid}>
-              {validation.hasLower ? "✅" : "⚫"} Lowercase letters (a-z)
+              {validation.hasLower ? "✓" : "✕"} Lowercase letters (a-z)
             </Text>
             <Text style={validation.hasUpper ? styles.valid : styles.invalid}>
-              {validation.hasUpper ? "✅" : "⚫"} Uppercase letters (A-Z)
+              {validation.hasUpper ? "✓" : "✕"} Uppercase letters (A-Z)
             </Text>
             <Text style={validation.hasNumber ? styles.valid : styles.invalid}>
-              {validation.hasNumber ? "✅" : "⚫"} Numbers (0-9)
+              {validation.hasNumber ? "✓" : "✕"} Numbers (0-9)
             </Text>
             <Text style={validation.hasSpecial ? styles.valid : styles.invalid}>
-              {validation.hasSpecial ? "✅" : "⚫"} Special characters (!@#$%^&*)
+              {validation.hasSpecial ? "✓" : "✕"} Special characters (!@#$%^&*)
             </Text>
           </View>
         )}
 
         {/* First and Last Name Input Input */}
         <Text style={styles.label}>Name</Text>
-        <View style={styles.nameContainer}>
           <TextInput
-            style={[styles.input, styles.nameInput]}
+            style={styles.input}
             placeholder="First Name"
             placeholderTextColor="#999"
             value={firstName}
             onChangeText={validateFirstName}
           />
           <TextInput
-            style={[styles.input, styles.nameInput]}
+            style={styles.input}
             placeholder="Last Name"
             placeholderTextColor="#999"
             value={lastName}
             onChangeText={validateLastName}
           />
-        </View>
 
-        {/* Birthdate Input */}
-        <Text style={styles.label}>Birth Date (MM/DD/YYYY)</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="MM/DD/YYYY"
-          placeholderTextColor="#999"
-          value={birthDate}
-          onChangeText={handleBirthDateChange}
-          keyboardType="numeric"
-          maxLength={10}
-        />
-
-        {/* Phonenumber Input */}
+        {/* Phone Number Input */}
         <Text style={styles.label}>Phone Number</Text>
         <TextInput
           style={styles.input}
@@ -308,31 +320,86 @@ const RegisterAccount: React.FC = () => {
           keyboardType="phone-pad"
         />
         
-        {/* Gender Select */}
-        <Text style={styles.label}>Gender</Text>
-        <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={gender}
-            onValueChange={(itemValue) => setGender(itemValue)}
-            style={styles.picker}
-            
-          >
-            <Picker.Item label="Select Gender" value="" />
-            <Picker.Item label="Male" value="male" />
-            <Picker.Item label="Female" value="female" />
-            <Picker.Item label="Other" value="other" />
-          </Picker>
+      {/* Shorter Inputs: Birthdate and Gender */}
+        {/* Labels (adding labels first to allow line break) */}
+        <View style={styles.shortContainer}>
+          <Text style={styles.label}>Birthdate</Text>
+          <Text style={[styles.label, styles.shortInput]}>Gender</Text>
+        </View>
+        {/* Birthdate Input */}
+          <View style={styles.shortContainer}>
+          <TextInput
+            style={[styles.input, styles.shortInput]}
+            placeholder="MM/DD/YYYY"
+            placeholderTextColor="#999"
+            value={birthDate}
+            onChangeText={handleBirthdateChange}
+            keyboardType="numeric"
+            maxLength={10}
+          />
+          {/* Gender Select */}
+            <View style={styles.shortInput}>
+            <SelectList
+              setSelected={(val: string) => setGender(val)}
+              data={(genderList as unknown) as {key: string, value: string}[]}
+              save="key"
+              placeholder="Gender"
+              boxStyles={{ 
+              borderColor: '#ccc', // border color
+              borderRadius: 8, // border radius
+              height: 50 // height
+              }} 
+              dropdownTextStyles={{ color: '#252422', fontSize: 16 }} // dropdown text color and size
+              inputStyles={{ color: '#252422', fontSize: 16 }} // placeholder text color and size
+            />
+            </View>
         </View>
         
         {/* Agree to Terms */}
-        <View style={styles.checkboxContainer}>
+        <View style={styles.agrmntContainer}>
+          {/* Terms and Conditions Section */}
+          <View style={styles.termsContainer}>
+            <View style={{ 
+              borderWidth: agreedToTerms ? 0 : 1, 
+              borderColor: Platform.OS === "ios" ? "#585858" : '#fff', 
+              borderRadius: 3, 
+              transform: Platform.OS === "ios"
+              ? [{ scale: agreedToTerms ? 1 : 0.5 }]
+              : [{ scale: 1 }],
+              }}>
+              {/* transform: Platform.OS === "ios" ? [{ scale: 0.5 }] : [{ scale: 1 }] }}> */}
+              <Checkbox
+                status={agreedToTerms ? "checked" : "unchecked"}
+                onPress={() => setAgreedToTerms(!agreedToTerms)}
+                color="#E97451"
+                theme={{
+                  colors: {
+                    accent: "#E97451", // Fill color when checked
+                    text: "#fff",      // Checkmark color
+                  },
+                }}
+              />
+            </View>
+            <Text style={styles.termsText}>
+              I agree to the{" "}
+              <Text style={styles.linkText} onPress={() => setModalVisible(true)}>
+                Terms & Conditions
+              </Text>
+            </Text>
+          </View>
+
+          {/* Terms Modal */}
+          <TermsModal visible={modalVisible} onClose={() => setModalVisible(false)} />
+        </View>
+
+        {/* <View style={styles.checkboxContainer}>
           <Checkbox
             status={agreedToTerms ? "checked" : "unchecked"}
             onPress={() => setAgreedToTerms(!agreedToTerms)}
             color="#E97451"
           />
           <Text style={styles.checkboxLabel}>Agree to terms</Text>
-        </View>
+        </View> */}
 
         {/* Submit Button */}
         <TouchableOpacity style={styles.button} onPress={handleSubmit}>
@@ -377,75 +444,53 @@ const styles = StyleSheet.create({
 
   // Logo styling
   logo: {
-    width: 220,
-    height: 220,
+    width: 80,
+    height: 80,
     resizeMode: "contain",
-    marginBottom: -50,
+    marginTop: Platform.OS === 'ios' ? 50 : 10,
+  },
+
+  // Title
+  title: {
+    fontSize: 28,
+    textAlign: "center",
+    fontWeight: "bold",
+    marginBottom: 20,
+    color: "#252422",
   },
 
   // Labels
   label: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "500",
     alignSelf: "flex-start",
     marginBottom: 3,
     color: "#000",
+    marginTop: 10,
   },
   
   // input 
   input: {
     width: "100%",
-    height: 40,
+    height: 50,
     borderWidth: 1,
     borderColor: "#ccc",
-    borderRadius: 6,
+    borderRadius: 8,
     paddingHorizontal: 10,
-    fontSize: 14,
-    marginBottom: 10,
+    fontSize: 16,
+    marginBottom: 5,
     color: "#333",
   },
 
-  // First and Last name fields
-  nameContainer: {
+  // Short container fields
+  shortContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     width: "100%",
   },
-  nameInput: {
+  shortInput: {
     width: "48%",
-  },
-
-  // Birthdate input field
-  dateInput: {
-    width: "100%",
-    height: 40,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 6,
-    justifyContent: "center",
-    paddingHorizontal: 10,
-    marginBottom: 10,
-    backgroundColor: "#fff",
-  },
-  dateText: {
-    fontSize: 14,
-    color: "#333",
-  },
-  pickerContainer: {
-    width: "100%",
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 6,
-    backgroundColor: "white",
-    overflow: "hidden",
-    marginBottom: 10,
-  },
-  
-  // Gender Picker field
-  picker: {
-    width: "100%",
-    height: 50,
-    color: "#333",
+    textAlign: "left",
   },
 
   // Checkbox
@@ -456,7 +501,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   checkboxLabel: {
-    fontSize: 14,
+    fontSize: 16,
     marginLeft: 6,
   },
 
@@ -465,12 +510,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#E97451",
     paddingVertical: 10,
     paddingHorizontal: 30,
-    borderRadius: 6,
+    borderRadius: 8,
     marginTop: 10,
   },
   buttonText: {
     color: "#fff",
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "bold",
   },
 
@@ -480,7 +525,7 @@ const styles = StyleSheet.create({
   },
   backText: {
     color: "#000",
-    fontSize: 12,
+    fontSize: 14,
   },
 
   // Validation container for password requirements
@@ -525,7 +570,6 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 45,
     paddingRight: 40,
-    paddingVertical: 0,
   },
   passwordInput: {
     flex: 1,
@@ -536,15 +580,35 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     paddingBottom: 0,
     textAlignVertical: "center",
+    marginBottom: 10,
   },
-  
   eyeIcon: {
     position: "absolute",
     right: 10,
     justifyContent: "center",
     alignItems: "center",
   },
-  
+
+  // Terms and Conditions Modal
+  agrmntContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
+  termsContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 20,
+  },
+  termsText: {
+    fontSize: 16,
+    marginLeft: 10,
+  },
+  linkText: {
+    color: "#007bff",
+    textDecorationLine: "underline",
+  },
 });
 
 export default RegisterAccount;

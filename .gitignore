@@ -1,3 +1,6 @@
 .DS_Store
 
 omnigym/src/App2.tsx
+./OmniGymSocialApp/omnigym/
+Fullstack/Backend/.env
+Fullstack/Backend/api/postgresCode.txt

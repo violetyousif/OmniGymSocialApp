@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   StyleSheet, 
   Text, 
@@ -9,20 +9,25 @@ import {
   Dimensions, 
   Image, 
   Keyboard, 
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
+  Platform,
 } from 'react-native';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from '@react-navigation/native';
-import { useEffect } from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context'; // Safe Area Insets for iOS
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import { supabase } from '../../lib/supabase'
+
 
 // Get users screen size
 const { width, height } = Dimensions.get('window'); 
 
 const LoginScreen = () => {
   const navigation = useNavigation();
+  const insets = useSafeAreaInsets(); // Safe Area Handling for iOS
 
   useEffect(() => {
     navigation.setOptions({ headerShown: false });
@@ -46,9 +51,9 @@ const LoginScreen = () => {
     );
   };
 
-  // Password Validation (Must be at least 12 characters)
+  // Password Validation (Must be at least8 characters)
   const validatePassword = (password: string) => {
-    return password.length >= 12;
+    return password.length >= 8;
   };
 
   // Handle Email Input Change
@@ -67,50 +72,83 @@ const LoginScreen = () => {
     setIsValidPassword(validatePassword(text));
   };
 
-  const handleLogin = () => {
-    // TODO: Replace with real SQL authentication logic
-    // Example of how SQL authentication might look (Commented Out)
+  // const handleLogin = () => {
+  //   // TODO: Replace with real SQL authentication logic
+  //   // Example of how SQL authentication might look (Commented Out)
+  //   /*
+  //   fetch('https://your-sql-api.com/login', {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: JSON.stringify({
+  //       email,
+  //       password,
+  //     }),
+  //   })
+  //   .then(response => response.json())
+  //   .then(data => {
+  //     if (data.success) {
+  //       router.replace('/(tabs)/Profile');
+  //     } else {
+  //       alert('Invalid login credentials');
+  //     }
+  //   })
+  //   .catch(error => {
+  //     console.error('Error:', error);
+  //   });
+  //   */
+  //   // Temporary front-end test: Redirect to Profile
+  //   router.replace('/(tabs)/screens/Profile'); 
+  // };
+  
+  const handleLogin = async () => {
+    // Mark fields as touched to show errors if needed
+    setIsTouchedEmail(true);
+    setIsTouchedPassword(true);
+  
+    // Validate before making a request
+    const emailIsValid = validateEmail(email);
+    const passwordIsValid = validatePassword(password);
     
-    /*
-    fetch('https://your-sql-api.com/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
+    if (!emailIsValid || !passwordIsValid) {
+      return;
+    }
+  
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
-      }),
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        router.replace('/(tabs)/Profile');
-      } else {
-        alert('Invalid login credentials');
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-    });
-    */
+      });
   
-    // Temporary front-end test: Redirect to Profile
-    router.replace('/(tabs)/screens/Profile'); 
+      if (error) {
+        console.error("Login error:", error.message);
+        alert("Login failed: " + error.message);
+      } else {
+        console.log("Signed in:", data);
+        router.replace('/(tabs)/screens/Profile');    // Navigate after successful login
+      }
+    } catch (err) {
+      console.error("Unexpected login error:", err);
+      alert("Something went wrong. Please try again.");
+    }
   };
   
+
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
 
         {/* Dismiss Keyboard when tapping outside */}
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
 
+          {/* Main Inner Container */}
+          <View style={styles.innerContainer}>
             {/* Large Gradient Circle */}
             <LinearGradient 
               colors={['#E97451', '#8B4513']} 
-              style={[styles.circle, styles.largeCircle]} 
+              // style={[styles.circle, { top: insets.top + 20 }]} // Dynamic Safe Area Adjustment
+              style={styles.circle}
             />
 
             {/* Login Box */}
@@ -142,7 +180,9 @@ const LoginScreen = () => {
                   secureTextEntry={!isPasswordVisible} // Toggles visibility
                   style={[styles.input, styles.passwordInput]}
                   value={password}
-                  onChangeText={setPassword}
+                  // onChangeText={setPassword}
+                  onChangeText={handlePasswordChange}
+                  onBlur={() => setIsTouchedPassword(true)}
                 />
                 {/* Eye Icon to Toggle Visibility */}
                 <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)} style={styles.eyeIcon}>
@@ -150,17 +190,15 @@ const LoginScreen = () => {
                 </TouchableOpacity>
               </View>
               {isTouchedPassword && isValidPassword === false && (
-                <Text style={styles.errorText}>Password must be at least 12 characters</Text>
+                <Text style={styles.errorText}>Password must be at least 8 characters</Text>
               )}
 
               {/* Buttons Sign in, Register, Forgot Password */}
-              <View style={styles.ButtonStyle}>
-                <Button title="Sign In" color="#ED7446" onPress={handleLogin}/>
-              </View>
-              <TouchableOpacity onPress={() => router.push('/auth/RegisterGym')}>
-                <Text style={styles.registerText}>Don't have an account? Register</Text>
+              <TouchableOpacity style={styles.ButtonStyle} onPress={handleLogin}>
+                <Text style={styles.buttonText}>Sign In</Text>
               </TouchableOpacity>
-
+              {/* Register and Forgot Password */}
+              <Text style={styles.default}>Don't have an account? <Text onPress={() => router.push('../auth/RegisterGym')} style={styles.registerText}>Register</Text></Text>
               <TouchableOpacity>
                 <Text style={styles.registerText}>Forgot Password?</Text>
               </TouchableOpacity>
@@ -177,85 +215,113 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#333333',
-    justifyContent: 'center',
+  },
+  // Inner Container
+  innerContainer: {
+    flex: 1,
+    justifyContent: 'flex-start',
     alignItems: 'center',
   },
+// Large Circle
+circle: {
+  width: wp('160%'),
+  height: wp('160%'),
+  borderRadius: wp('90%'),
+  backgroundColor: '#F15A29',
+  position: 'absolute',
+  top: hp('12%'),
+  // left: wp('%'),
+  zIndex: 1,
+},
 
-  // Form Box
-  form: {
-    width: 320,
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 20,
-    alignItems: 'center',
-    elevation: 5,
-    zIndex: 3, 
-    marginTop: 20, 
-  },
+// Form Box
+form: {
+  width: wp('80%'),
+  backgroundColor: 'white',
+  padding: 20,
+  borderRadius: 20,
+  alignItems: 'center',
+  elevation: 5,
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.25,
+  shadowRadius: 3.84,
+  position: 'absolute',
+  top: hp('19%'),
+  alignSelf: 'center',
+  zIndex: 3,
+},
   // Input Margins
   input: {
     width: '100%',
     height: 50,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: '#D8D7D4',
     borderRadius: 8,
     paddingHorizontal: 15,
     paddingVertical: 10,
     marginBottom: 10,
-    fontSize: 16,
+    fontSize: 18,
   },
   inputError: {
     borderColor: 'red', 
   },
   errorText: {
     color: 'red',
-    fontSize: 14,
+    fontSize: 16,
     alignSelf: 'flex-start',
     marginBottom: 10,
   },
-  // Register and Forgot Password
-  registerText: {
-    color: '#007bff',
-    textAlign: 'center',
-    marginTop: 10,
-  },
   // Button Styling
   ButtonStyle: {
-    width: '50%',
+    backgroundColor: '#ED7446',
+    width: '40%',
     alignSelf: 'center',
+    marginTop: 20,
+    marginBottom: 20,
+    padding: 5,
+    borderRadius: 7,
+    boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.015,
+  },
+  // Button Text
+  buttonText: {
+    color: 'white',
+    fontSize: 18,
+    textAlign: 'center',
+    margin: 5,
+    fontWeight: 'bold',
+  },
+  // Register and Forgot Password
+  default: {
+    fontSize: 18,
+    color: '#252422',
+  },
+  registerText: {
+    color: '#ED7446',
+    textAlign: 'center',
     marginTop: 10,
-  },
-  // Circle Styles
-  circle: {
-    position: 'absolute',
-    borderRadius: 500, 
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  largeCircle: {
-    width: width * 1.5,
-    height: width * 1.5,
-    top: height * 0.15,
-    zIndex: 1, 
+    marginBottom: 20,
+    fontSize: 18,
   },
   // Logo above form
   logo: {
     width: width * 0.5, 
     height: width * 0.5,
     resizeMode: 'contain', 
-    marginBottom: 20,
   },
-  
+  // Password Styling
   // Password eye
   passwordContainer: {
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: "#D8D7D4",
     borderRadius: 8,
     backgroundColor: "#fff",
     width: "100%",
-    height: 45,
+    height: 50,
     paddingRight: 40,
     paddingVertical: 0,
   },
@@ -263,13 +329,12 @@ const styles = StyleSheet.create({
     flex: 1,
     borderWidth: 0,
     backgroundColor: "transparent",
-    fontSize: 16,
+    fontSize: 18,
     height: "100%",
     paddingTop: 8,
     paddingBottom: 0,
     textAlignVertical: "center",
   },
-  
   eyeIcon: {
     position: "absolute",
     right: 10,
