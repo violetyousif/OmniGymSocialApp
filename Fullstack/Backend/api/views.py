@@ -1,49 +1,53 @@
-from django.shortcuts import render
+# This file defines the API views for handling frontend requests using real Supabase data.
 
-# PURPOSE: Control what data gets sent/received and create the views here
-from rest_framework import viewsets
-from .models import Item
-from .serializers import ItemSerializer
-
-# PURPOSE: Handles user registration and login
-
-from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth import authenticate
-from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from rest_framework.response import Response
 from rest_framework import status
-from .models import User
-from .serializers import UserSerializer
+from django.utils import timezone  # ✅ Added to set uploadDate
+from .models.pf_models import PFUser  # ✅ PFUsers model
+from .models import PlanetFitnessDB   # ✅ PlanetFitnessDB now correctly imported
+from .serializers import PFUserSerializer
+
+@api_view(['POST'])
+def register_pf_user(request):
+    """
+    Handles POST requests to register a new PFUser into the Supabase PFUsers table.
+    """
+    data = request.data
+
+    # Step 1: Ensure PlanetFitnessDB has this member first (FK requirement)
+    member_exists = PlanetFitnessDB.objects.filter(
+        memberID=data.get('memberID'),
+        gymAbbr=data.get('gymAbbr'),
+        gymCity=data.get('gymCity'),
+        gymState=data.get('gymState')
+    ).exists()
+
+    if not member_exists:
+        # Create the minimal matching record in PlanetFitnessDB
+        PlanetFitnessDB.objects.create(
+            memberID=data.get('memberID'),
+            gymAbbr=data.get('gymAbbr'),
+            gymCity=data.get('gymCity'),
+            gymState=data.get('gymState'),
+            firstName=data.get('firstName'),
+            lastName=data.get('lastName'),
+            uploadDate=timezone.now()  # ✅ Fix: Add missing timestamp
+        )
+
+    # Step 2: Proceed with inserting into PFUsers
+    serializer = PFUserSerializer(data=data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response({"message": "PFUser created successfully!"}, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ItemViewSet(viewsets.ModelViewSet):
-    queryset = Item.objects.all()
-    serializer_class = ItemSerializer
-
-    @api_view(['POST'])
-    def register_user(request):
-        """Handles user registration"""
-        serializer = UserSerializer(data=request.data)  # Ensure UserSerializer is imported
-
-        if serializer.is_valid():
-            serializer.save()
-            return Response({"message": "User registered successfully!"}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    @api_view(['POST'])
-    def login_user(request):
-        """Handles user login and returns a JWT token"""
-        email = request.data.get('email')
-        password = request.data.get('password')
-
-        user = authenticate(email=email, password=password)
-
-        if user:
-            refresh = RefreshToken.for_user(user)
-            return Response({
-                "message": "Login successful!",
-                "access_token": str(refresh.access_token),
-                "refresh_token": str(refresh),
-            }, status=status.HTTP_200_OK)
-
-        return Response({"error": "Invalid email or password"}, status=status.HTTP_400_BAD_REQUEST)
+@api_view(['GET'])
+def list_pf_users(request):
+    """
+    Returns a list of all Planet Fitness users in the PFUsers table.
+    """
+    users = PFUser.objects.all()
+    serializer = PFUserSerializer(users, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)

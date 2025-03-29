@@ -1,5 +1,4 @@
 from django.db import models
-
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import RegexValidator
@@ -12,10 +11,11 @@ from django.utils import timezone
 class Item(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField()
-    
+
     def __str__(self):
         return self.name
-    
+
+
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         """Create and return a regular user with an email and password."""
@@ -37,15 +37,16 @@ class CustomUserManager(BaseUserManager):
 
         return self.create_user(email, password, **extra_fields)
 
+
 class User(AbstractBaseUser, PermissionsMixin):
     """Custom User model with gym-related fields."""
-    
+
     # Required fields
     email = models.EmailField(unique=True, max_length=255)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     birthdate = models.DateField()
-    
+
     # Phone number validation: must be in format XXX-XXX-XXXX
     phone_number = models.CharField(
         max_length=12,
@@ -75,4 +76,20 @@ class User(AbstractBaseUser, PermissionsMixin):
     def clean(self):
         """Additional validations"""
         if self.birthdate >= timezone.now().date():
-            raise ValidationError(_("Birthdate must be in the past."))   
+            raise ValidationError(_("Birthdate must be in the past."))
+
+
+# ✅ Represents the PlanetFitnessDB table (used as a foreign key source for PFUsers)
+class PlanetFitnessDB(models.Model):
+    databaseID = models.AutoField(primary_key=True)
+    gymCity = models.CharField(max_length=255)
+    gymAbbr = models.CharField(max_length=10)
+    memberID = models.CharField(max_length=255)
+    lastName = models.CharField(max_length=255)
+    firstName = models.CharField(max_length=255)
+    uploadDate = models.DateTimeField(auto_now_add=True)
+    gymState = models.CharField(max_length=255)
+
+    class Meta:
+        db_table = 'PlanetFitnessDB'  # Match the exact table name in Supabase
+        managed = False  # ⚠️ Prevent Django from modifying this Supabase-managed table

@@ -1,7 +1,6 @@
 from django.contrib import admin
-from .models import Item
+from .models.pf_models import PFUser, PlanetFitnessDB  # ✅ Corrected import path
 
-# Register your models here.
-
-# Register the Item model with the Django admin site
-admin.site.register(Item)
+# ✅ Register both models for visibility in admin panel (optional)
+admin.site.register(PFUser)
+admin.site.register(PlanetFitnessDB)

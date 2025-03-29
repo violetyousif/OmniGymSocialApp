@@ -24,6 +24,7 @@ from django.conf.urls.static import static
 # Main project-level router URL configuration
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('api.urls')),
-    path('api/', include('auth_app.urls')),  # Include authentication URLs
+    path('api/', include('api.urls')),  # Only include this for now
+    # path('api/', include('auth_app.urls')),  # Commented out for later
 ]
+

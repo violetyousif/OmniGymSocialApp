@@ -1,25 +1,31 @@
+# api/serializers.py
+
 from rest_framework import serializers
-from .models import Item
-from .models import User
+from .models import PFUser  # ✅ Planet Fitness User model (already connected to Supabase)
 
-# PURPOSE: This tells Django REST Framework how to convert the Item model to JSON and back.
-class ItemSerializer(serializers.ModelSerializer):
+# PURPOSE: Serializes PFUser model (Planet Fitness users) for reading/writing to Supabase
+class PFUserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Item
+        model = PFUser
         fields = '__all__'
-
-
-# PURPOSE: Serializes the User model for registration and login
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['email', 'first_name', 'last_name', 'birthdate', 'phone_number', 'membership_id', 'gym_abbr', 'gym_city', 'password']
         extra_kwargs = {
-            'password': {'write_only': True}
+            'password': {'write_only': True}  # 🔒 Hide password in API responses
         }
 
-    def create(self, validated_data):
-        user = User(**validated_data)
-        user.set_password(validated_data['password'])  # Hash the password
-        user.save()
-        return user
+    def validate_email(self, value):
+        # ✅ Validate proper email formatting
+        if '@' not in value or '.' not in value:
+            raise serializers.ValidationError("Enter a valid email address.")
+        return value
+
+    def validate_password(self, value):
+        # ✅ Enforce strong password requirements
+        if len(value) < 10 \
+           or not any(c.isupper() for c in value) \
+           or not any(c.islower() for c in value) \
+           or not any(c.isdigit() for c in value) \
+           or not any(not c.isalnum() for c in value):
+            raise serializers.ValidationError(
+                "Password must be at least 10 characters and include uppercase, lowercase, number, and symbol."
+            )
+        return value
