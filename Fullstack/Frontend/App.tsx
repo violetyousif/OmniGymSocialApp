@@ -7,16 +7,15 @@ import { View } from 'react-native';
 import { supabase } from './lib/supabase';
 import { Session } from '@supabase/supabase-js';
 
-import LoginScreen from './app/(tabs)/Login'; // 👈 Import your custom Login page
-import RootLayout from './app/_layout';     // Your main app layout
+import LoginScreen from './app/(tabs)/Login'; // Import Login page
+import RootLayout from './app/_layout';     // Main app layout
 
 
 export default function App() {
-  const [loaded] = useFonts({
-    SpaceMono: require('./assets/fonts/SpaceMono-Regular.ttf'),
-  });
 
+  const [loaded] = useFonts({ SpaceMono: require('./assets/fonts/SpaceMono-Regular.ttf'),});
   const [session, setSession] = useState<Session | null>(null);
+  const [todos, setTodos] = useState<any[]>([]);
 
   useEffect(() => {
     // Check session on mount
@@ -24,7 +23,7 @@ export default function App() {
       setSession(session);
     });
 
-    // Subscribe to session updates (login/logout)
+    // Allow session updates (login/logout)
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
@@ -37,12 +36,36 @@ export default function App() {
 
   if (!loaded) return null;
 
+  useEffect(() => {
+    const getTodos = async () => {
+      try {
+        const { data: todos, error } = await supabase.from('todos').select();
+
+        if (error) {
+          console.error('Error fetching todos:', (error as Error).message);
+          return;
+        }
+
+        if (todos && todos.length > 0) {
+          setTodos(todos);
+        }
+      } catch (error) {
+        console.error('Error fetching todos:', (error as Error).message);
+      }
+    };
+
+    getTodos();
+  }, []);
+
+
   return (
     <NavigationContainer>
       {/* If logged in, show the main app; otherwise, show login */}
       {session && session.user ? <RootLayout /> : <LoginScreen />}
       <StatusBar style="auto" />
     </NavigationContainer>
+
+    
   );
 }
 

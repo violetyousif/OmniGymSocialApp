@@ -1,10 +1,7 @@
-# api/models/pf_models.py
-
 from django.db import models
 
-# This model maps to the existing 'PFUsers' table in Supabase.
-# Django will not try to create or manage this table during migrations.
-class PFUser(models.Model):
+
+class LTFUser(models.Model):
     userID = models.BigAutoField(primary_key=True)
     username = models.CharField(max_length=255)
     memberID = models.CharField(max_length=255)
@@ -27,9 +24,7 @@ class PFUser(models.Model):
         managed = False
 
 
-# This model maps to the existing 'PlanetFitnessDB' table in Supabase.
-# It must exist before inserting into PFUsers because of foreign key constraints.
-class PlanetFitnessDB(models.Model):
+class LifetimeFitnessDB(models.Model):
     databaseID = models.AutoField(primary_key=True)
     memberID = models.CharField(max_length=255)
     gymAbbr = models.CharField(max_length=10)

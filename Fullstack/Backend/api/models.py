@@ -5,7 +5,7 @@ from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
-# PURPOSE: Defines and creates the data structure models
+# PURPOSE: Defines and creates the data structure models for each table
 
 
 class Item(models.Model):
@@ -79,17 +79,185 @@ class User(AbstractBaseUser, PermissionsMixin):
             raise ValidationError(_("Birthdate must be in the past."))
 
 
-# ✅ Represents the PlanetFitnessDB table (used as a foreign key source for PFUsers)
-class PlanetFitnessDB(models.Model):
-    databaseID = models.AutoField(primary_key=True)
-    gymCity = models.CharField(max_length=255)
-    gymAbbr = models.CharField(max_length=10)
-    memberID = models.CharField(max_length=255)
-    lastName = models.CharField(max_length=255)
-    firstName = models.CharField(max_length=255)
-    uploadDate = models.DateTimeField(auto_now_add=True)
-    gymState = models.CharField(max_length=255)
 
+# class GymMember(models.Model):
+#     GYM_CHOICES = (
+#         ('PF', 'Planet Fitness'),
+#         ('LTF', 'Lifetime Fitness'),
+#     )
+
+#     memberID = models.CharField(max_length=15, unique=True)
+#     gymAbbr = models.CharField(max_length=4, choices=GYM_CHOICES)
+#     gymCity = models.CharField(max_length=20)
+#     gymState = models.CharField(max_length=20)
+#     firstName = models.CharField(max_length=20)
+#     lastName = models.CharField(max_length=20)
+#     uploadDate = models.DateTimeField(auto_now_add=True)
+
+#     class Meta:
+#         unique_together = ('gymAbbr', 'memberID', 'gymCity', 'gymState')
+#         db_table = 'GymMembers'
+#         managed = False  # Set to False if Supabase owns table creation
+
+#     def __str__(self):
+#         return f"{self.gymAbbr}-{self.memberID} ({self.firstName} {self.lastName})"
+
+
+
+# class FindGymMember(models.Model):
+#     memberID = models.CharField(max_length=15, unique=True)
+#     gymAbbr = models.CharField(max_length=10)
+#     gymCity = models.CharField(max_length=20)
+#     gymState = models.CharField(max_length=20)
+#     firstName = models.CharField(max_length=20)
+#     lastName = models.CharField(max_length=20)
+#     uploadDate = models.DateTimeField(auto_now_add=True)
+#     class Meta:
+#         abstract = False
+
+# class PlanetFitnessDB(FindGymMember):
+#     class Meta:
+#         db_table = "PlanetFitnessDB"
+#         managed = False
+
+# class LifetimeFitnessDB(FindGymMember):
+#     class Meta:
+#         db_table = "LifetimeFitnessDB"
+#         managed = False
+
+# class SetGymUser(models.Model):
+#     memberID = models.CharField(max_length=15)
+#     gymAbbr = models.CharField(max_length=10)
+#     gymCity = models.CharField(max_length=20)
+#     gymState = models.CharField(max_length=20)
+#     firstName = models.CharField(max_length=20)
+#     lastName = models.CharField(max_length=20)
+#     email = models.CharField(max_length=30)
+#     password = models.CharField(max_length=20)
+#     birthDate = models.CharField(max_length=10)
+#     phoneNum = models.CharField(max_length=12)
+#     gender = models.CharField(max_length=10)
+#     termsAccepted = models.BooleanField(default=False)
+#     dateJoined = models.DateField(auto_now_add=True)
+#     activeAccnt = models.BooleanField(default=True)
+#     userID = models.UUIDField(primary_key=True)
+
+#     class Meta:
+#         abstract = False
+
+# class PFUsers(SetGymUser):
+#     class Meta:
+#         db_table = "PFUsers"
+#         managed = False
+
+# class LTFUsers(SetGymUser):
+#     class Meta:
+#         db_table = "LTFUsers"
+#         managed = False
+
+
+
+class AffilGyms(models.Model):
+    gymName = models.CharField(max_length=255)
+    gymAbbr = models.CharField(max_length=10)
+    gymCity = models.CharField(max_length=255)
+    gymState = models.CharField(max_length=255)
     class Meta:
-        db_table = 'PlanetFitnessDB'  # Match the exact table name in Supabase
-        managed = False  # ⚠️ Prevent Django from modifying this Supabase-managed table
+        db_table = 'AffilGyms'
+        managed = False
+
+
+class PlanetFitnessDB(models.Model):
+    memberID = models.CharField(max_length=255)
+    gymAbbr = models.CharField(max_length=10)
+    gymCity = models.CharField(max_length=255)
+    gymState = models.CharField(max_length=255)
+    firstName = models.CharField(max_length=255)
+    lastName = models.CharField(max_length=255)
+    uploadDate = models.DateTimeField()
+    class Meta:
+        db_table = "PFUsers"
+        managed = False
+
+class LifetimeFitnessDB(models.Model):
+    memberID = models.CharField(max_length=255)
+    gymAbbr = models.CharField(max_length=10)
+    gymCity = models.CharField(max_length=255)
+    gymState = models.CharField(max_length=255)
+    firstName = models.CharField(max_length=255)
+    lastName = models.CharField(max_length=255)
+    uploadDate = models.DateTimeField()
+    class Meta:
+        db_table = "LTFUsers"
+        managed = False
+
+
+class PFUsers(models.Model):
+    userID = models.UUIDField(primary_key=True)
+    memberID = models.CharField(max_length=15)
+    gymAbbr = models.CharField(max_length=5)
+    gymCity = models.CharField(max_length=20)
+    lastName = models.CharField(max_length=20)
+    firstName = models.CharField(max_length=20)
+    email = models.CharField(max_length=30)
+    password = models.CharField(max_length=20)
+    birthDate = models.CharField(max_length=10)
+    phoneNum = models.CharField(max_length=12)
+    gender = models.CharField(max_length=10)
+    termsAccepted = models.BooleanField(default=False)
+    dateJoined = models.DateField(auto_now_add=True)
+    activeAccnt = models.BooleanField(default=True)
+    gymState = models.CharField(max_length=20)
+    class Meta:
+        abstract = False
+        db_table = 'PFUsers'
+
+class LTFUsers(models.Model):
+    userID = models.UUIDField(primary_key=True)
+    memberID = models.CharField(max_length=15)
+    gymAbbr = models.CharField(max_length=5)
+    gymCity = models.CharField(max_length=20)
+    lastName = models.CharField(max_length=20)
+    firstName = models.CharField(max_length=20)
+    email = models.CharField(max_length=30)
+    password = models.CharField(max_length=20)
+    birthDate = models.CharField(max_length=10)
+    phoneNum = models.CharField(max_length=12)
+    gender = models.CharField(max_length=10)
+    termsAccepted = models.BooleanField(default=False)
+    dateJoined = models.DateField(auto_now_add=True)
+    activeAccnt = models.BooleanField(default=True)
+    gymState = models.CharField(max_length=20)
+    class Meta:
+        abstract = False
+        db_table = 'LTFUsers'
+
+# # Represents the PlanetFitnessDB table (used as a foreign key source for PFUsers)
+# class PlanetFitnessDB(models.Model):
+#     databaseID = models.AutoField(primary_key=True)
+#     gymCity = models.CharField(max_length=255)
+#     gymAbbr = models.CharField(max_length=10)
+#     memberID = models.CharField(max_length=255)
+#     lastName = models.CharField(max_length=255)
+#     firstName = models.CharField(max_length=255)
+#     uploadDate = models.DateTimeField(auto_now_add=True)
+#     gymState = models.CharField(max_length=255)
+
+#     class Meta:
+#         db_table = 'PlanetFitnessDB'  # Match the exact table name in Supabase
+#         managed = False  # Prevent Django from modifying this Supabase-managed table
+
+
+# class GymFitnessDB(models.Model):
+#     databaseID = models.AutoField(primary_key=True)
+#     gymCity = models.CharField(max_length=255)
+#     gymAbbr = models.CharField(max_length=10)
+#     memberID = models.CharField(max_length=255)
+#     lastName = models.CharField(max_length=255)
+#     firstName = models.CharField(max_length=255)
+#     uploadDate = models.DateTimeField(auto_now_add=True)
+#     gymState = models.CharField(max_length=255)
+
+#     class Meta:
+#         db_table = 'PlanetFitnessDB'  # Match the exact table name in Supabase
+#         managed = False  # Prevent Django from modifying this Supabase-managed table

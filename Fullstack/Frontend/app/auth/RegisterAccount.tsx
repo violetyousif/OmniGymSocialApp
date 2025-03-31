@@ -18,6 +18,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { SelectList } from "react-native-dropdown-select-list";
 import TermsModal from "../../components/TermsModal"; // Import the modal component
 import { supabase } from '../../lib/supabase'
+import { BACKEND_URL } from "../../lib/config";
+
 
 
   /**
@@ -164,7 +166,7 @@ const RegisterAccount: React.FC = () => {
   };
 
   // Handle onClick for submit button
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     let errors = [];
     // Removes non numeric char
     const numericPhone = phoneNumber.replace(/\D/g, "");
@@ -201,17 +203,46 @@ const RegisterAccount: React.FC = () => {
       return;
     }
   
-    // If everything is valid, log the user data
-    console.log("User Registered:", {
-      email,
-      password,
-      firstName,
-      lastName,
-      birthDate,
-      phoneNumber,
-      gender,
-    });
+    // // If everything is valid, log the user data
+    // console.log("User Registered:", {
+    //   email,
+    //   password,
+    //   firstName,
+    //   lastName,
+    //   birthDate,
+    //   phoneNumber,
+    //   gender,
+    // });
   
+    try {
+      const res = await fetch(`${BACKEND_URL}/register/registerUser/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          password,
+          firstName,
+          lastName,
+          birthDate,
+          phoneNum: phoneNumber,  // Match Django field
+          gender,
+          termsAccepted: agreedToTerms,
+          // Add gymAbbr, gymCity, gymState, memberID if passed from Step 1
+        }),
+      });
+  
+      const result = await res.json();
+  
+      if (res.ok) {
+        alert("Registration successful!");
+        router.push("../(tabs)/Login");
+      } else {
+        alert(result.error || "Registration failed.");
+      }
+    } catch (err) {
+      console.error("Registration error:", err);
+      alert("Server error or no connection.");
+    }
     router.push("../(tabs)/Login"); // ROUTES TO THE NEXT PAGE (Back to login)
   };
 
@@ -320,7 +351,7 @@ const RegisterAccount: React.FC = () => {
           keyboardType="phone-pad"
         />
         
-      {/* Shorter Inputs: Birthdate and Gender */}
+      {/* Shorter Inputs: birthDate and Gender */}
         {/* Labels (adding labels first to allow line break) */}
         <View style={styles.shortContainer}>
           <Text style={styles.label}>Birthdate</Text>

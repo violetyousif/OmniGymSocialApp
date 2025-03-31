@@ -1,53 +1,204 @@
 # This file defines the API views for handling frontend requests using real Supabase data.
 
+from django.shortcuts import render
+
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from django.utils import timezone  # ✅ Added to set uploadDate
-from .models.pf_models import PFUser  # ✅ PFUsers model
-from .models import PlanetFitnessDB   # ✅ PlanetFitnessDB now correctly imported
+from django.utils import timezone  # Added to set uploadDate
+from .models.pf_models import PFUser  # PFUsers model
+from .models import AffilGyms, PlanetFitnessDB, LifetimeFitnessDB
 from .serializers import PFUserSerializer
 
+# PURPOSE: Control what data gets sent/received and create the views here
+from rest_framework import viewsets
+from .models import Item
+from .serializers import ItemSerializer
+
+# PURPOSE: Handles user registration and login
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth import authenticate
+from rest_framework.response import Response
+from .models import User
+from .serializers import UserSerializer
+
+# PURPOSE: Handles user registration and login
+# from django.http import JsonResponse
+# from .models import AffilGyms, PlanetFitnessDB, LifetimeFitnessDB
+# from django.views.decorators.csrf import csrf_exempt
+# from django.http import JsonResponse
+# # from supabase import create_client
+# from .models import PFUsers, LifetimeFitnessDB, LTFUsers, PlanetFitnessDB
+
+# class ItemViewSet(viewsets.ModelViewSet):
+#     queryset = Item.objects.all()
+#     serializer_class = ItemSerializer
+
+
+# PURPOSE: Handles user login
 @api_view(['POST'])
-def register_pf_user(request):
-    """
-    Handles POST requests to register a new PFUser into the Supabase PFUsers table.
-    """
-    data = request.data
+def loginUser(request):
+    """Handles user login and returns a JWT token"""
+    email = request.data.get('email')
+    password = request.data.get('password')
 
-    # Step 1: Ensure PlanetFitnessDB has this member first (FK requirement)
-    member_exists = PlanetFitnessDB.objects.filter(
-        memberID=data.get('memberID'),
-        gymAbbr=data.get('gymAbbr'),
-        gymCity=data.get('gymCity'),
-        gymState=data.get('gymState')
-    ).exists()
+    user = authenticate(email=email, password=password)
 
-    if not member_exists:
-        # Create the minimal matching record in PlanetFitnessDB
-        PlanetFitnessDB.objects.create(
-            memberID=data.get('memberID'),
-            gymAbbr=data.get('gymAbbr'),
-            gymCity=data.get('gymCity'),
-            gymState=data.get('gymState'),
-            firstName=data.get('firstName'),
-            lastName=data.get('lastName'),
-            uploadDate=timezone.now()  # ✅ Fix: Add missing timestamp
-        )
+    if user:
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            "message": "Login successful!",
+            "access_token": str(refresh.access_token),
+            "refresh_token": str(refresh),
+        }, status=status.HTTP_200_OK)
 
-    # Step 2: Proceed with inserting into PFUsers
-    serializer = PFUserSerializer(data=data)
+    return Response({"error": "Invalid email or password"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+# PURPOSE: Handles user registration
+@api_view(['POST'])
+def registerUser(request):
+    """Handles user registration"""
+    serializer = UserSerializer(data=request.data)  # Ensure UserSerializer is imported
+
     if serializer.is_valid():
         serializer.save()
-        return Response({"message": "PFUser created successfully!"}, status=status.HTTP_201_CREATED)
+        return Response({"message": "User registered successfully!"}, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['GET'])
-def list_pf_users(request):
-    """
-    Returns a list of all Planet Fitness users in the PFUsers table.
-    """
-    users = PFUser.objects.all()
-    serializer = PFUserSerializer(users, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+# PURPOSE: Verify membership for specific gym during registration
+@api_view(["POST"])
+def verifyMembership(request):
+    data = request.data
+    gym_name = data.get("gymName")
+    member_id = data.get("memberID")
+
+    if not gym_name or not member_id:
+        return Response({"error": "Gym name and member ID are required."}, status=400)
+
+    # Step 1: Look up gym name in AffilGyms table
+    # gym = AffilGyms.objects.filter(gymName=gym_name).first()
+    gym = AffilGyms.objects.filter(gymName=gym_name)
+    print("Matched gyms:", gym)
+
+    if not gym:
+        return Response({"error": "Unable to locate gym."}, status=404)
+
+    gym_abbr = gym.gymAbbr
+    gym_city = gym.gymCity
+    gym_state = gym.gymState
+
+    # Step 2: Locate necessary gym DB
+    db_map = {
+        "PF": PlanetFitnessDB,
+        "LTF": LifetimeFitnessDB
+    }
+
+    GymTable = db_map.get(gym_abbr)
+    if not GymTable:
+        return Response({"error": "Unsupported gym type."}, status=400)
+
+    # Step 3: Check if user exists
+    user = GymTable.objects.filter(
+        memberID=member_id,
+        gymAbbr=gym_abbr,
+        gymState=gym_state,
+        gymCity=gym_city
+    ).first()
+
+    if not user:
+        return Response({"error": "Member not found."}, status=404)
+
+    # Validated user
+    return Response({
+        "valid": True,
+        "gymAbbr": gym_abbr,
+        "gymCity": gym_city,
+        "gymState": gym_state,
+        "firstName": user.firstName,
+        "lastName": user.lastName
+    }, status=200)
+
+
+# PURPOSE: Get gym cities based on gym name
+@api_view(["GET"])
+def getGymCities(request):
+    gym_name = request.query_params.get("gymName")
+
+    if not gym_name:
+        return Response({"error": "Missing gym name"}, status=400)
+
+    cities = (
+        AffilGyms.objects
+        .filter(gymName=gym_name)
+        .values_list("gymCity", flat=True)
+        .distinct()
+    )
+    
+    return Response({"cities": list(cities)}, status=200)
+
+# PURPOSE: Get gym states based on gym name
+@api_view(["GET"])
+def getGymStates(request):
+    gym_name = request.query_params.get("gymName")
+
+    if not gym_name:
+        return Response({"error": "Missing gym name"}, status=400)
+
+    states = (
+        AffilGyms.objects
+        .filter(gymName=gym_name)
+        .values_list("gymState", flat=True)
+        .distinct()
+    )
+
+    return Response({"states": list(states)}, status=200)
+
+
+
+
+
+# @api_view(['POST'])
+# def register_pf_user(request):
+#     """
+#     Handles POST requests to register a new PFUser into the Supabase PFUsers table.
+#     """
+#     data = request.data
+
+#     # Step 1: Ensure PlanetFitnessDB has this member first (FK requirement)
+#     member_exists = PlanetFitnessDB.objects.filter(
+#         memberID=data.get('memberID'),
+#         gymAbbr=data.get('gymAbbr'),
+#         gymCity=data.get('gymCity'),
+#         gymState=data.get('gymState')
+#     ).exists()
+
+#     if not member_exists:
+#         # Create the minimal matching record in PlanetFitnessDB
+#         PlanetFitnessDB.objects.create(
+#             memberID=data.get('memberID'),
+#             gymAbbr=data.get('gymAbbr'),
+#             gymCity=data.get('gymCity'),
+#             gymState=data.get('gymState'),
+#             firstName=data.get('firstName'),
+#             lastName=data.get('lastName'),
+#             uploadDate=timezone.now()
+#         )
+
+#     # Step 2: Proceed with inserting into PFUsers
+#     serializer = PFUserSerializer(data=data)
+#     if serializer.is_valid():
+#         serializer.save()
+#         return Response({"message": "PFUser created successfully!"}, status=status.HTTP_201_CREATED)
+#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# @api_view(['GET'])
+# def list_pf_users(request):
+#     """
+#     Returns a list of all Planet Fitness users in the PFUsers table.
+#     """
+#     users = PFUser.objects.all()
+#     serializer = PFUserSerializer(users, many=True)
+#     return Response(serializer.data, status=status.HTTP_200_OK)
