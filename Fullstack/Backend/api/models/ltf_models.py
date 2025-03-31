@@ -1,7 +1,7 @@
 from django.db import models
 
 
-class LTFUser(models.Model):
+class LTFUsers(models.Model):
     userID = models.BigAutoField(primary_key=True)
     username = models.CharField(max_length=255)
     memberID = models.CharField(max_length=255)
@@ -20,7 +20,7 @@ class LTFUser(models.Model):
     gymState = models.CharField(max_length=255)
 
     class Meta:
-        db_table = 'PFUsers'
+        db_table = 'LTFUsers'
         managed = False
 
 
@@ -35,5 +35,5 @@ class LifetimeFitnessDB(models.Model):
     gymState = models.CharField(max_length=255)
 
     class Meta:
-        db_table = 'PlanetFitnessDB'
+        db_table = 'LifetimeFitnessDB'
         managed = False

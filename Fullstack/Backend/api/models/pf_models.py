@@ -4,7 +4,7 @@ from django.db import models
 
 # This model maps to the existing 'PFUsers' table in Supabase.
 # Django will not try to create or manage this table during migrations.
-class PFUser(models.Model):
+class PFUsers(models.Model):
     userID = models.BigAutoField(primary_key=True)
     username = models.CharField(max_length=255)
     memberID = models.CharField(max_length=255)

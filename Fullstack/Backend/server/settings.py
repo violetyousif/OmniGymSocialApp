@@ -97,16 +97,18 @@ USE_POSTGRES = os.getenv('USE_POSTGRES', 'False') == 'True'
 if USE_POSTGRES:
     import dj_database_url  # install `dj-database-url`
     DATABASE_URL = os.getenv("DATABASE_URL")
+    if not DATABASE_URL:
+        raise ValueError("DATABASE_URL is not set in the .env file.")
     DATABASES = {
-        # 'default': dj_database_url.parse(DATABASE_URL)
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv("DB_NAME"),
-            'USER': os.getenv("DB_USER"),
-            'PASSWORD': os.getenv("DB_PASSWORD"),
-            'HOST': os.getenv("DB_HOST"),
-            'PORT': os.getenv("DB_PORT"),
-        }
+        'default': dj_database_url.parse(DATABASE_URL)
+        # 'default': {
+        #     'ENGINE': 'django.db.backends.postgresql',
+        #     'NAME': os.getenv("DB_NAME"),
+        #     'USER': os.getenv("DB_USER"),
+        #     'PASSWORD': os.getenv("DB_PASSWORD"),
+        #     'HOST': os.getenv("DB_HOST"),
+        #     'PORT': os.getenv("DB_PORT"),
+        # }
     }
 else:
     DATABASES = {
@@ -155,6 +157,6 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True,
 }
 
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY")
+# SUPABASE_URL = os.getenv("SUPABASE_URL")
+# SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY")
 

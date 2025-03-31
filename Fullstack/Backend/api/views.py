@@ -6,9 +6,10 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from django.utils import timezone  # Added to set uploadDate
-from .models.pf_models import PFUser  # PFUsers model
-from .models import AffilGyms, PlanetFitnessDB, LifetimeFitnessDB
-from .serializers import PFUserSerializer
+from .models.pf_models import PFUsers, PlanetFitnessDB  # PFUsers model
+from .models.ltf_models import LTFUsers, LifetimeFitnessDB
+from .models.globalOps_model import AffilGyms
+from .serializers import PFUserSerializer, UserTypeSerializer, UserSerializer
 
 # PURPOSE: Control what data gets sent/received and create the views here
 from rest_framework import viewsets
@@ -18,9 +19,7 @@ from .serializers import ItemSerializer
 # PURPOSE: Handles user registration and login
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
-from rest_framework.response import Response
 from .models import User
-from .serializers import UserSerializer
 
 # PURPOSE: Handles user registration and login
 # from django.http import JsonResponse

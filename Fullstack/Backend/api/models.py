@@ -79,6 +79,24 @@ class User(AbstractBaseUser, PermissionsMixin):
             raise ValidationError(_("Birthdate must be in the past."))
 
 
+class AffilGyms(models.Model):
+    gymID = models.BigAutoField(primary_key=True)
+    gymName = models.CharField(max_length=100)
+    gymCity = models.CharField(max_length=100)
+    gymState = models.CharField(max_length=100)
+    
+    GYM_ABBR_CHOICES = [
+        ('PF', 'Planet Fitness'),
+        ('LTF', 'Lifetime Fitness'),
+    ]
+    gymAbbr = models.CharField(max_length=4, choices=GYM_ABBR_CHOICES)
+
+    class Meta:
+        unique_together = ('gymAbbr', 'gymCity', 'gymState')
+    
+    def __str__(self):
+        return f"{self.gymName} - {self.gymCity}, {self.gymState}"
+
 
 # class GymMember(models.Model):
 #     GYM_CHOICES = (
@@ -176,7 +194,7 @@ class PlanetFitnessDB(models.Model):
     lastName = models.CharField(max_length=255)
     uploadDate = models.DateTimeField()
     class Meta:
-        db_table = "PFUsers"
+        db_table = "PlanetFitnessDB"
         managed = False
 
 class LifetimeFitnessDB(models.Model):
@@ -188,7 +206,7 @@ class LifetimeFitnessDB(models.Model):
     lastName = models.CharField(max_length=255)
     uploadDate = models.DateTimeField()
     class Meta:
-        db_table = "LTFUsers"
+        db_table = "LifetimeFitnessDB"
         managed = False
 
 
