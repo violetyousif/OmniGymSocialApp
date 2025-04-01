@@ -183,8 +183,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'gray',
   },
- 
-  // General Info Section
   infoSection: {
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -207,20 +205,18 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: 'green',
   },
- 
-  // Metrics Section
   metricsSection: {
     marginVertical: 10,
     justifyContent: 'center',
     alignItems: 'center',
   },
   metricsContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: 'center', // Center the content within the scrollable area
+    alignItems: 'center', // Center horizontally
   },
   metricItem: {
     alignItems: 'center',
-    marginHorizontal: 20,
+    marginHorizontal: 20, // Adjust margin if needed
   },
   metricIcon: {
     fontSize: 30,
@@ -233,8 +229,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 5,
   },
- 
-  // PR Song Section
   prSongSection: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -251,8 +245,6 @@ const styles = StyleSheet.create({
   songTitle: {
     fontWeight: 'bold',
   },
- 
-  // Graph Section
   graphSection: {
     height: 200,
     backgroundColor: '#eee',
@@ -263,7 +255,7 @@ const styles = StyleSheet.create({
   graphPlaceholder: {
     fontSize: 16,
     color: 'gray',
-  },
+  }
 });
  
 export default Profile;

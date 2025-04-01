@@ -6,6 +6,7 @@ import appConfig from '../app.json';
 const appName = appConfig.expo.name; // Use the name property inside the expo object
 
 
+
 const Main = () => {
   return <WelcomePg />;
 };

@@ -26,7 +26,7 @@ const Settings = () => {
   const [squats, setSquats] = useState(220);
  
   const togglePublic = () => setIsPublic((prev) => !prev);
-  const toggleUnits = () => setUnits(units === 'Imperial' ? 'SI' : 'Imperial');
+  const toggleUnits = () => setUnits(units === 'Imperial' ? 'Metric' : 'Imperial');
  
  
   const pickImage = async () => {
