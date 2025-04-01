@@ -20,14 +20,15 @@ const HomeScreen = () => {
 
   // content data
   const contentData = [
-    { id: '1', image: require('../../../assets/images/foodstock.png'), link: '/(tabs)/Login' },
-    { id: '2', image: require('../../../assets/images/sample.png'), link: '/(tabs)/Login' },
-    { id: '3', image: require('../../../assets/images/timework.png'), link: '/(tabs)/Login' },
-    { id: '4', image: require('../../../assets/images/gympng.png'), link: '/(tabs)/Login' },
-    { id: '5', image: require('../../../assets/images/connect.png'), link: '/(tabs)/Login' },
-    { id: '6', image: require('../../../assets/images/consult.png'), link: '/(tabs)/Login' },
-    { id: '7', image: require('../../../assets/images/plan.png'), link: '/(tabs)/Login' },
+    { id: '1', image: require('../../../assets/images/Orange.jpg'), link: '/(tabs)/exscreens/Leaderboard', label: 'Leaderboards' },
+    { id: '2', image: require('../../../assets/images/Orange2.jpg'), link: '/(tabs)/exscreens/Events', label: 'Events' },
+    { id: '3', image: require('../../../assets/images/Orange3.jpg'), link: '/(tabs)/screens/Settings', label: 'Settings' },
+    { id: '4', image: require('../../../assets/images/Orange4.jpg'), link: '/(tabs)/screens/Profile', label: 'Profile' },
+    { id: '5', image: require('../../../assets/images/Orange5.jpg'), link: '/(tabs)/exscreens/Support', label: 'Support' },
+    { id: '6', image: require('../../../assets/images/Orange6.jpg'), link: '/(tabs)/screens/Inbox', label: 'Inbox' },
+    { id: '7', image: require('../../../assets/images/Orange7.jpg'), link: '/(tabs)/screens/Routine', label: 'Routine' },
   ];
+  
   
   return (
     <View style={styles.container}>
@@ -49,21 +50,28 @@ const HomeScreen = () => {
           numColumns={2}
           columnWrapperStyle={styles.row}
           ListHeaderComponent={
-            <TouchableOpacity 
-              style={styles.largeBox} 
-              onPress={() => contentData[0].link ? router.push(contentData[0].link as any) : console.warn(`No link for large box`)}
-            >
+          <TouchableOpacity 
+            style={styles.largeBox} 
+            onPress={() => contentData[0].link ? router.push(contentData[0].link as any) : console.warn(`No link for large box`)}
+          >
+            <View style={styles.imageWrapper}>
               <Image source={contentData[0].image} style={styles.boxImage} />
-            </TouchableOpacity>
+              <Text style={styles.overlayText}>{contentData[0].label}</Text>
+            </View>
+          </TouchableOpacity>
           }
           renderItem={({ item }) => (
             <TouchableOpacity 
               style={styles.smallBox} 
               onPress={() => item.link ? router.push(item.link as any) : console.warn(`No link for box ${item.id}`)}
             >
-              <Image source={item.image} style={styles.boxImage} />
+              <View style={styles.imageWrapper}>
+                <Image source={item.image} style={styles.boxImageSmall} />
+                <Text style={styles.overlayText}>{item.label}</Text>
+              </View>
             </TouchableOpacity>
           )}
+          
         />
       </View>
     </View>
@@ -148,8 +156,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#bbb',
     borderRadius: 10,
     marginBottom: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 
   // Images Inside Boxes
@@ -159,6 +165,42 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     resizeMode: 'cover',
   },
+
+  imageWrapper: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  
+  overlayText: {
+    position: 'absolute',
+    color: '#fff',
+    fontSize: 30,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    textShadowColor: '#000',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+    zIndex: 2,
+  },
+  
+  boxImageLarge: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 20,
+    resizeMode: 'cover',
+  },
+  
+  boxImageSmall: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 10,
+    resizeMode: 'cover',
+  },
+  
+  
+  
 });
 
 export default HomeScreen;

@@ -56,11 +56,13 @@ export default function RootLayout() {
 
         {/* Ensure Bottom Tabs Load After Login */}
         <Stack.Screen name="/(tabs)/screens" />
-        {/* <Stack.Screen name="/(tabs)/screens/_layout" />
+        <Stack.Screen name="/(tabs)/screens/Profile" />
+        <Stack.Screen name="/(tabs)/screens/Settings" />
+        {/*<Stack.Screen name="/(tabs)/screens/_layout" />
         <Stack.Screen name="/(tabs)/screens/Home" />
         <Stack.Screen name="/(tabs)/screens/Inbox" />
         <Stack.Screen name="/(tabs)/screens/Profile" />
-        <Stack.Screen name="/(tabs)/screens/Settings" /> */}
+        <Stack.Screen name="/(tabs)/screens/Settings" />*/}
 
         {/* Not Found Page */}
         <Stack.Screen name="+not-found" />

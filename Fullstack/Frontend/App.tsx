@@ -7,8 +7,8 @@ import { View } from 'react-native';
 import { supabase } from './lib/supabase';
 import { Session } from '@supabase/supabase-js';
 
-import LoginScreen from './app/(tabs)/Login'; // 👈 Import your custom Login page
-import RootLayout from './app/_layout';     // Your main app layout
+import LoginScreen from './app/(tabs)/Login'; 
+import RootLayout from './app/_layout';  
 
 
 export default function App() {
