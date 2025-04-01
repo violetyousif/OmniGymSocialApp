@@ -74,7 +74,7 @@ export default function RootLayout() {
         <Stack.Screen name="auth/RegisterAccount" />
         <Stack.Screen name="auth/RegisterGym" />*/}
 
-        {/* ✅ Ensure Bottom Tabs Load After Login 
+        {/* Ensure Bottom Tabs Load After Login 
         <Stack.Screen name="(tabs)" />*/}
 
         {/* Not Found Page 

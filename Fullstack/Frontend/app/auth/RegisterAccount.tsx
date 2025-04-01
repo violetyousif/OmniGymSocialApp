@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,17 +8,16 @@ import {
   Image,
   ScrollView,
   Platform,
-  // Checkbox,
 } from "react-native";
 import { useRouter } from "expo-router";
-// import { Picker } from "@react-native-picker/picker";
 import { Checkbox } from "react-native-paper";
 import moment from "moment";
 import { Ionicons } from "@expo/vector-icons";
 import { SelectList } from "react-native-dropdown-select-list";
 import TermsModal from "../../components/TermsModal"; // Import the modal component
 import { supabase } from '../../lib/supabase'
-
+import { BACKEND_URL } from "../../lib/config";
+import { useLocalSearchParams } from "expo-router";
 
   /**
    * 
@@ -35,7 +34,6 @@ const RegisterAccount: React.FC = () => {
 
   // State for modal user agreement visibility
   const [modalVisible, setModalVisible] = useState(false);
-
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [firstName, setFirstName] = useState<string>("");
@@ -48,9 +46,9 @@ const RegisterAccount: React.FC = () => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const genderList = [
-    {key: 'F', value: "Female"},
-    {key: "M", value: "Male"},
-    {key: "O", value: "Other"},
+    {key: "Female", value: "Female"},
+    {key: "Male", value: "Male"},
+    {key: "Other", value: "Other"},
    ];
 
   // Validate to make sure it's an email
@@ -163,8 +161,18 @@ const RegisterAccount: React.FC = () => {
     setPhoneNumber(formattedNum);
   };
 
+  const { gymAbbr, gymCity, gymState, memberID, firstName: passedFirst, lastName: passedLast } = useLocalSearchParams();
+  // const { gymAbbr, firstName: passedFirst, lastName: passedLast } = useLocalSearchParams();
+
+
+  useEffect(() => {
+    if (passedFirst) setFirstName(String(passedFirst));
+    if (passedLast) setLastName(String(passedLast));
+  }, []);
+
+
   // Handle onClick for submit button
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     let errors = [];
     // Removes non numeric char
     const numericPhone = phoneNumber.replace(/\D/g, "");
@@ -201,17 +209,56 @@ const RegisterAccount: React.FC = () => {
       return;
     }
   
-    // If everything is valid, log the user data
-    console.log("User Registered:", {
-      email,
-      password,
-      firstName,
-      lastName,
-      birthDate,
-      phoneNumber,
-      gender,
-    });
+
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/register/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          password,
+          firstName,
+          lastName,
+          phoneNum: phoneNumber,
+          birthDate,
+          gender,
+          termsAccepted: agreedToTerms,
+          gymAbbr,
+          gymCity,
+          gymState,
+          memberID,
+        }),
+      });
+        
+
+      let result;
+      try {
+        result = await res.json();
+      } catch (parseErr) {
+        console.error("JSON parse failed:", parseErr);
+        alert("Unexpected server response.");
+        return;
+      }
+
+      if (res.ok) {
+        alert("Registration successful!");
+        router.push("../(tabs)/Login");
+      } else {
+        alert(result.error || JSON.stringify(result) || "Registration failed.");
+      }
+
+      // const result = await res.json();
   
+      // if (res.ok) {
+      //   alert("Registration successful!");
+      //   router.push("../(tabs)/Login");
+      // } else {
+      //   alert(result.error || "Registration failed.");
+      // }
+    } catch (err) {
+      console.error("Registration error:", err);
+      alert("Server error or no connection.");
+    }
     router.push("../(tabs)/Login"); // ROUTES TO THE NEXT PAGE (Back to login)
   };
 
@@ -320,7 +367,7 @@ const RegisterAccount: React.FC = () => {
           keyboardType="phone-pad"
         />
         
-      {/* Shorter Inputs: Birthdate and Gender */}
+      {/* Shorter Inputs: birthDate and Gender */}
         {/* Labels (adding labels first to allow line break) */}
         <View style={styles.shortContainer}>
           <Text style={styles.label}>Birthdate</Text>
@@ -367,7 +414,6 @@ const RegisterAccount: React.FC = () => {
               ? [{ scale: agreedToTerms ? 1 : 0.5 }]
               : [{ scale: 1 }],
               }}>
-              {/* transform: Platform.OS === "ios" ? [{ scale: 0.5 }] : [{ scale: 1 }] }}> */}
               <Checkbox
                 status={agreedToTerms ? "checked" : "unchecked"}
                 onPress={() => setAgreedToTerms(!agreedToTerms)}
@@ -391,15 +437,6 @@ const RegisterAccount: React.FC = () => {
           {/* Terms Modal */}
           <TermsModal visible={modalVisible} onClose={() => setModalVisible(false)} />
         </View>
-
-        {/* <View style={styles.checkboxContainer}>
-          <Checkbox
-            status={agreedToTerms ? "checked" : "unchecked"}
-            onPress={() => setAgreedToTerms(!agreedToTerms)}
-            color="#E97451"
-          />
-          <Text style={styles.checkboxLabel}>Agree to terms</Text>
-        </View> */}
 
         {/* Submit Button */}
         <TouchableOpacity style={styles.button} onPress={handleSubmit}>

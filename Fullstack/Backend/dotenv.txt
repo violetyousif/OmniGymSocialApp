@@ -1,0 +1,25 @@
+###### Remove anything with a single # in front of it
+###### Place this in a frontend ".env" file
+
+### Use PostgreSQL from Supabase
+# USE_POSTGRES=True
+
+### Port 6543 is for transaction shared pooler, so there might be statement restrictions. 
+### Refer to "Connect" button on Supabase for details.
+### Note: replace [DATABASE_PASSWORD] with the actual password.
+# DATABASE_URL=postgresql://postgres.dxhsxrtltaceipztlcns:[DATABASE_PASSWORD]@aws-0-us-east-2.pooler.supabase.com:6543/postgres
+
+
+### Connection Issues? 
+### Use `curl -4 https://ifconfig.co` in terminal to verify you can connect to IPv4 connectivity.
+
+
+### Django secret key for cryptographic signing; replace DJANGO_KEY_HERE with your actual key.
+### Run command to generate new Django key:
+###   `python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'` 
+### Note: This key should be kept secret and not shared publicly.
+# SECRET_KEY=DJANGO_KEY_HERE
+
+
+### Enable debug mode for development
+# DEBUG=True

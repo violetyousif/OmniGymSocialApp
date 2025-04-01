@@ -11,6 +11,7 @@ import {
 import { useRouter } from 'expo-router';
 import { supabase } from '../../../lib/supabase'
 import { Session } from '@supabase/supabase-js'
+import { BACKEND_URL } from "../../../lib/config";
 
 const { width, height } = Dimensions.get('window'); 
 
@@ -36,7 +37,16 @@ const HomeScreen = () => {
         <View style={styles.logoContainer}>
           <Image source={require('../../../assets/images/OmniGymLogo.png')} style={styles.logo} />
         </View>
-        <TouchableOpacity onPress={() => router.replace('/(tabs)/Login')} style={styles.logoutContainer}>
+        <TouchableOpacity onPress={async () => {
+              const { error } = await supabase.auth.signOut({ scope: 'global' });
+              if (error) {
+                console.error('Error signing out:', error.message);
+              } else {
+                router.replace('/(tabs)/Login');
+              }
+            }} 
+            style={styles.logoutContainer}
+          >
           <Text style={styles.logout}>LOGOUT</Text>
         </TouchableOpacity>
       </View>

@@ -1,7 +1,17 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Modal, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Modal, FlatList, TouchableOpacity, ScrollView } from 'react-native';
+import { FontAwesome, Entypo } from '@expo/vector-icons';
+import { useRouter } from 'expo-router'; // Import for navigating between screens
+import { Dimensions } from 'react-native';
+import { Image } from 'react-native';
+import { supabase } from '../../../lib/supabase'
+import { Session } from '@supabase/supabase-js'
 
+const { width } = Dimensions.get('window'); // Get screen width for responsive design
+ 
 const Routine = () => {
+  const router = useRouter();  // Router for navigation
+ 
   // States for user input
   const [routineTitle, setRoutineTitle] = useState('');
   const [expectedTime, setExpectedTime] = useState('');
@@ -16,15 +26,15 @@ const Routine = () => {
   const [showTypePicker, setShowTypePicker] = useState(false);
   const [aiPlan, setAiPlan] = useState('');
   const [showAiModal, setShowAiModal] = useState(false);
-
+ 
   const workoutTypes = ['Strength Training', 'Cardio', 'Glute Day', 'Yoga', 'Pilates'];
-
+ 
   // Handle selection from the custom picker
   const handlePickerSelect = (item: string) => {
     setSelectedType(item);
     setShowTypePicker(false);
   };
-
+ 
   // Handle form submission
   const handleSubmit = () => {
     console.log({
@@ -41,10 +51,9 @@ const Routine = () => {
     });
     alert('Workout plan created successfully!');
   };
-
+ 
   // Generate AI Plan (Placeholder for actual AI integration)
   const generateAiPlan = () => {
-    // This is just a placeholder. Replace with actual AI generation logic.
     setAiPlan(`
       AI-generated Plan:
       - Routine Title: ${routineTitle}
@@ -57,11 +66,27 @@ const Routine = () => {
     `);
     setShowAiModal(true);
   };
-
+ 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
+      {/* Full-Width Header */}
+      <View style={styles.topBar}>
+        <TouchableOpacity style={styles.chatIcon} onPress={() => alert('Open Chat')}>
+          <FontAwesome name="comment" size={24} color="gray" />
+        </TouchableOpacity>
+ 
+        <View style={styles.logoContainer}>
+          <Image source={require('../../../assets/images/OmniGymLogo.png')} style={styles.logo} />
+        </View>
+ 
+        {/* Logout Button */}
+        <TouchableOpacity onPress={() => router.replace('/(tabs)/Login')} style={styles.logoutContainer}>
+          <Text style={styles.logout}>LOGOUT</Text>
+        </TouchableOpacity>
+      </View>
+ 
       <Text style={styles.title}>Create Workout Plan</Text>
-
+ 
       {/* Routine Title */}
       <Text style={styles.label}>Title for Routine</Text>
       <TextInput
@@ -70,7 +95,7 @@ const Routine = () => {
         onChangeText={setRoutineTitle}
         value={routineTitle}
       />
-
+ 
       {/* Expected Time of Completion */}
       <Text style={styles.label}>Expected Time of Completion</Text>
       <TextInput
@@ -79,13 +104,13 @@ const Routine = () => {
         onChangeText={setExpectedTime}
         value={expectedTime}
       />
-
+ 
       {/* Workout Type Picker */}
       <Text style={styles.label}>Type of Workout</Text>
       <TouchableOpacity onPress={() => setShowTypePicker(true)} style={styles.input}>
         <Text>{selectedType || 'Select Workout Type'}</Text>
       </TouchableOpacity>
-
+ 
       {/* Modal Picker */}
       <Modal
         visible={showTypePicker}
@@ -108,7 +133,7 @@ const Routine = () => {
           </View>
         </View>
       </Modal>
-
+ 
       {/* Date Picker (Workout Day) */}
       <Text style={styles.label}>Workout Day (Weekdays)</Text>
       <TextInput
@@ -117,7 +142,7 @@ const Routine = () => {
         onChangeText={setWorkoutDay}
         value={workoutDay}
       />
-
+ 
       {/* Strength Training */}
       {selectedType === 'Strength Training' && (
         <>
@@ -137,7 +162,7 @@ const Routine = () => {
           />
         </>
       )}
-
+ 
       {/* Cardio */}
       {selectedType === 'Cardio' && (
         <>
@@ -155,15 +180,9 @@ const Routine = () => {
             onChangeText={setDistance}
             value={distance}
           />
-          <Text style={styles.label}>Pace</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter pace"
-            onChangeText={(text) => console.log(text)} // Just a placeholder for pace input
-          />
         </>
       )}
-
+ 
       {/* Rest Intervals */}
       <Text style={styles.label}>Rest Intervals</Text>
       <TextInput
@@ -172,7 +191,7 @@ const Routine = () => {
         onChangeText={setRestIntervals}
         value={restIntervals}
       />
-
+ 
       {/* Estimated Calories Burned */}
       <Text style={styles.label}>Overall Est. Calories Burned</Text>
       <TextInput
@@ -181,22 +200,22 @@ const Routine = () => {
         onChangeText={setEstCaloriesBurned}
         value={estCaloriesBurned}
       />
-
+ 
       {/* Create Button */}
       <TouchableOpacity style={styles.button} onPress={handleSubmit}>
         <Text style={styles.buttonText}>Create Plan</Text>
       </TouchableOpacity>
-
+ 
       {/* AI Plan Generation Button */}
       <TouchableOpacity style={styles.button} onPress={generateAiPlan}>
         <Text style={styles.buttonText}>Generate Plan Using AI</Text>
       </TouchableOpacity>
-
+ 
       {/* View Plan Button */}
       <TouchableOpacity style={styles.button} onPress={() => alert('Viewing current plan')}>
         <Text style={styles.buttonText}>View Plan</Text>
       </TouchableOpacity>
-
+ 
       {/* AI Plan Modal */}
       <Modal
         visible={showAiModal}
@@ -211,67 +230,118 @@ const Routine = () => {
           </View>
         </View>
       </Modal>
-    </View>
+    </ScrollView>
   );
 };
-
+ 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: '#fff', // White background color
+    flex: 1, // Full screen height
+  },
+ 
+  // Full-Width Header
+  topBar: {
+    width: '100%',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    flexDirection: 'row', // Horizontal alignment for top bar elements
+    alignItems: 'center', // Center align the items vertically
+    justifyContent: 'space-between', // Space out logo, logout, and chat icons
+    backgroundColor: '#FFF',
+    paddingVertical: 18,
+    elevation: 5,
+    borderBottomWidth: 7,
+    borderBottomColor: '#E97451', // Orange border color
+  },
+ 
+  // Centered Logo
+  logoContainer: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'flex-start',
-    backgroundColor: '#f5f5f5', // Light background
-    padding: 20,
   },
+  logo: {
+    width: 40,
+    height: 40,
+    resizeMode: 'contain', // Maintain aspect ratio
+  },
+ 
+  // Logout Button
+  logoutContainer: {
+    position: 'absolute',
+    right: 20,
+    bottom: 10,
+  },
+  logout: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: 'black', // Black color for logout text
+  },
+ 
+  // Chat Icon - Aligned to Left
+  chatIcon: {
+    position: 'absolute',
+    left: 20,
+    bottom: 10,
+  },
+ 
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
-    color: '#ff7f50', // Consistent color from Settings page
+    textAlign: 'center',
+    marginTop: 80,
   },
+ 
   label: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 5,
+    fontSize: 16,
+    fontWeight: '500',
+    marginBottom: 6,
   },
+ 
   input: {
-    width: '100%',
-    padding: 10,
-    marginBottom: 15,
-    borderWidth: 1,
+    width: width - 40,
+    height: 40,
+    marginBottom: 20,
+    paddingLeft: 10,
     borderColor: '#ccc',
+    borderWidth: 1,
     borderRadius: 8,
-    backgroundColor: '#fff',
   },
+ 
+  pickerItem: {
+    padding: 10,
+    fontSize: 18,
+  },
+ 
+  button: {
+    backgroundColor: '#E97451',
+    paddingVertical: 12,
+    borderRadius: 8,
+    marginBottom: 12,
+    alignItems: 'center',
+  },
+ 
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+ 
   modalBackground: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
+ 
   modalContainer: {
-    backgroundColor: 'white',
+    width: '80%',
+    backgroundColor: '#fff',
     padding: 20,
-    borderRadius: 10,
-    width: '80%',
-  },
-  pickerItem: {
-    padding: 10,
-    fontSize: 18,
-    textAlign: 'center',
-  },
-  button: {
-    backgroundColor: '#333',
-    padding: 12,
-    marginVertical: 10,
     borderRadius: 8,
-    width: '80%',
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 14,
   },
 });
-
+ 
 export default Routine;

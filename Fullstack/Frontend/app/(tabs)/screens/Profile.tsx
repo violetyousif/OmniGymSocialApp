@@ -1,22 +1,45 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { FontAwesome, Entypo } from '@expo/vector-icons';
-
+import { useRouter } from 'expo-router';
+import { Dimensions } from 'react-native';
+import { supabase } from '../../../lib/supabase'
+import { Session } from '@supabase/supabase-js'
+ 
+const { width } = Dimensions.get('window');
+ 
 const Profile = () => {
+  const router = useRouter();
+ 
+  // Static Local Profile Image
+  // const profileImage = require('../../../assets/images/Maruf.jpg');
+ 
   return (
     <ScrollView style={styles.container}>
-      {/* Profile Section */}
-      <View style={styles.profileSection}>
-        <Image
-          source={{ uri: 'https://via.placeholder.com/150' }} // Replace with actual user image
-          style={styles.profileImage}
-        />
-        <Text style={styles.name}>Jane Doe</Text>
+      {/* Full-Width Header */}
+      <View style={styles.topBar}>
+        <View style={styles.logoContainer}>
+          <Image source={require('../../../assets/images/OmniGymLogo.png')} style={styles.logo} />
+        </View>
+ 
+        {/* Logout Button */}
+        <TouchableOpacity onPress={() => router.replace('/(tabs)/Login')} style={styles.logoutContainer}>
+          <Text style={styles.logout}>LOGOUT</Text>
+        </TouchableOpacity>
+ 
+        {/* Chat Icon - Aligned to Left */}
         <TouchableOpacity style={styles.chatIcon} onPress={() => alert('Open Chat')}>
           <FontAwesome name="comment" size={24} color="gray" />
         </TouchableOpacity>
       </View>
-
+ 
+      {/* Profile Section */}
+      <View style={styles.profileSection}>
+        {/* <Image source={profileImage} style={styles.profileImage} /> */}
+        <Text style={styles.name}>Abdulla Maruf</Text>
+        <Text style={styles.email}>amaruf@example.com</Text>
+      </View>
+ 
       {/* General Info Section */}
       <View style={styles.infoSection}>
         <View style={styles.infoItem}>
@@ -41,8 +64,8 @@ const Profile = () => {
           <Text style={styles.infoValue}>366</Text>
         </View>
       </View>
-
-      {/* PR Metrics Section - Centered */}
+ 
+      {/* PR Metrics Section */}
       <View style={styles.metricsSection}>
         <ScrollView horizontal contentContainerStyle={styles.metricsContainer}>
           <View style={styles.metricItem}>
@@ -67,7 +90,7 @@ const Profile = () => {
           </View>
         </ScrollView>
       </View>
-
+ 
       {/* PR Song Section */}
       <View style={styles.prSongSection}>
         <Entypo name="controller-play" size={24} color="white" />
@@ -76,7 +99,7 @@ const Profile = () => {
           <Text style={styles.songTitle}>"Goddess" by Written by Wolves</Text>
         </Text>
       </View>
-
+ 
       {/* Graph Placeholder */}
       <View style={styles.graphSection}>
         <Text style={styles.graphPlaceholder}>Graph Visualization</Text>
@@ -84,15 +107,64 @@ const Profile = () => {
     </ScrollView>
   );
 };
-
+ 
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
     flex: 1,
   },
+ 
+  // Full-Width Header
+  topBar: {
+    width: '100%',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#FFF',
+    paddingVertical: 18,
+    elevation: 5,
+    borderBottomWidth: 7,
+    borderBottomColor: '#E97451',
+  },
+ 
+  // Centered Logo
+  logoContainer: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  logo: {
+    width: 40,
+    height: 40,
+    resizeMode: 'contain',
+  },
+ 
+  // Logout Button
+  logoutContainer: {
+    position: 'absolute',
+    right: 20,
+    bottom: 10,
+  },
+  logout: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: 'black',
+  },
+ 
+  // Chat Icon - Aligned to Left
+  chatIcon: {
+    position: 'absolute',
+    left: 20,
+    bottom: 10,
+  },
+ 
+  // Profile Section
   profileSection: {
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 80, // Moved profile picture below the orange line
     marginBottom: 10,
   },
   profileImage: {
@@ -107,10 +179,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 10,
   },
-  chatIcon: {
-    position: 'absolute',
-    right: 30,
-    top: 30,
+  email: {
+    fontSize: 16,
+    color: 'gray',
   },
   infoSection: {
     flexDirection: 'row',
@@ -184,7 +255,7 @@ const styles = StyleSheet.create({
   graphPlaceholder: {
     fontSize: 16,
     color: 'gray',
-  },
+  }
 });
-
+ 
 export default Profile;

@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Switch, Image } from 'react-native';
+import { supabase } from '../../../lib/supabase'
+import { Session } from '@supabase/supabase-js'
 import * as ImagePicker from 'expo-image-picker';
 
+ 
 const Settings = () => {
   // States for profile information
   const [isPublic, setIsPublic] = useState(true);
@@ -9,37 +12,37 @@ const Settings = () => {
   const [name, setName] = useState('Jane Doe');
   const [caption, setCaption] = useState('Fitness Enthusiast | Gym Lover | Stronger Every Day');
   const [profileImage, setProfileImage] = useState<string>('https://via.placeholder.com/150');
-
+ 
   // States for general information
   const [joined, setJoined] = useState('2018');
   const [age, setAge] = useState(30);
   const [fitnessGoal, setFitnessGoal] = useState('Build Muscle');
   const [wilksScore, setWilksScore] = useState(366);
-
+ 
   // States for metrics
   const [benchPress, setBenchPress] = useState(105);
   const [deadlift, setDeadlift] = useState(220);
   const [runningTime, setRunningTime] = useState('5:30 min/km');
   const [squats, setSquats] = useState(220);
-
+ 
   const togglePublic = () => setIsPublic((prev) => !prev);
-  const toggleUnits = () => setUnits(units === 'Imperial' ? 'SI' : 'Imperial');
-
-
+  const toggleUnits = () => setUnits(units === 'Imperial' ? 'Metric' : 'Imperial');
+ 
+ 
   const pickImage = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
       alert('Permission to access gallery is required!');
       return;
     }
-  
+ 
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [1, 1],
       quality: 1,
     });
-  
+ 
     if (!result.canceled && result.assets.length > 0) {
       const selected = result.assets[0];
       const fileType = selected.uri.split('.').pop()?.toLowerCase();
@@ -50,7 +53,7 @@ const Settings = () => {
       }
     }
   };
-
+ 
   return (
     <ScrollView style={styles.container}>
       {/* Profile Header */}
@@ -66,7 +69,7 @@ const Settings = () => {
           <Text style={styles.caption}>{caption}</Text>
         </View>
       </View>
-
+ 
       {/* Units Converter Section Public/Private Section */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Units Converter</Text>
@@ -80,11 +83,11 @@ const Settings = () => {
           <Switch value={isPublic} onValueChange={togglePublic} />
         </View>
       </View>
-
+ 
       {/* Edit Profile Section */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Edit Profile</Text>
-
+ 
         <View style={styles.inputRow}>
           <Text style={styles.label}>Name:</Text>
           <TextInput
@@ -94,7 +97,7 @@ const Settings = () => {
             placeholder="Enter your name"
           />
         </View>
-
+ 
         <View style={styles.inputRow}>
           <Text style={styles.label}>Caption:</Text>
           <TextInput
@@ -104,7 +107,7 @@ const Settings = () => {
             placeholder="Enter your caption"
           />
         </View>
-
+ 
         <View style={styles.inputRow}>
           <Text style={styles.label}>Joined Year:</Text>
           <TextInput
@@ -114,7 +117,7 @@ const Settings = () => {
             placeholder="Enter joined year"
           />
         </View>
-
+ 
         <View style={styles.inputRow}>
           <Text style={styles.label}>Age:</Text>
           <TextInput
@@ -125,7 +128,7 @@ const Settings = () => {
             keyboardType="numeric"
           />
         </View>
-
+ 
         <View style={styles.inputRow}>
           <Text style={styles.label}>Fitness Goal:</Text>
           <TextInput
@@ -135,7 +138,7 @@ const Settings = () => {
             placeholder="Enter fitness goal"
           />
         </View>
-
+ 
         <View style={styles.inputRow}>
           <Text style={styles.label}>Wilks Score:</Text>
           <TextInput
@@ -146,7 +149,7 @@ const Settings = () => {
             keyboardType="numeric"
           />
         </View>
-
+ 
         <View style={styles.inputRow}>
           <Text style={styles.label}>Bench Press:</Text>
           <TextInput
@@ -157,7 +160,7 @@ const Settings = () => {
             keyboardType="numeric"
           />
         </View>
-
+ 
         <View style={styles.inputRow}>
           <Text style={styles.label}>Deadlift:</Text>
           <TextInput
@@ -168,7 +171,7 @@ const Settings = () => {
             keyboardType="numeric"
           />
         </View>
-
+ 
         <View style={styles.inputRow}>
           <Text style={styles.label}>Running Time:</Text>
           <TextInput
@@ -178,7 +181,7 @@ const Settings = () => {
             placeholder="Enter running time"
           />
         </View>
-
+ 
         <View style={styles.inputRow}>
           <Text style={styles.label}>Squats:</Text>
           <TextInput
@@ -189,18 +192,18 @@ const Settings = () => {
             keyboardType="numeric"
           />
         </View>
-
+ 
         {/* Save Changes Button */}
         <TouchableOpacity style={styles.button} onPress={() => alert('Profile updated')}>
           <Text style={styles.buttonText}>Save Changes</Text>
         </TouchableOpacity>
       </View>
-
-
+ 
+ 
     </ScrollView>
   );
 };
-
+ 
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#f5f5f5',
@@ -269,22 +272,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: -10, 
-    marginTop: -20, 
+    marginBottom: -10,
+    marginTop: -20,
   },
   label: {
     fontSize: 14,
     color: '#666',
   },
   inputRow: {
-    marginVertical: 1, 
+    marginVertical: 1,
   },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 6, 
-    padding: 6, 
-    marginTop: 4, 
+    borderRadius: 6,
+    padding: 6,
+    marginTop: 4,
     backgroundColor: '#fff',
   },
   button: {
@@ -303,5 +306,5 @@ const styles = StyleSheet.create({
     marginHorizontal: -20,
   }
 });
-
+ 
 export default Settings;
