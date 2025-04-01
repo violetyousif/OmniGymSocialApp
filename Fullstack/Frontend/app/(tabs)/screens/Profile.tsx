@@ -1,52 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { FontAwesome, Entypo } from '@expo/vector-icons';
-import { supabase } from '../../../lib/supabase';
-
-
-const [profile, setProfile] = useState<any>(null);
-const [profileImage, setProfileImage] = useState<string | null>(null);
-const [firstName, setFirstName] = useState<string | null>(null);
-
-
-useEffect(() => {
-  const fetchProfile = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-
-    const { data, error } = await supabase
-      .from('LTFUsers')
-      .select('*')
-      .eq('userID', user?.id)
-      .maybeSingle();
-
-    if (data) {
-      setProfile(data);
-    } else {
-      console.error(error);
-    }
-  };
-
-  fetchProfile();
-}, []);
 
 const Profile = () => {
   return (
     <ScrollView style={styles.container}>
       {/* Profile Section */}
       <View style={styles.profileSection}>
-        {profileImage ? (
-          <Image
-            source={{ uri: profileImage }}
-            style={styles.profileImage}
-          />
-        ) : (
-          <View style={[styles.profileImage, styles.placeholderImage]}>
-            <Text style={styles.placeholderText}>No Image</Text>
-          </View>
-        )}
-
-        <Text style={styles.name}>{firstName ? `${firstName}` : 'Loading...'}</Text>
-
+        <Image
+          source={{ uri: 'https://via.placeholder.com/150' }} // Replace with actual user image
+          style={styles.profileImage}
+        />
+        <Text style={styles.name}>Jane Doe</Text>
         <TouchableOpacity style={styles.chatIcon} onPress={() => alert('Open Chat')}>
           <FontAwesome name="comment" size={24} color="gray" />
         </TouchableOpacity>
@@ -136,14 +101,6 @@ const styles = StyleSheet.create({
     borderRadius: 60,
     borderWidth: 2,
     borderColor: '#ddd',
-  },
-  placeholderImage: {
-    backgroundColor: '#eee',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  placeholderText: {
-    color: '#999',
   },
   name: {
     fontSize: 22,

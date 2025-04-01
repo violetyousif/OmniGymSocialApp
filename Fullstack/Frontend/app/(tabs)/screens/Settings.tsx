@@ -86,16 +86,6 @@ const Settings = () => {
         <Text style={styles.sectionTitle}>Edit Profile</Text>
 
         <View style={styles.inputRow}>
-          <Text style={styles.label}>Profile Image URL:</Text>
-          <TextInput
-            style={styles.input}
-            value={profileImage}
-            onChangeText={setProfileImage}
-            placeholder="Enter Image URL"
-          />
-        </View>
-
-        <View style={styles.inputRow}>
           <Text style={styles.label}>Name:</Text>
           <TextInput
             style={styles.input}
