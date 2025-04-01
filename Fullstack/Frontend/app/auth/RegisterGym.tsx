@@ -6,41 +6,76 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
-  Platform,
-  TouchableWithoutFeedback,
-  Keyboard,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { SelectList } from "react-native-dropdown-select-list";
-import { supabase } from '../../lib/supabase'
 
 const RegisterGym = () => {
   const router = useRouter();
 
   const [selectedGym, setSelectedGym] = useState("");
+  const [selectedCity, setSelectedCity] = useState("");
+  const [selectedZip, setSelectedZip] = useState("");
   const [membershipID, setMembershipID] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  // Dropdown list for gyms ---- THIS IS USED FOR THE FRONTEND TESTING
   const gymList = [
-    {key: "lifetimefitness", value: "Lifetime Fitness"},
-    {key: "planetfitness", value: "Planet Fitness"},
-   ];
+    { key: "lifetimefitness", value: "Lifetime Fitness" },
+    { key: "planetfitness", value: "Planet Fitness" },
+  ];
 
-  // Simulated membership database ---- THIS IS USED FOR THE FRONTEND TESTING
+  const gymCityList = [
+    { key: "macomb", value: "Macomb" },
+    { key: "sterlingheights", value: "Sterling Heights" },
+    { key: "utica", value: "Utica" },
+    { key: "detroit", value: "Detroit" },
+    { key: "warren", value: "Warren" },
+  ];
+
+  const gymZipMap: Record<string, { key: string; value: string }[]> = {
+    macomb: [
+      { key: "48042", value: "48042" },
+      { key: "48044", value: "48044" },
+    ],
+    sterlingheights: [
+      { key: "48310", value: "48310" },
+      { key: "48312", value: "48312" },
+      { key: "48313", value: "48313" },
+    ],
+    utica: [
+      { key: "48315", value: "48315" },
+      { key: "48317", value: "48317" },
+    ],
+    detroit: [
+      { key: "48201", value: "48201" },
+      { key: "48226", value: "48226" },
+      { key: "48228", value: "48228" },
+    ],
+    warren: [
+      { key: "48089", value: "48089" },
+      { key: "48091", value: "48091" },
+      { key: "48092", value: "48092" },
+    ],
+  };
+
   const validMemberships: Record<string, string[]> = {
     lifetimefitness: ["LTF112233", "LTF443322", "LTF667788"],
     planetfitness: ["PF112233", "PF998877", "PF554433"],
   };
 
-  // Function to validate gym membership -- FRONTEND TESTING
   const handleSubmit = async () => {
-    if (!selectedGym || !membershipID) {
-      setErrorMessage("Please select a gym and enter your Membership ID.");
+    let errors = [];
+
+    if (!selectedGym) errors.push("Please select a gym");
+    if (!membershipID) errors.push("Please enter your Membership ID.");
+    if (!selectedCity) errors.push("Please select a City.");
+    if (!selectedZip) errors.push("Please select a Zip.");
+
+    if (errors.length > 0) {
+      alert(errors.join("\n"));
       return;
     }
 
-    // Map gym name to gym code
     const gymCodeMap: Record<string, string> = {
       lifetimefitness: "LTF",
       planetfitness: "PF",
@@ -53,80 +88,89 @@ const RegisterGym = () => {
       return;
     }
 
-    // Simulated member key (Gym Code + Membership ID)
     const membershipKey = `${gymPrefix}${membershipID}`;
 
-    // Simulated database check  ----- THIS IS FRONT END TESTING
     if (validMemberships[selectedGym]?.includes(membershipKey)) {
-      console.log("Membership valid:", membershipKey);
-      setErrorMessage(""); // Clear error
-      router.push("/auth/RegisterAccount"); 
+      setErrorMessage("");
+      router.push("/auth/RegisterAccount");
     } else {
-      console.log("Invalid Membership:", membershipKey);
       setErrorMessage("Invalid Gym Member ID. Please try again.");
     }
-
-    // Commented out Firebase database logic  --- GENERATED LOGIC FROM CHATGPT FOR DATABASE MAKE SURE TO UNCOMMENT THE INMPORT LINE 12
-    /*
-    try {
-      const memberRef = doc(db, "memberships", membershipKey);
-      const memberSnap = await getDoc(memberRef);
-
-      if (memberSnap.exists()) {
-        // Membership is valid, navigate to the next page
-        router.push("/nextPage"); // Replace with your actual next page
-      } else {
-        setErrorMessage("Invalid Member/Gym ID. Please try again.");
-      }
-    } catch (error) {
-      console.error("Error checking membership:", error);
-      setErrorMessage("An error occurred. Please try again.");
-    }
-    */
   };
 
   return (
-
     <View style={styles.container}>
-      {/* Logo */}
       <Image
         source={require("../../assets/images/OrangeLogo.png")}
         style={styles.logo}
       />
-      {/* Title */}
       <Text style={styles.title}>
         Gym Member{"\n"}
         Verification
       </Text>
 
-        {/* Gym Dropdown */}
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Gym</Text>
-          <SelectList
-            setSelected={(val: string) => setSelectedGym(val)}
-            data={(gymList as unknown) as {key: string, value: string}[]}
-            save="key"
-            placeholder="Select Gym"
-            boxStyles={{ 
-              borderColor: '#ccc', // border color
-              borderRadius: 8, // border radius
-              height: 50 // height
-            }} 
-            dropdownTextStyles={{ color: '#252422', fontSize: 16 }} // dropdown text color and size
-            inputStyles={{ color: '#252422', fontSize: 16 }} // placeholder text color and size
-          />
-        </View>
+      {/* Gym Dropdown */}
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Gym</Text>
+        <SelectList
+          setSelected={(val: string) => setSelectedGym(val)}
+          data={gymList}
+          save="key"
+          placeholder="Select Gym"
+          boxStyles={styles.dropdownBox}
+          dropdownTextStyles={styles.dropdownText}
+          inputStyles={styles.dropdownInput}
+        />
+      </View>
 
       {/* Membership ID Input */}
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Membership ID</Text>
-          <View style={styles.dropdownContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter Membership ID"
-            placeholderTextColor="#999"
-            value={membershipID}
-            onChangeText={setMembershipID}
+        <TextInput
+          style={styles.input}
+          placeholder="Enter Membership ID"
+          placeholderTextColor="#999"
+          value={membershipID}
+          onChangeText={setMembershipID}
+        />
+      </View>
+
+      {/* City Dropdown */}
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>City</Text>
+        <SelectList
+          setSelected={(val: string) => {
+            setSelectedCity(val);
+            setSelectedZip(""); // Clear ZIP when city changes
+          }}
+          data={gymCityList}
+          save="key"
+          placeholder="City"
+          boxStyles={styles.dropdownBox}
+          dropdownTextStyles={styles.dropdownText}
+          inputStyles={styles.dropdownInput}
+        />
+      </View>
+
+      {/* Zip Dropdown (disabled until city is selected) */}
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Zip</Text>
+        <View pointerEvents={selectedCity ? "auto" : "none"}>
+          <SelectList
+            setSelected={(val: string) => setSelectedZip(val)}
+            data={selectedCity ? gymZipMap[selectedCity] || [] : []}
+            save="key"
+            placeholder={selectedCity ? "Select Zip" : "Select City First"}
+            boxStyles={{
+              ...styles.dropdownBox,
+              backgroundColor: selectedCity ? "#fff" : "#f0f0f0",
+              opacity: selectedCity ? 1 : 0.6,
+            }}
+            dropdownTextStyles={styles.dropdownText}
+            inputStyles={{
+              color: selectedCity ? "#252422" : "#999",
+              fontSize: 16,
+            }}
           />
         </View>
       </View>
@@ -148,7 +192,6 @@ const RegisterGym = () => {
 };
 
 const styles = StyleSheet.create({
-  // Main Container
   container: {
     flex: 1,
     alignItems: "center",
@@ -156,14 +199,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     paddingHorizontal: 20,
   },
-  // Logo Styling
   logo: {
     width: 150,
     height: 150,
     resizeMode: "contain",
     marginBottom: 20,
   },
-  // Title
   title: {
     fontSize: 28,
     textAlign: "center",
@@ -172,27 +213,16 @@ const styles = StyleSheet.create({
     color: "#252422",
     lineHeight: 40,
   },
-  // Input Container
   inputContainer: {
     width: "70%",
     marginBottom: 20,
   },
-  // Labels/input headers
   label: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 5,
     color: "#000",
   },
-  // dropdown Container
-  dropdownContainer: {
-    width: "100%",
-    borderWidth: 1,
-    borderColor: '#D8D7D4',
-    borderRadius: 8,
-    overflow: "hidden",
-  },
-  // Input field
   input: {
     width: "100%",
     height: 50,
@@ -203,14 +233,24 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
   },
-  // Error Message
+  dropdownBox: {
+    borderColor: "#ccc",
+    borderRadius: 8,
+    height: 50,
+  },
+  dropdownText: {
+    color: "#252422",
+    fontSize: 16,
+  },
+  dropdownInput: {
+    color: "#252422",
+    fontSize: 16,
+  },
   errorText: {
     color: "red",
     fontSize: 14,
     marginBottom: 10,
   },
-  
-  // Submit Button
   button: {
     backgroundColor: "#E97451",
     paddingVertical: 12,
@@ -223,8 +263,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-
-  // Previous/back Button
   backButton: {
     paddingTop: 40,
     marginTop: 20,
