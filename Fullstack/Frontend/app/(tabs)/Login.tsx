@@ -126,7 +126,7 @@ const LoginScreen = () => {
         alert("Login failed: " + error.message);
       } else {
         console.log("Signed in:", data);
-        router.replace('/(tabs)/screens/Profile');    // Navigate after successful login
+        router.replace('/(tabs)/screens/Home');    // Navigate after successful login
       }
     } catch (err) {
       console.error("Unexpected login error:", err);
