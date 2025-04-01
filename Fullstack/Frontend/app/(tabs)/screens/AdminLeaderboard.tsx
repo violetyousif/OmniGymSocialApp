@@ -60,6 +60,55 @@ const AdminLeaderboard = () => {
     fetchLeaderboard();
   }, [isAdmin]);
 
+  /*useEffect(() => {
+    const fetchLeaderboard = async () => {
+      if (!isAdmin) return;
+  
+      // Simulate async delay
+      await new Promise((resolve) => setTimeout(resolve, 500));
+  
+      // Mock data structure based on your table
+      const mockData = [
+        {
+          email: 'john@mock.com',
+          prWeight: 300,
+          prReps: 3,
+          cntstCategory: 'Bench Press',
+          submissionDate: '2025-03-30',
+          leaderboardID: 1,
+        },
+        {
+          email: 'sara@mock.com',
+          prWeight: 250,
+          prReps: 2,
+          cntstCategory: 'Deadlift',
+          submissionDate: '2025-03-25',
+          leaderboardID: 2,
+        },
+      ];
+  
+      const withScore = mockData
+        .filter(e => e.prWeight && e.prReps && e.prReps !== 0)
+        .map(e => ({
+          ...e,
+          score: e.prWeight / e.prReps,
+        }))
+        .sort((a, b) => b.score - a.score);
+  
+      setEntries(withScore);
+    };
+  
+    fetchLeaderboard();
+  }, [isAdmin]);
+  */
+
+
+
+
+
+
+
+
   if (!checked) return null;
 
   // If user is not admin, show unauthorized message (this will change, there for the time being)

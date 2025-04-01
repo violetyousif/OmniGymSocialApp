@@ -94,6 +94,34 @@ const EventsScreen = () => {
     setLoading(false);
   };
 
+  //TEST 
+  /*
+  const fetchEvents = async () => {
+    setLoading(true);
+  
+    // Simulate a delay
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  
+    // Mock data
+    const mockData: Event[] = [
+      {
+        eventID: 1,
+        eventName: 'Mock Strength Showdown',
+        eventDate: '2025-04-20',
+        eventType: 'Powerlifting',
+        eventLocation: 'LTF Uptown',
+        gymCity: 'Dallas',
+        gymState: 'TX',
+        gymAbbr: selectedGym,
+      },
+    ];
+  
+    setEvents(mockData);
+    setLoading(false);
+  };
+  */
+  
+
 
 
   /**
@@ -162,7 +190,7 @@ const EventsScreen = () => {
 
 
   /**
-   * Main return:
+   * The Main return:
    * - Gym toggle (Lifetime vs PF)
    * - Existing events list
    * - Submission form for new events
