@@ -6,20 +6,21 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from django.utils import timezone  # Added to set uploadDate
-from .models.pf_models import PFUsers, PlanetFitnessDB  # PFUsers model
-from .models.ltf_models import LTFUsers, LifetimeFitnessDB
-from .models.globalOps_model import AffilGyms
-from .serializers import PFUserSerializer, UserTypeSerializer, UserSerializer
+# from .models.pf_models import PFUsers, PlanetFitnessDB  # PFUsers model
+# from .models.ltf_models import LTFUsers, LifetimeFitnessDB
+from .models import AffilGyms, PlanetFitnessDB, LifetimeFitnessDB
+# from .models.globalOps_models import AffilGyms
+from .serializers import LTFUserSerializer, PFUserSerializer
 
 # PURPOSE: Control what data gets sent/received and create the views here
 from rest_framework import viewsets
-from .models import Item
-from .serializers import ItemSerializer
+# from .models import Item
+# from .serializers import ItemSerializer
 
 # PURPOSE: Handles user registration and login
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
-from .models import User
+# from .models import User
 
 # PURPOSE: Handles user registration and login
 # from django.http import JsonResponse
@@ -57,13 +58,31 @@ def loginUser(request):
 # PURPOSE: Handles user registration
 @api_view(['POST'])
 def registerUser(request):
-    """Handles user registration"""
-    serializer = UserSerializer(data=request.data)  # Ensure UserSerializer is imported
+    """Handles user registration for PF or LTF users based on gymAbbr"""
+    gym_abbr = request.data.get("gymAbbr")
+
+    if gym_abbr == "PF":
+        serializer = PFUserSerializer(data=request.data)
+    elif gym_abbr == "LTF":
+        serializer = LTFUserSerializer(data=request.data)
+    else:
+        return Response({"error": "Invalid or missing gymAbbr. Must be 'PF' or 'LTF'."}, status=status.HTTP_400_BAD_REQUEST)
 
     if serializer.is_valid():
         serializer.save()
         return Response({"message": "User registered successfully!"}, status=status.HTTP_201_CREATED)
+
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# @api_view(['POST'])
+# def registerUser(request):
+#     """Handles user registration"""
+#     serializer = UserSerializer(data=request.data)  # Ensure UserSerializer is imported
+
+#     if serializer.is_valid():
+#         serializer.save()
+#         return Response({"message": "User registered successfully!"}, status=status.HTTP_201_CREATED)
+#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # PURPOSE: Verify membership for specific gym during registration

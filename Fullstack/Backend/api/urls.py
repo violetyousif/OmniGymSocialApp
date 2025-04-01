@@ -1,7 +1,7 @@
 # PURPOSE: This is where we define the URL routing for our Django application (route requests to the appropriate views)
 
 from django.urls import path, include
-from .views import register_pf_user, list_pf_users  # Updated to import correct view functions
+# from .views import register_pf_user, list_pf_users  # Updated to import correct view functions
 from rest_framework_simplejwt.views import TokenRefreshView
 
 # Import views for user registration and login

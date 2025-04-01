@@ -32,6 +32,21 @@ const RegisterGym = () => {
   const [gymStateOptions, setGymStateOptions] = useState<{ key: string; value: string }[]>([]);
   
 
+  // useEffect(() => {
+  //   const testSupabasePermission = async () => {
+  //     const { data, error } = await supabase
+  //       .from("AffilGyms")
+  //       .select("*");
+  
+  //     if (error) {
+  //       console.log("Permission Error:", error.message);
+  //     } else {
+  //       console.log("Data:", data);
+  //     }
+  //   };
+  
+  //   testSupabasePermission();
+  //   return undefined; // Ensure no JSX or invalid return type
 
   // Load gym names from AffilGyms table
   useEffect(() => {

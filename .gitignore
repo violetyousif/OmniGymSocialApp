@@ -5,3 +5,9 @@ omnigym/src/App2.tsx
 Fullstack/Backend/api/postgresCode.txt
 Fullstack/Frontend/.env
 Fullstack/Backend/.env
+Fullstack/Backend/api/models/__init__.py
+Fullstack/Backend/api/models/globalOps_model.py
+Fullstack/Backend/api/models/globalOps_models.py
+Fullstack/Backend/api/models/pf_models.py
+Fullstack/Backend/api/models/__pycache__/__init__.cpython-312.pyc
+Fullstack/Backend/api/models/ltf_models.py
