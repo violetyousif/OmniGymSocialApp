@@ -17,9 +17,9 @@ urlpatterns = [
     path('', include(router.urls)),
     path('register/', registerUser, name='register'),
     path('login/', loginUser, name='login'),
-    path("api/verifyMembership/", verifyMembership),
-    path("api/getGymCities/", getGymCities),
-    path("api/getGymStates/", getGymStates),
+    path("verifyMembership/", verifyMembership),
+    path("getGymCities/", getGymCities),
+    path("getGymStates/", getGymStates),
 
 
     

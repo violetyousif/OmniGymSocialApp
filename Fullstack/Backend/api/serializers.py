@@ -36,6 +36,7 @@ class UserTypeSerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
         extra_kwargs = {
+            'userID': {'required': False},
             'password': {'write_only': True}
         }
 

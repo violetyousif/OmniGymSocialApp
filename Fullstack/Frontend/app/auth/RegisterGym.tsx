@@ -72,16 +72,15 @@ const RegisterGym = () => {
     fetchGyms();
   }, []);
 
-
-
   useEffect(() => {
     const fetchStates = async () => {
       if (!selectedGymName) return;
-
+  
       try {
-        const res = await fetch(`${BACKEND_URL}/api/gym_states/?gymName=${encodeURIComponent(selectedGymName)}`);
+        const res = await fetch(`${BACKEND_URL}/api/getGymStates/?gymName=${encodeURIComponent(selectedGymName)}`);
         const result = await res.json();
-
+        console.log("Raw response:", result);
+  
         if (res.ok && result.states) {
           const formatted = result.states.map((state: string) => ({
             key: state,
@@ -97,19 +96,23 @@ const RegisterGym = () => {
         setGymStateOptions([]);
       }
     };
-
+  
     fetchStates();
   }, [selectedGymName]);
   
-
   useEffect(() => {
     const fetchCities = async () => {
-      if (!selectedGymName) return;
-
+      if (!selectedGymName || !selectedGymState) return;
+  
       try {
-        const res = await fetch(`${BACKEND_URL}/api/gym_cities/?gymName=${encodeURIComponent(selectedGymName)}`);
-        const result = await res.json();
-
+        const res = await fetch(
+          `${BACKEND_URL}/api/getGymCities/?gymName=${encodeURIComponent(selectedGymName)}&gymState=${encodeURIComponent(selectedGymState)}`
+        );
+        const text = await res.text();
+        console.log("Raw response:", text);
+  
+        const result = JSON.parse(text);
+  
         if (res.ok && result.cities) {
           const formatted = result.cities.map((city: string) => ({
             key: city,
@@ -122,25 +125,43 @@ const RegisterGym = () => {
         }
       } catch (err) {
         console.error("Error fetching cities:", err);
-        setGymCityOptions([]); 
+        setGymCityOptions([]);
       }
     };
-
+  
     fetchCities();
-  }, [selectedGymName]);
+  }, [selectedGymName, selectedGymState]);
+  
 
+  // useEffect(() => {
+  //   const fetchCities = async () => {
+  //     if (!selectedGymName) return;
+  
+  //     try {
+  //       const res = await fetch(`${BACKEND_URL}/api/getGymCities/?gymName=${encodeURIComponent(selectedGymName)}`);
+  //       const text = await res.text();
+  //       console.log("Raw response:", text);
+  
 
-  // Dropdown list for gyms ---- THIS IS USED FOR THE FRONTEND TESTING
-  // const gymList = [
-  //   {key: "lifetimefitness", value: "Lifetime Fitness"},
-  //   {key: "planetfitness", value: "Planet Fitness"},
-  //  ];
-
-  // Simulated membership database ---- THIS IS USED FOR THE FRONTEND TESTING
-  // const validMemberships: Record<string, string[]> = {
-  //   lifetimefitness: ["LTF112233", "LTF443322", "LTF667788"],
-  //   planetfitness: ["PF112233", "PF998877", "PF554433"],
-  // };
+  //       const result = JSON.parse(text); // safely parse after logging
+  //       if (res.ok && result.cities) {
+  //         const formatted = result.cities.map((city: string) => ({
+  //           key: city,
+  //           value: city,
+  //         }));
+  //         setGymCityOptions(formatted);
+  //         console.log("Fetched gymCityOptions:", formatted);
+  //       } else {
+  //         setGymCityOptions([]);
+  //       }
+  //     } catch (err) {
+  //       console.error("Error fetching cities:", err);
+  //       setGymCityOptions([]); 
+  //     }
+  //   };
+  
+  //   fetchCities();
+  // }, [selectedGymName]);
 
   
     // Handle Submit (Calls Django backend to verify)
@@ -151,6 +172,13 @@ const RegisterGym = () => {
       }
   
       try {
+        console.log("Submitting with values:", {
+          gymName: selectedGymName,
+          gymCity: selectedGymCity,
+          gymState: selectedGymState,
+          memberID: membershipID
+        });
+        
         const res = await fetch(`${BACKEND_URL}/api/verifyMembership/`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -334,7 +362,7 @@ const RegisterGym = () => {
 
         {/* Gym State */}
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Gym's State</Text>
+          <Text style={styles.label}>Gym State</Text>
           <SelectList
             setSelected={(val: string) => setSelectedGymState(val)}
             data={gymStateOptions}
@@ -344,7 +372,8 @@ const RegisterGym = () => {
               borderColor: '#ccc', // border color
               borderRadius: 8, // border radius
               height: 50 // height
-            }} 
+            }}
+            dropdownStyles={{ maxHeight: 300 }} // Increase this to show more items (you can go higher)
             dropdownTextStyles={{ color: '#252422', fontSize: 16 }} // dropdown text color and size
             inputStyles={{ color: '#252422', fontSize: 16 }} // placeholder text color and size
           />
@@ -353,7 +382,7 @@ const RegisterGym = () => {
 
         {/* Gym City */}
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Gym's City</Text>
+          <Text style={styles.label}>Gym City</Text>
           <SelectList
             setSelected={setSelectedGymCity}
             data={gymCityOptions}
@@ -364,6 +393,7 @@ const RegisterGym = () => {
               borderRadius: 8, // border radius
               height: 50 // height
             }} 
+            dropdownStyles={{ maxHeight: 300 }} // Increase this to show more items (you can go higher)
             dropdownTextStyles={{ color: '#252422', fontSize: 16 }} // dropdown text color and size
             inputStyles={{ color: '#252422', fontSize: 16 }} // placeholder text color and size
           />

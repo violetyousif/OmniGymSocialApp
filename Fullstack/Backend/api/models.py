@@ -8,6 +8,7 @@ from django.utils.translation import gettext_lazy as _
 # PURPOSE: Defines and creates the data structure models for each table
 
 class AffilGyms(models.Model):
+    gymID = models.BigAutoField(primary_key=True)
     gymName = models.CharField(max_length=255)
     gymCity = models.CharField(max_length=255)
     gymState = models.CharField(max_length=255)
@@ -25,7 +26,8 @@ class AffilGyms(models.Model):
 
 
 class LTFUsers(models.Model):
-    userID = models.UUIDField(primary_key=True)
+    id = models.BigAutoField(primary_key=True)
+    userID = models.UUIDField(primary_key=False)
     memberID = models.CharField(max_length=15)
     gymAbbr = models.CharField(max_length=5)
     gymCity = models.CharField(max_length=20)
@@ -58,7 +60,8 @@ class LifetimeFitnessDB(models.Model):
         managed = False
 
 class PFUsers(models.Model):
-    userID = models.UUIDField(primary_key=True)
+    id = models.BigAutoField(primary_key=True)
+    userID = models.UUIDField(primary_key=False)
     memberID = models.CharField(max_length=15)
     gymAbbr = models.CharField(max_length=5)
     gymCity = models.CharField(max_length=20)

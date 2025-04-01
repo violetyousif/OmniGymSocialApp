@@ -72,7 +72,9 @@ def registerUser(request):
         serializer.save()
         return Response({"message": "User registered successfully!"}, status=status.HTTP_201_CREATED)
 
+    print("Serializer errors:", serializer.errors)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 # @api_view(['POST'])
 # def registerUser(request):
@@ -97,15 +99,16 @@ def verifyMembership(request):
 
     # Step 1: Look up gym name in AffilGyms table
     # gym = AffilGyms.objects.filter(gymName=gym_name).first()
-    gym = AffilGyms.objects.filter(gymName=gym_name)
+    gym = AffilGyms.objects.filter(gymName=gym_name).first()
     print("Matched gyms:", gym)
 
     if not gym:
         return Response({"error": "Unable to locate gym."}, status=404)
 
+    
     gym_abbr = gym.gymAbbr
-    gym_city = gym.gymCity
-    gym_state = gym.gymState
+    gym_city = data.get("gymCity")
+    gym_state = data.get("gymState")
 
     # Step 2: Locate necessary gym DB
     db_map = {
@@ -118,12 +121,17 @@ def verifyMembership(request):
         return Response({"error": "Unsupported gym type."}, status=400)
 
     # Step 3: Check if user exists
+    # Using iexact to allow case-insensitive matching
     user = GymTable.objects.filter(
-        memberID=member_id,
-        gymAbbr=gym_abbr,
-        gymState=gym_state,
-        gymCity=gym_city
+        gymCity__iexact=gym_city,
+        memberID__iexact=member_id,
+        gymAbbr__iexact=gym_abbr,
+        gymState__iexact=gym_state
     ).first()
+
+    if not user:
+        print(f"Member not found with ID: {member_id}, gymAbbr: {gym_abbr}, city: {gym_city}, state: {gym_state}")
+        return Response({"error": "Member not found."}, status=404)
 
     if not user:
         return Response({"error": "Member not found."}, status=404)
@@ -140,21 +148,22 @@ def verifyMembership(request):
 
 
 # PURPOSE: Get gym cities based on gym name
-@api_view(["GET"])
-def getGymCities(request):
-    gym_name = request.query_params.get("gymName")
+# @api_view(["GET"])
+# def getGymCities(request):
+#     gym_name = request.query_params.get("gymName")
 
-    if not gym_name:
-        return Response({"error": "Missing gym name"}, status=400)
+#     if not gym_name:
+#         return Response({"error": "Missing gym name"}, status=400)
 
-    cities = (
-        AffilGyms.objects
-        .filter(gymName=gym_name)
-        .values_list("gymCity", flat=True)
-        .distinct()
-    )
+#     cities = (
+#         AffilGyms.objects
+#         .filter(gymName=gym_name)
+#         .values_list("gymCity", flat=True)
+#         .distinct()
+#     )
     
-    return Response({"cities": list(cities)}, status=200)
+#     return Response({"cities": list(cities)}, status=200)
+
 
 # PURPOSE: Get gym states based on gym name
 @api_view(["GET"])
@@ -174,6 +183,22 @@ def getGymStates(request):
     return Response({"states": list(states)}, status=200)
 
 
+@api_view(["GET"])
+def getGymCities(request):
+    gym_name = request.query_params.get("gymName")
+    gym_state = request.query_params.get("gymState")
+
+    if not gym_name or not gym_state:
+        return Response({"error": "Missing gym name or state"}, status=400)
+
+    cities = (
+        AffilGyms.objects
+        .filter(gymName=gym_name, gymState=gym_state)
+        .values_list("gymCity", flat=True)
+        .distinct()
+    )
+    
+    return Response({"cities": list(cities)}, status=200)
 
 
 
