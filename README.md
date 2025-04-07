@@ -9,8 +9,11 @@ An app to build a community for its gym members.
    - _Iterations1.html_ will link the iterations to the github and has a tab for the "App Home" (_Omni2.html_). Since the app is mobile-based, we were unable to link the file type directly to the tabs.
 
    - _Omni2.html_ is the omnigym intro site and will describe omnigym's purpose. (Refer to footnote for terms.)
-<br><br>
 
+<br><br>
+---
+---
+<br><br><br>
 
 # Setup Guide
 
@@ -175,65 +178,10 @@ python test_connection.py
 
 More info: [Supabase Arrays Guide](https://supabase.com/docs/guides/database/arrays)
 
-
-
-
-
-
-
-
-
-
-## Running the App
-### Web Simulator
-To compile and run the app in your web browser, use: <br>
-      ```bash
-      ionic serve
-      ```
-<br>This command will compile your project and automatically open it in your default browser.
-
-### Preparing for Native Development (Android & iOS)
-The project uses Capacitor for native builds.
-1. Build the Project
-   Before adding any native platforms, ensure the project is built:
-      ```bash
-      ionic build
-      ```
-2. Add and Sync Native Platforms
-   Android:
-      ```bash
-      ionic capacitor add android
-      ionic capacitor copy android
-      ionic capacitor open android
-      ```
-      The last command will open the Android project in Android Studio, where you can run the app on an emulator or device.
-   iOS (Mac only):
-      ```bash
-      ionic capacitor add ios
-      ionic capacitor copy ios
-      ionic capacitor open ios
-      ```
-      The last command will open the iOS project in Xcode, where you can run the app on the iOS simulator or a connected device.
-
-## Optional: Version Checks and Updates
-- Verify Capacitor Version:<br>
-      ```
-      npx cap --version
-      ```
-  <br>
-- Update Ionic CLI and Capacitor:<br>
-      ```
-      npm install -g @ionic/cli
-      npm install @capacitor/core @capacitor/cli
-      ```
-  <br>
-## Troubleshooting:
-- Ensure your Node.js and npm versions meet the minimum requirements.
-- Confirm that Android Studio and Xcode are correctly installed and configured.
-- For further assistance, refer to the [Ionic Documentation](https://ionic.io/docs/appflow) and [Ionic Capacitor Documentation](https://ionicframework.com/docs/cli/commands/build).
-<br><br><br><br>
-
-
+<br><br>
+---
+---
+<br><br><br>
 
 # OMNIGYM APP PAGES
 ### Login Page:
@@ -334,8 +282,10 @@ _All the following info is required to successfully register or else an error is
      - Technical help (includes contact info)
      - Account help (e.g.: If user changes gyms, they can submit a ticket to change gyms in account)
 
-<br><br><br><br>
-
+<br><br>
+---
+---
+<br><br><br>
 
 ## DATA COLLECTION
 ### Data Collected From User Registration (frontend):
