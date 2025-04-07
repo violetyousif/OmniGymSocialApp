@@ -6,7 +6,6 @@ import {
   FlatList,
   TextInput,
   Button,
-  TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
 import { supabase } from '../../../lib/supabase';

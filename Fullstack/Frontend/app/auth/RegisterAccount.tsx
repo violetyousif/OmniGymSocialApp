@@ -246,15 +246,6 @@ const RegisterAccount: React.FC = () => {
       } else {
         alert(result.error || JSON.stringify(result) || "Registration failed.");
       }
-
-      // const result = await res.json();
-  
-      // if (res.ok) {
-      //   alert("Registration successful!");
-      //   router.push("../(tabs)/Login");
-      // } else {
-      //   alert(result.error || "Registration failed.");
-      // }
     } catch (err) {
       console.error("Registration error:", err);
       alert("Server error or no connection.");

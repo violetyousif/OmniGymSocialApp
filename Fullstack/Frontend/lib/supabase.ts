@@ -8,10 +8,18 @@ import "react-native-url-polyfill/auto" // Polyfill for react-native
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { createClient } from '@supabase/supabase-js'
 
+
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error("Missing Supabase environment variables. Check .env file.");
+}
+
 // Supabase url and anon key; connects to .env file in frontend
 export const supabase = createClient(
-  process.env.EXPO_PUBLIC_SUPABASE_URL || "",
-  process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || "",
+  supabaseUrl,
+  supabaseAnonKey,
   {
     auth: {
       storage: AsyncStorage,
@@ -19,7 +27,8 @@ export const supabase = createClient(
       persistSession: true,
       detectSessionInUrl: false,
     },
-  })
+  }
+);
 
 
 // Tells Supabase Auth to continuously refresh the session automatically
@@ -34,3 +43,6 @@ AppState.addEventListener('change', (state) => {
       supabase.auth.stopAutoRefresh()
     }
   })
+
+
+  console.log("ENV TEST:", process.env.EXPO_PUBLIC_SUPABASE_URL);

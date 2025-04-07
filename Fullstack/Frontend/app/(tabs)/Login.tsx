@@ -5,12 +5,10 @@ import {
   TextInput, 
   TouchableOpacity, 
   View, 
-  Button, 
   Dimensions, 
   Image, 
   Keyboard, 
   TouchableWithoutFeedback,
-  Platform,
 } from 'react-native';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -71,36 +69,6 @@ const LoginScreen = () => {
     if (text === "") return;
     setIsValidPassword(validatePassword(text));
   };
-
-  // const handleLogin = () => {
-  //   // TODO: Replace with real SQL authentication logic
-  //   // Example of how SQL authentication might look (Commented Out)
-  //   /*
-  //   fetch('https://your-sql-api.com/login', {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //     body: JSON.stringify({
-  //       email,
-  //       password,
-  //     }),
-  //   })
-  //   .then(response => response.json())
-  //   .then(data => {
-  //     if (data.success) {
-  //       router.replace('/(tabs)/Profile');
-  //     } else {
-  //       alert('Invalid login credentials');
-  //     }
-  //   })
-  //   .catch(error => {
-  //     console.error('Error:', error);
-  //   });
-  //   */
-  //   // Temporary front-end test: Redirect to Profile
-  //   router.replace('/(tabs)/screens/Profile'); 
-  // };
   
   const handleLogin = async () => {
     // Mark fields as touched to show errors if needed
@@ -230,7 +198,6 @@ circle: {
   backgroundColor: '#F15A29',
   position: 'absolute',
   top: hp('12%'),
-  // left: wp('%'),
   zIndex: 1,
 },
 

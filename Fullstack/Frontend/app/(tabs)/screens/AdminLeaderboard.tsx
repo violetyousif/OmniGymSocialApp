@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 import { supabase } from '@/lib/supabase';
-import { Ionicons } from '@expo/vector-icons';
 
 /**
  * This file renders a leaderboard view for admin users.

@@ -29,24 +29,7 @@
       "output": "static",
       "favicon": "./assets/images/DarkGreyLogo.png"
     },
-    // "plugins": [
-    //   "expo-router",
-    //   [
-    //     "SplashScreen",
-    //     {
-    //       "ios": {
-    //         "backgroundColor": "#ffffff",
-    //         "image": "./assets/images/OrangeLogo.png",
-    //         "resizeMode": "cover"
-    //       },
-    //       "android": {
-    //         "backgroundColor": "#ffffff",
-    //         "image": "./assets/images/OrangeLogo.png",
-    //         "imageWidth": 150
-    //         }
-    //       }
-    //   ]
-    // ],
+
     "experiments": {
       "typedRoutes": true
     }

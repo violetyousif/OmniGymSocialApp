@@ -27,23 +27,6 @@ const RegisterGym = () => {
   
   const [selectedGymState, setSelectedGymState] = useState<string>("");
   const [gymStateOptions, setGymStateOptions] = useState<{ key: string; value: string }[]>([]);
-  
-
-  // useEffect(() => {
-  //   const testSupabasePermission = async () => {
-  //     const { data, error } = await supabase
-  //       .from("AffilGyms")
-  //       .select("*");
-  
-  //     if (error) {
-  //       console.log("Permission Error:", error.message);
-  //     } else {
-  //       console.log("Data:", data);
-  //     }
-  //   };
-  
-  //   testSupabasePermission();
-  //   return undefined; // Ensure no JSX or invalid return type
 
   // Load gym names from AffilGyms table
   useEffect(() => {
@@ -128,39 +111,7 @@ const RegisterGym = () => {
   
     fetchCities();
   }, [selectedGymName, selectedGymState]);
-  
 
-  // useEffect(() => {
-  //   const fetchCities = async () => {
-  //     if (!selectedGymName) return;
-  
-  //     try {
-  //       const res = await fetch(`${BACKEND_URL}/api/getGymCities/?gymName=${encodeURIComponent(selectedGymName)}`);
-  //       const text = await res.text();
-  //       console.log("Raw response:", text);
-  
-
-  //       const result = JSON.parse(text); // safely parse after logging
-  //       if (res.ok && result.cities) {
-  //         const formatted = result.cities.map((city: string) => ({
-  //           key: city,
-  //           value: city,
-  //         }));
-  //         setGymCityOptions(formatted);
-  //         console.log("Fetched gymCityOptions:", formatted);
-  //       } else {
-  //         setGymCityOptions([]);
-  //       }
-  //     } catch (err) {
-  //       console.error("Error fetching cities:", err);
-  //       setGymCityOptions([]); 
-  //     }
-  //   };
-  
-  //   fetchCities();
-  // }, [selectedGymName]);
-
-  
     // Handle Submit (Calls Django backend to verify)
     const handleSubmit = async () => {
       if (!selectedGymName || !membershipID) {
@@ -214,116 +165,6 @@ const RegisterGym = () => {
       }
     };
   
-
-  // Function to validate gym membership -- FRONTEND TESTING
-  // const handleSubmit = async () => {
-  //   if (!selectedGymName || !membershipID) {
-  //     setErrorMessage("Please select a gym and enter your Membership ID.");
-  //     return;
-  //   }
-
-  //   // Step 1: Get gym metadata from AffilGyms
-  //   const { data: gymMeta, error: gymError } = await supabase
-  //     .from("AffilGyms")
-  //     .select("gymAbbr, gymCity, gymState")
-  //     .eq("gymName", selectedGymName)
-  //     .single();
-
-  //   if (gymError || !gymMeta) {
-  //     setErrorMessage("Gym not found in database.");
-  //     return;
-  //   }
-
-  //   const { gymAbbr, gymCity, gymState } = gymMeta;
-
-  //   const gymAbbrToTable: Record<string, string> = {
-  //     PF: "PlanetFitnessDB",
-  //     LTF: "LifetimeFitnessDB",
-  //   };
-
-  //   const gymTable = gymAbbrToTable[gymAbbr];
-
-  //   if (!gymTable) {
-  //     setErrorMessage("This gym's database isn't connected yet.");
-  //     return;
-  //   }
-
-  //   // Step 2: Validate membership in gym-specific DB
-  //   const { data: match, error: memberError } = await supabase
-  //     .from(gymTable)
-  //     .select("*")
-  //     .eq("memberID", membershipID)
-  //     .eq("gymAbbr", gymAbbr)
-  //     .eq("gymCity", gymCity)
-  //     .eq("gymState", gymState)
-  //     .single();
-
-  //   if (memberError || !match) {
-  //     setErrorMessage("Invalid Gym Member ID. Please try again.");
-  //     return;
-  //   }
-
-  //   // Step 3: Pass info to RegisterAccount screen
-  //   setErrorMessage("");
-
-  //   router.push({
-  //     pathname: "/auth/RegisterAccount",
-  //     params: {
-  //       gymAbbr,
-  //       gymCity,
-  //       gymState,
-  //       memberID: membershipID,
-  //       firstName: match.firstName,
-  //       lastName: match.lastName,
-  //     },
-  //   });
-  // };
-
-
-    // // Map gym name to gym code
-    // const gymCodeMap: Record<string, string> = {
-    //   lifetimefitness: "LTF",
-    //   planetfitness: "PF",
-    // };
-    //
-    // const gymAbbr = gymCodeMap[selectedGym];
-    //
-    // if (!gymAbbr) {
-    //   setErrorMessage("Invalid gym selection.");
-    //   return;
-    // }
-    //
-    // // Simulated member key (Gym Code + Membership ID)
-    // const membershipKey = `${gymAbbr}${membershipID}`;
-    //
-    // Simulated database check  ----- THIS IS FRONT END TESTING
-    // if (validMemberships[selectedGym]?.includes(membershipKey)) {
-    //   console.log("Membership valid:", membershipKey);
-    //   setErrorMessage(""); // Clear error
-    //   router.push("/auth/RegisterAccount");
-    // if (validMemberships[selectedGym]?.includes(membershipKey)) {
-    //   console.log("Membership valid:", membershipKey);
-    //   setErrorMessage(""); // Clear error
-    
-    //   // Pass gym data to RegisterAccount
-    //   router.push({
-    //     pathname: "/auth/RegisterAccount",
-    //     params: {
-    //       gymAbbr,                    // "PF" or "LTF"
-    //       gymCity,
-    //       gymState,
-    //       memberID: membershipID,     // Raw member ID (without prefix)
-    //       firstName: match.firstName,
-    //       lastName: match.lastName,
-    //     }
-    //   });
-    // } else {
-    //   console.log("Invalid Membership:", membershipKey);
-    //   setErrorMessage("Invalid Gym Member ID. Please try again.");
-    // }
-  //
-  //};
-
   return (
     <View style={styles.container}>
       <Image
@@ -405,47 +246,7 @@ const RegisterGym = () => {
           onChangeText={setMembershipID}
         />
       </View>
-
-      {/* City Dropdown */}
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>City</Text>
-        <SelectList
-          setSelected={(val: string) => {
-            setSelectedCity(val);
-            setSelectedZip(""); // Clear ZIP when city changes
-          }}
-          data={gymCityList}
-          save="key"
-          placeholder="City"
-          boxStyles={styles.dropdownBox}
-          dropdownTextStyles={styles.dropdownText}
-          inputStyles={styles.dropdownInput}
-        />
-      </View>
-
-      {/* Zip Dropdown (disabled until city is selected) */}
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Zip</Text>
-        <View pointerEvents={selectedCity ? "auto" : "none"}>
-          <SelectList
-            setSelected={(val: string) => setSelectedZip(val)}
-            data={selectedCity ? gymZipMap[selectedCity] || [] : []}
-            save="key"
-            placeholder={selectedCity ? "Select Zip" : "Select City First"}
-            boxStyles={{
-              ...styles.dropdownBox,
-              backgroundColor: selectedCity ? "#fff" : "#f0f0f0",
-              opacity: selectedCity ? 1 : 0.6,
-            }}
-            dropdownTextStyles={styles.dropdownText}
-            inputStyles={{
-              color: selectedCity ? "#252422" : "#999",
-              fontSize: 16,
-            }}
-          />
-        </View>
-      </View>
-
+      
       {/* Error Message */}
       {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
 
