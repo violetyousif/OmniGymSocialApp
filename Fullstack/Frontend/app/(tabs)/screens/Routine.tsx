@@ -4,9 +4,7 @@ import { FontAwesome, Entypo } from '@expo/vector-icons';
 import { useRouter } from 'expo-router'; // Import for navigating between screens
 import { Dimensions } from 'react-native';
 import { Image } from 'react-native';
-import { supabase } from '../../../lib/supabase'
-import { Session } from '@supabase/supabase-js'
-
+ 
 const { width } = Dimensions.get('window'); // Get screen width for responsive design
  
 const Routine = () => {
@@ -345,3 +343,4 @@ const styles = StyleSheet.create({
 });
  
 export default Routine;
+ 
