@@ -6,6 +6,9 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { SelectList } from "react-native-dropdown-select-list";
@@ -325,11 +328,14 @@ const RegisterGym = () => {
   //};
 
   return (
+
     <View style={styles.container}>
+      {/* Logo */}
       <Image
         source={require("../../assets/images/OrangeLogo.png")}
         style={styles.logo}
       />
+      {/* Title */}
       <Text style={styles.title}>
         Gym Member{"\n"}Verification
       </Text>
@@ -397,51 +403,13 @@ const RegisterGym = () => {
       {/* Membership ID Input */}
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Membership ID</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter Membership ID"
-          placeholderTextColor="#999"
-          value={membershipID}
-          onChangeText={setMembershipID}
-        />
-      </View>
-
-      {/* City Dropdown */}
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>City</Text>
-        <SelectList
-          setSelected={(val: string) => {
-            setSelectedCity(val);
-            setSelectedZip(""); // Clear ZIP when city changes
-          }}
-          data={gymCityList}
-          save="key"
-          placeholder="City"
-          boxStyles={styles.dropdownBox}
-          dropdownTextStyles={styles.dropdownText}
-          inputStyles={styles.dropdownInput}
-        />
-      </View>
-
-      {/* Zip Dropdown (disabled until city is selected) */}
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Zip</Text>
-        <View pointerEvents={selectedCity ? "auto" : "none"}>
-          <SelectList
-            setSelected={(val: string) => setSelectedZip(val)}
-            data={selectedCity ? gymZipMap[selectedCity] || [] : []}
-            save="key"
-            placeholder={selectedCity ? "Select Zip" : "Select City First"}
-            boxStyles={{
-              ...styles.dropdownBox,
-              backgroundColor: selectedCity ? "#fff" : "#f0f0f0",
-              opacity: selectedCity ? 1 : 0.6,
-            }}
-            dropdownTextStyles={styles.dropdownText}
-            inputStyles={{
-              color: selectedCity ? "#252422" : "#999",
-              fontSize: 16,
-            }}
+          <View style={styles.dropdownContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter Membership ID"
+            placeholderTextColor="#999"
+            value={membershipID}
+            onChangeText={setMembershipID}
           />
         </View>
       </View>
@@ -464,6 +432,7 @@ const RegisterGym = () => {
 
 // Styles
 const styles = StyleSheet.create({
+  // Main Container
   container: {
     flex: 1,
     alignItems: "center",
@@ -471,12 +440,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     paddingHorizontal: 20,
   },
+  // Logo Styling
   logo: {
     width: 100,
     height: 100,
     resizeMode: "contain",
     marginBottom: 20,
   },
+  // Title
   title: {
     fontSize: 28,
     textAlign: "center",
@@ -485,16 +456,27 @@ const styles = StyleSheet.create({
     color: "#252422",
     lineHeight: 40,
   },
+  // Input Container
   inputContainer: {
     width: "70%",
     marginBottom: 20,
   },
+  // Labels/input headers
   label: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginBottom: 5,
     color: "#000",
   },
+  // dropdown Container
+  dropdownContainer: {
+    width: "100%",
+    borderWidth: 1,
+    borderColor: '#D8D7D4',
+    borderRadius: 8,
+    overflow: "hidden",
+  },
+  // Input field
   input: {
     width: "100%",
     height: 50,
@@ -505,24 +487,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
   },
-  dropdownBox: {
-    borderColor: "#ccc",
-    borderRadius: 8,
-    height: 50,
-  },
-  dropdownText: {
-    color: "#252422",
-    fontSize: 16,
-  },
-  dropdownInput: {
-    color: "#252422",
-    fontSize: 16,
-  },
+  // Error Message
   errorText: {
     color: "red",
     fontSize: 14,
     marginBottom: 10,
   },
+  
+  // Submit Button
   button: {
     backgroundColor: "#E97451",
     paddingVertical: 12,
@@ -535,6 +507,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
+
+  // Previous/back Button
   backButton: {
     paddingTop: 40,
     marginTop: 20,
