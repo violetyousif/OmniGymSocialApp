@@ -29,6 +29,16 @@ header div {
 header.scrolled {
     background: linear-gradient(to bottom, #ff8c00, #ffaf50);
 }
+
+p {
+    font-family: 'Rubik', sans-serif;
+    text-align: center;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #333;
+    margin: 0 20px;
+}
+
 nav {
     display: flex;
     gap: 15px;
@@ -122,7 +132,7 @@ nav a {
 }
 .about-item img {
     width: 100%;
-    max-width: 250px;
+    max-width: 150px;
     border-radius: 20px;
 }
 .about-item.fade-in {
@@ -206,11 +216,13 @@ nav a {
 .footer-tagline {
     font-size: 16px;
     margin: 10px 0;
+    color: #ccc;
 }
 
 .footer-links {
     font-size: 14px;
     margin: 20px 0;
+    color: #ccc;
 }
 
 .footer-links a {
@@ -248,7 +260,9 @@ nav a {
     padding: 20px;
 }
 .gallery-container img {
-    max-width: 100%;
+    width: 200px;
+    max-width: 300px;
+    /* max-width: 100%; */
     height: auto;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -257,7 +271,8 @@ nav a {
 .button-container {
     display: flex;
     justify-content: center;
-    margin-top: 20px; /* Adjust spacing */
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
 .button-container button {

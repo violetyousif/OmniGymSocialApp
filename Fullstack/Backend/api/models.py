@@ -1,13 +1,11 @@
 from django.db import models
-# from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
-# from django.core.validators import RegexValidator
-# from django.core.exceptions import ValidationError
-# from django.utils import timezone
 
 # PURPOSE: Defines and creates the data structure models for each table
 
 class AffilGyms(models.Model):
+    # SRP: This class has a single responsibility - representing affiliated gyms
+    # and their properties. It doesn't handle user management or other concerns.
     gymID = models.BigAutoField(primary_key=True)
     gymName = models.CharField(max_length=255)
     gymCity = models.CharField(max_length=255)
@@ -26,6 +24,8 @@ class AffilGyms(models.Model):
 
 
 class LTFUsers(models.Model):
+    # OCP: This model is open for extension (can add new fields/methods)
+    # but closed for modification (existing fields shouldn't change)
     id = models.BigAutoField(primary_key=True)
     userID = models.UUIDField(primary_key=False)
     memberID = models.CharField(max_length=15)
@@ -42,11 +42,15 @@ class LTFUsers(models.Model):
     dateJoined = models.DateField(auto_now_add=True)
     activeAccnt = models.BooleanField(default=True)
     gymState = models.CharField(max_length=20)
+
     class Meta:
         abstract = False
         db_table = 'LTFUsers'
 
+
 class LifetimeFitnessDB(models.Model):
+    # LSP: This model could be substituted for any gym user model
+    # while maintaining the same interface/behavior
     databaseID = models.AutoField(primary_key=True)
     gymCity = models.CharField(max_length=255)
     gymAbbr = models.CharField(max_length=10)
@@ -55,11 +59,15 @@ class LifetimeFitnessDB(models.Model):
     firstName = models.CharField(max_length=255)
     uploadDate = models.DateTimeField()
     gymState = models.CharField(max_length=255)
+
     class Meta:
         db_table = 'LifetimeFitnessDB'
         managed = False
 
+
 class PFUsers(models.Model):
+    # ISP: This model is specific to Planet Fitness users
+    # and does not include unrelated fields
     id = models.BigAutoField(primary_key=True)
     userID = models.UUIDField(primary_key=False)
     memberID = models.CharField(max_length=15)
@@ -76,11 +84,15 @@ class PFUsers(models.Model):
     dateJoined = models.DateField(auto_now_add=True)
     activeAccnt = models.BooleanField(default=True)
     gymState = models.CharField(max_length=20)
+
     class Meta:
         abstract = False
         db_table = 'PFUsers'
 
+
 class PlanetFitnessDB(models.Model):
+    # DIP: The abstract base models could be created to depend on abstractions
+    # rather than concrete implementations
     databaseID = models.AutoField(primary_key=True)
     gymCity = models.CharField(max_length=255)
     gymAbbr = models.CharField(max_length=10)
@@ -89,6 +101,7 @@ class PlanetFitnessDB(models.Model):
     firstName = models.CharField(max_length=255)
     uploadDate = models.DateTimeField()
     gymState = models.CharField(max_length=255)
+
     class Meta:
         db_table = 'PlanetFitnessDB'
         managed = False
