@@ -149,13 +149,14 @@ def verifyMembership(request):
         return Response({"error": "Member not found."}, status=404)
 
     # Validated user
+    from html import escape
     return Response({
         "valid": True,
-        "gymAbbr": gym_abbr,
-        "gymCity": gym_city,
-        "gymState": gym_state,
-        "firstName": user.firstName,
-        "lastName": user.lastName
+        "gymAbbr": escape(gym_abbr),
+        "gymCity": escape(gym_city),
+        "gymState": escape(gym_state),
+        "firstName": escape(user.firstName),
+        "lastName": escape(user.lastName)
     }, status=200)
 
 
