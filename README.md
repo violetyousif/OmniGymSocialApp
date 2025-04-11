@@ -9,10 +9,17 @@ An app to build a community for its gym members.
    - _Iterations1.html_ will link the iterations to the github and has a tab for the "App Home" (_Omni2.html_). Since the app is mobile-based, we were unable to link the file type directly to the tabs.
 
    - _Omni2.html_ is the omnigym intro site and will describe omnigym's purpose. (Refer to footnote for terms.)
-<br><br>
 
-## SETUP INSTRUCTIONS
-This guide will help you download the project, install dependencies, and run the app using Ionic with React. You can compile and view the app on web, Android, and iOS simulators.
+<br><br>
+---
+---
+<br><br><br>
+
+# Setup Guide
+
+This guide walks you through setting up the **Frontend (React Native + Expo)** and **Backend (Django + Supabase)** environments for the Omnigym Social App project. It is compatible with both **iOS and Android** platforms.
+
+---
 
 ## Installing OmniGymSocialApp Project
 To begin, you will download the github repo and open it in the VSCode or your preferred code editor.
@@ -23,115 +30,158 @@ To begin, you will download the github repo and open it in the VSCode or your pr
    cd OmniGymSocialApp
    ```
 
-2. **Set Up the Backend**
-   - Navigate to the backend directory:
-     ```bash
-     cd Fullstack/Backend
-     ```
-   - Create a virtual environment (optional but recommended):
-     ```bash
-     python3 -m venv venv
-     source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-     ```
-   - Install the required Python packages:
-     ```bash
-     pip install -r requirements.txt
-     ```
+---
 
-3. **Ionic with React Setup Guide**
+## 📦 Prerequisites
 
-## Prerequisites
+### Install Node.js (Recommended via Node.js site)
+Node.js includes npm (Node Package Manager), which is essential for managing frontend dependencies.
 
-Before getting started with frontend, please ensure you have the following installed:
+- Download and install from [nodejs.org](https://nodejs.org/en)
+- Verify installation:
+```bash
+node -v
+npm -v
+```
 
-- **Node.js and npm**  
-  Verify installation:<br>
-  ```
-  node --version
-  npm --version
-  ```
+---
 
-If not installed, download from [nodejs.org](https://nodejs.org/en).
+## 🍺 (Optional) Install Homebrew (MacOS/WSL)
 
-- **Ionic Cli** <br>
-   Install the Ionic CLI globally: <br>
-      ```
-         npm install -g @ionic/cli
-      ```
-   <br><br>Verify installation:<br>
-      ```
-         ionic --version
-      ```
+Only needed if you plan to use it for other tools like `watchman`. Node.js installation via Node.js site is sufficient for this project.
 
-**Native Development Tools:**
-- Android: Install [Android Studio](https://developer.android.com/studio) (ensure the Android SDK is installed).
-- iOS (Mac only): Install [Xcode](https://developer.apple.com/xcode/) from the Mac App Store.
+### macOS
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zshrc
+eval "$(/opt/homebrew/bin/brew shellenv)"
+```
 
-## App Setup
-1. Download the Project if you haven't already.
-   Clone the repository or download the ZIP file from GitHub. Then, open the project in your preferred code editor.
+### Windows (WSL recommended)
+```bash
+wsl --install -d Ubuntu
+```
+After reboot:
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> ~/.bashrc
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+```
 
-2. Navigate to the App directory:
-   The main application code is located in the omnigym folder. Navigate to this folder:
-      ```bash
-      cd OmniGymSocialApp/omnigym
-      ```
-3. Install dependencies:
-   Install the required packages by running:
-      ```bash
-      npm install
-      ```
+---
 
-## Running the App
-### Web Simulator
-To compile and run the app in your web browser, use: <br>
-      ```bash
-      ionic serve
-      ```
-<br>This command will compile your project and automatically open it in your default browser.
+## 🚀 Running the Frontend (React Native + Expo)
 
-### Preparing for Native Development (Android & iOS)
-The project uses Capacitor for native builds.
-1. Build the Project
-   Before adding any native platforms, ensure the project is built:
-      ```bash
-      ionic build
-      ```
-2. Add and Sync Native Platforms
-   Android:
-      ```bash
-      ionic capacitor add android
-      ionic capacitor copy android
-      ionic capacitor open android
-      ```
-      The last command will open the Android project in Android Studio, where you can run the app on an emulator or device.
-   iOS (Mac only):
-      ```bash
-      ionic capacitor add ios
-      ionic capacitor copy ios
-      ionic capacitor open ios
-      ```
-      The last command will open the iOS project in Xcode, where you can run the app on the iOS simulator or a connected device.
+### Docs and Tools
+- [Expo Setup Guide](https://docs.expo.dev/get-started/set-up/)
+- [Watchman Install (macOS)](https://facebook.github.io/watchman/docs/install#macos)
 
-## Optional: Version Checks and Updates
-- Verify Capacitor Version:<br>
-      ```
-      npx cap --version
-      ```
-  <br>
-- Update Ionic CLI and Capacitor:<br>
-      ```
-      npm install -g @ionic/cli
-      npm install @capacitor/core @capacitor/cli
-      ```
-  <br>
-## Troubleshooting:
-- Ensure your Node.js and npm versions meet the minimum requirements.
-- Confirm that Android Studio and Xcode are correctly installed and configured.
-- For further assistance, refer to the [Ionic Documentation](https://ionic.io/docs/appflow) and [Ionic Capacitor Documentation](https://ionicframework.com/docs/cli/commands/build).
-<br><br><br><br>
+### Recommended VSCode Extensions
+- Expo Tools
+- React Native Tools
 
+### Initial Setup
+```bash
+cd Fullstack/Frontend
 
+npm install
+```
+
+### Optional Tools
+```bash
+# macOS only (for fast refresh on file changes)
+brew install watchman
+```
+
+### Install Required Packages
+```bash
+npm install @react-native-community/datetimepicker@8.2.0             @react-native-picker/picker@2.9.0             expo-constants@~17.0.8             expo-router@~4.0.19             expo@~52.0.38             jest-expo@~52.0.6             react-native-select-dropdown             react-native-url-polyfill
+
+npx expo install expo-file-system                  @supabase/supabase-js                  @react-native-async-storage/async-storage
+
+npm audit fix
+```
+
+### Running the App
+```bash
+npx expo start          # Starts Expo server
+npx expo start --clear  # Clears cache and starts server
+```
+
+### Open on Simulator
+- iOS (Mac only): Press `i` – Requires Xcode installed from Mac App Store.
+- Android: Press `a` – Requires Android Studio + Emulator configured.
+- Exit: `Ctrl + C`
+
+---
+
+## 🛠️ Backend Setup (Django + Supabase)
+
+### Virtual Environment
+```bash
+cd omnigymsocialapp/Fullstack/Backend
+
+python -m venv venv
+# macOS
+source venv/bin/activate
+# Windows
+venv\Scripts\activate
+```
+
+### Install Dependencies
+If you have a `requirements.txt`:
+```bash
+pip install -r requirements.txt
+```
+Or manually:
+```bash
+pip install django djangorestframework djangorestframework-simplejwt             python-dotenv psycopg2-binary
+```
+
+### Start Django Project
+```bash
+django-admin startproject server .
+python manage.py runserver
+```
+
+### Migrate Database
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
+
+### Create Superuser
+```bash
+python manage.py createsuperuser
+```
+
+---
+
+## 🔐 Supabase Integration
+
+### Install Required Packages
+```bash
+pip install psycopg2 python-dotenv
+```
+
+### Setup `.env` File
+Create a `.env` file in the backend folder with:
+```
+SUPABASE_DB_URL=your_supabase_database_url
+SUPABASE_API_KEY=your_supabase_service_role_key
+```
+
+### Test Connection
+```bash
+python test_connection.py
+```
+
+More info: [Supabase Arrays Guide](https://supabase.com/docs/guides/database/arrays)
+
+<br><br>
+---
+---
+<br><br><br>
 
 # OMNIGYM APP PAGES
 ### Login Page:
@@ -232,8 +282,10 @@ _All the following info is required to successfully register or else an error is
      - Technical help (includes contact info)
      - Account help (e.g.: If user changes gyms, they can submit a ticket to change gyms in account)
 
-<br><br><br><br>
-
+<br><br>
+---
+---
+<br><br><br>
 
 ## DATA COLLECTION
 ### Data Collected From User Registration (frontend):

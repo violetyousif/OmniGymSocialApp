@@ -1,3 +1,10 @@
+# SOLID Principles Applied:
+# SRP: Each view has a single responsibility
+# OCP: Views can be extended without modification
+# LSP: Views can be substituted where needed
+# ISP: Each view has a focused interface
+# DIP: Views depend on abstractions (serializers/models)
+
 # This file defines the API views for handling frontend requests using real Supabase data.
 
 from django.shortcuts import render
@@ -38,6 +45,8 @@ from django.contrib.auth import authenticate
 # PURPOSE: Handles user login
 @api_view(['POST'])
 def loginUser(request):
+    """SRP: Handles only user login functionality
+    DIP: Depends on authentication abstraction"""
     """Handles user login and returns a JWT token"""
     email = request.data.get('email')
     password = request.data.get('password')
@@ -58,6 +67,9 @@ def loginUser(request):
 # PURPOSE: Handles user registration
 @api_view(['POST'])
 def registerUser(request):
+    """SRP: Handles only user registration
+    OCP: Can be extended for new gym types
+    DIP: Uses serializer abstractions"""
     """Handles user registration for PF or LTF users based on gymAbbr"""
     gym_abbr = request.data.get("gymAbbr")
 
@@ -137,13 +149,14 @@ def verifyMembership(request):
         return Response({"error": "Member not found."}, status=404)
 
     # Validated user
+    from html import escape
     return Response({
         "valid": True,
-        "gymAbbr": gym_abbr,
-        "gymCity": gym_city,
-        "gymState": gym_state,
-        "firstName": user.firstName,
-        "lastName": user.lastName
+        "gymAbbr": escape(gym_abbr),
+        "gymCity": escape(gym_city),
+        "gymState": escape(gym_state),
+        "firstName": escape(user.firstName),
+        "lastName": escape(user.lastName)
     }, status=200)
 
 
