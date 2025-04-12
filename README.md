@@ -212,7 +212,7 @@ _All the following info is required to successfully register or else an error is
 1. Email
 2. Password:
    - _Hashed password implementation to prevent security concerns with user inputs_
-   - 10 Character minimum
+   - 8 Character minimum
    - Must have special characters.
    - Must include uppercase
    - Must include lowercase
