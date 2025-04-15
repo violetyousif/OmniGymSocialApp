@@ -9,7 +9,7 @@ import {
   ScrollView,
   Platform,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { Checkbox } from "react-native-paper";
 import moment from "moment";
 import { Ionicons } from "@expo/vector-icons";
@@ -17,7 +17,6 @@ import { SelectList } from "react-native-dropdown-select-list";
 import TermsModal from "../../components/TermsModal"; // Import the modal component
 import { supabase } from '../../lib/supabase'
 import { BACKEND_URL } from "../../lib/config";
-import { useLocalSearchParams } from "expo-router";
 
   /**
    * 

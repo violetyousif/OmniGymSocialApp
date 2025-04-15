@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { SelectList } from "react-native-dropdown-select-list";
-import { supabase } from '../../lib/supabase'
+import { supabase } from '../../lib/supabase';
 import { BACKEND_URL } from "../../lib/config";
 
 

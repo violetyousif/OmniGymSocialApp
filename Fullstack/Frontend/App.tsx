@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
-import { View } from 'react-native';
+import { View, Text, FlatList } from 'react-native';
 import { supabase } from './lib/supabase';
 import { Session } from '@supabase/supabase-js';
 
@@ -15,7 +15,14 @@ export default function App() {
 
   const [loaded] = useFonts({ SpaceMono: require('./assets/fonts/SpaceMono-Regular.ttf'),});
   const [session, setSession] = useState<Session | null>(null);
-  const [todos, setTodos] = useState<any[]>([]);
+  // const [todos, setTodos] = useState<any[]>([]);
+  interface Todo {
+    id: number;
+    title: string;
+  }
+
+  const [todos, setTodos] = useState<Todo[]>([]);
+
 
   useEffect(() => {
     // Check session on mount
@@ -36,6 +43,7 @@ export default function App() {
 
   if (!loaded) return null;
 
+  // Fetch todos from Supabase (given function from Supabase connect)
   useEffect(() => {
     const getTodos = async () => {
       try {
@@ -50,7 +58,11 @@ export default function App() {
           setTodos(todos);
         }
       } catch (error) {
-        console.error('Error fetching todos:', (error as Error).message);
+        if (error instanceof Error) {
+          console.error('Error fetching todos:', error.message);
+        } else {
+          console.error('Error fetching todos:', error);
+        }
       }
     };
 
@@ -59,13 +71,19 @@ export default function App() {
 
 
   return (
-    <NavigationContainer>
-      {/* If logged in, show the main app; otherwise, show login */}
-      {session && session.user ? <RootLayout /> : <LoginScreen />}
-      <StatusBar style="auto" />
-    </NavigationContainer>
-
-    
+    <View style={{ flex: 1 }}>
+      <NavigationContainer>
+        {/* If logged in, show the main app; otherwise, show login */}
+        {session && session.user ? <RootLayout /> : <LoginScreen />}
+        <StatusBar style="auto" />
+      </NavigationContainer>
+      <Text>Todo List</Text>
+      <FlatList
+        data={todos}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => <Text key={item.id}>{item.title}</Text>}
+      />
+    </View>
   );
 }
 
