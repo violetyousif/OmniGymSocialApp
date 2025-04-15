@@ -9,6 +9,7 @@ import {
   Dimensions 
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { FontAwesome, Entypo } from '@expo/vector-icons';
 import { supabase } from '../../../lib/supabase'
 import { Session } from '@supabase/supabase-js'
 
@@ -39,6 +40,10 @@ const HomeScreen = () => {
         </View>
         <TouchableOpacity onPress={() => router.replace('/(tabs)/Login')} style={styles.logoutContainer}>
           <Text style={styles.logout}>LOGOUT</Text>
+        </TouchableOpacity>
+                {/* Chat Icon - Aligned to Left */}
+        <TouchableOpacity style={styles.chatIcon} onPress={() => router.replace('/(tabs)/screens/Inbox')}>
+          <FontAwesome name="comment" size={24} color="gray" />
         </TouchableOpacity>
       </View>
 
@@ -108,6 +113,13 @@ const styles = StyleSheet.create({
     marginTop: 100, 
     paddingHorizontal: 10,
   },
+
+    // Chat Icon - Aligned to Left
+    chatIcon: {
+      position: 'absolute',
+      left: 20,
+      bottom: 10,
+    },
 
   // Centered Logo
   logoContainer: {
