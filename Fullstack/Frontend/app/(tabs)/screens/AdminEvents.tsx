@@ -28,13 +28,15 @@ type Event = {
 const EventsScreen = () => {
   const router = useRouter();
 
-  // Tracks the selected gym filter (Lifetime or Planet Fitness)
-  const [selectedGym, setSelectedGym] = useState<'LTF' | 'PF'>('LTF');
+  // Tracks all events pulled from Supabase
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-   // Tracks admin access status (null = still checking)
+  // Tracks admin access status (null = still checking)
   const [authorized, setAuthorized] = useState<boolean | null>(null);
+
+  // Filter to show only Local / Gym Hosted / All events
+  const [eventFilter, setEventFilter] = useState<'All' | 'Local' | 'Gym Hosted'>('All');
 
   // Form inputs for new event
   const [eventName, setEventName] = useState('');
@@ -43,21 +45,19 @@ const EventsScreen = () => {
   const [eventLocation, setEventLocation] = useState('');
   const [gymCity, setGymCity] = useState('');
   const [gymState, setGymState] = useState('');
+  const [gymAbbr, setGymAbbr] = useState('');
 
-
-  //check if user is an admin
+  // Check if user is an admin
   useEffect(() => {
     checkAdmin();
   }, []);
 
-
-  // When gym changes or after authorization, fetch events
+  // After authorization, fetch events
   useEffect(() => {
     if (authorized) {
       fetchEvents();
     }
-  }, [selectedGym, authorized]);
-
+  }, [authorized]);
 
   /**
    * Verifies whether the currently logged-in user is the admin.
@@ -73,19 +73,12 @@ const EventsScreen = () => {
     setAuthorized(isAdmin);
   };
 
-
   /**
-   * Fetches events from either the LTFEvents or PFEvents table,
-   * depending on the currently selected gym.
-   *
-   * Backend expectation:
-   * - Two separate tables: LTFEvents, PFEvents
-   * - Each must follow the structure defined in the Event type
+   * Fetches all events from the unified Events table
    */
   const fetchEvents = async () => {
     setLoading(true);
-    const table = selectedGym === 'LTF' ? 'LTFEvents' : 'PFEvents';
-    const { data, error } = await supabase.from(table).select('*');
+    const { data, error } = await supabase.from('Events').select('*');
     if (error) {
       console.error('Error fetching events:', error.message);
     } else {
@@ -94,48 +87,21 @@ const EventsScreen = () => {
     setLoading(false);
   };
 
-  //TEST 
-  /*
-  const fetchEvents = async () => {
-    setLoading(true);
-  
-    // Simulate a delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
-  
-    // Mock data
-    const mockData: Event[] = [
-      {
-        eventID: 1,
-        eventName: 'Mock Strength Showdown',
-        eventDate: '2025-04-20',
-        eventType: 'Powerlifting',
-        eventLocation: 'LTF Uptown',
-        gymCity: 'Dallas',
-        gymState: 'TX',
-        gymAbbr: selectedGym,
-      },
-    ];
-  
-    setEvents(mockData);
-    setLoading(false);
-  };
-  */
-  
-
-
-
   /**
-   * Handles submission of a new event into the appropriate Supabase table.
-   * Inputs are pulled from local state and inserted as a new row.
+   * Handles submission of a new event into the unified Events table.
    */
   const handleSubmit = async () => {
-    const table = selectedGym === 'LTF' ? 'LTFEvents' : 'PFEvents';
-    const { error } = await supabase.from(table).insert({
+    if (!eventName || !eventDate || !eventType || !eventLocation || !gymCity || !gymState || !gymAbbr) {
+      alert('Please fill in all fields');
+      return;
+    }
+
+    const { error } = await supabase.from('Events').insert({
       eventName,
       eventDate,
       eventType,
       eventLocation,
-      gymAbbr: selectedGym,
+      gymAbbr,
       gymCity,
       gymState,
       uploadDate: new Date(),
@@ -151,11 +117,10 @@ const EventsScreen = () => {
       setEventLocation('');
       setGymCity('');
       setGymState('');
+      setGymAbbr('');
       fetchEvents();
     }
   };
-
-
 
   /**
    * Renders each individual event inside a styled card
@@ -169,14 +134,12 @@ const EventsScreen = () => {
     </View>
   );
 
-
   // Show loading state while admin check is in progress
   if (authorized === null) {
     return <ActivityIndicator size="large" color="#FF6F3C" style={{ marginTop: 60 }} />;
   }
 
-
-  // Show block screen if user is not an admin (will change in future)
+  // Show block screen if user is not an admin (temporary)
   if (!authorized) {
     return (
       <View style={styles.container}>
@@ -187,36 +150,38 @@ const EventsScreen = () => {
     );
   }
 
-
-
   /**
    * The Main return:
-   * - Gym toggle (Lifetime vs PF)
+   * - Filter by event type (Local / Gym Hosted)
    * - Existing events list
    * - Submission form for new events
    */
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.toggleContainer}>
-        <TouchableOpacity
-          style={[styles.toggleBtn, selectedGym === 'LTF' && styles.selectedBtn]}
-          onPress={() => setSelectedGym('LTF')}
-        >
-          <Text style={styles.toggleText}>Lifetime</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.toggleBtn, selectedGym === 'PF' && styles.selectedBtn]}
-          onPress={() => setSelectedGym('PF')}
-        >
-          <Text style={styles.toggleText}>Planet Fitness</Text>
-        </TouchableOpacity>
+      {/* Filter: Local / Gym Hosted / All */}
+      <View style={styles.filterContainer}>
+        {['All', 'Local', 'Gym Hosted'].map((type) => (
+          <TouchableOpacity
+            key={type}
+            onPress={() => setEventFilter(type as any)}
+            style={[
+              styles.filterButton,
+              eventFilter === type && styles.selectedFilter,
+            ]}
+          >
+            <Text style={styles.filterText}>{type}</Text>
+          </TouchableOpacity>
+        ))}
       </View>
 
       {loading ? (
         <ActivityIndicator size="large" color="#FF6F3C" style={{ marginTop: 50 }} />
       ) : (
         <FlatList
-          data={events}
+          data={events.filter(e => {
+            if (eventFilter === 'All') return true;
+            return e.eventType.toLowerCase() === eventFilter.toLowerCase();
+          })}
           keyExtractor={(item) => item.eventID.toString()}
           renderItem={renderEvent}
           contentContainerStyle={{ paddingBottom: 20 }}
@@ -225,14 +190,13 @@ const EventsScreen = () => {
 
       {/* Event Submission Form */}
       <Text style={styles.formHeading}>Submit New Event</Text>
-
       <TextInput style={styles.input} placeholder="Event Name" value={eventName} onChangeText={setEventName} />
       <TextInput style={styles.input} placeholder="Event Date" value={eventDate} onChangeText={setEventDate} />
-      <TextInput style={styles.input} placeholder="Event Type" value={eventType} onChangeText={setEventType} />
+      <TextInput style={styles.input} placeholder="Event Type (Local or Gym Hosted)" value={eventType} onChangeText={setEventType} />
       <TextInput style={styles.input} placeholder="Location" value={eventLocation} onChangeText={setEventLocation} />
       <TextInput style={styles.input} placeholder="Gym City" value={gymCity} onChangeText={setGymCity} />
       <TextInput style={styles.input} placeholder="Gym State" value={gymState} onChangeText={setGymState} />
-
+      <TextInput style={styles.input} placeholder="Gym Abbreviation" value={gymAbbr} onChangeText={setGymAbbr} />
       <Button title="Submit Event" color="#FF6F3C" onPress={handleSubmit} />
     </ScrollView>
   );
@@ -245,22 +209,22 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingHorizontal: 15,
   },
-  toggleContainer: {
+  filterContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     marginBottom: 20,
     gap: 10,
   },
-  toggleBtn: {
+  filterButton: {
     paddingVertical: 10,
     paddingHorizontal: 20,
     backgroundColor: '#E0E0E0',
     borderRadius: 10,
   },
-  selectedBtn: {
+  selectedFilter: {
     backgroundColor: '#FF6F3C',
   },
-  toggleText: {
+  filterText: {
     color: '#fff',
     fontWeight: 'bold',
   },

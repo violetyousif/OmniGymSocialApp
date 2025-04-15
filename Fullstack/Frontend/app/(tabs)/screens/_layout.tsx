@@ -12,6 +12,7 @@ export default function TabsLayout() {
   useEffect(() => {
     const checkAdmin = async () => {
       const { data: { user } } = await supabase.auth.getUser();
+      console.log('LOGGED IN USER:', user); 
       if (user?.email === 'admin@example.com') {
         setIsAdmin(true);
       }
@@ -78,7 +79,18 @@ export default function TabsLayout() {
         }}
       />
 
-      {/* these tabs only if the user is an admin (use admin@example.com  as the email to test with password: admin12345) */}
+      {/* these Tabs should only visible if the user is an admin (use admin@example.com  as the email to test with password: admin12345) */}
+
+      {isAdmin && (
+        <Tabs.Screen
+          name="AdminHome"
+          options={{
+            title: 'Memberships',
+            tabBarIcon: ({ color, size }) => <Ionicons name="card-outline" size={size} color={color} />,
+          }}
+        />
+      )}
+
       {isAdmin && (
         <Tabs.Screen
           name="AdminLeaderboard"
@@ -88,24 +100,26 @@ export default function TabsLayout() {
           }}
         />
       )}
+      
       {isAdmin && (
         <Tabs.Screen
-          name="Events"
+          name="AdminForms"
           options={{
-            title: 'Events',
-            tabBarIcon: ({ color, size }) => <Ionicons name="calendar-outline" size={size} color={color} />,
+            title: 'Forms',
+            tabBarIcon: ({ color, size }) => <Ionicons name="document-outline" size={size} color={color} />,
           }}
         />
       )}
       {isAdmin && (
         <Tabs.Screen
-          name="ValidMemberships"
+          name="AdminSettings"
           options={{
-            title: 'Memberships',
-            tabBarIcon: ({ color, size }) => <Ionicons name="card-outline" size={size} color={color} />,
+            title: 'Settings',
+            tabBarIcon: ({ color, size }) => <Ionicons name="settings-outline" size={size} color={color} />,
           }}
         />
       )}
+      
       
 
       
