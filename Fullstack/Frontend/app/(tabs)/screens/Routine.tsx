@@ -69,7 +69,7 @@ const Routine = () => {
     <ScrollView style={styles.container}>
       {/* Full-Width Header */}
       <View style={styles.topBar}>
-        <TouchableOpacity style={styles.chatIcon} onPress={() => alert('Open Chat')}>
+        <TouchableOpacity style={styles.chatIcon} onPress={() => router.replace('/(tabs)/screens/Inbox')}>
           <FontAwesome name="comment" size={24} color="gray" />
         </TouchableOpacity>
  
