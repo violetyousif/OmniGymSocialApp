@@ -82,160 +82,167 @@ const Routine = () => {
           <Text style={styles.logout}>LOGOUT</Text>
         </TouchableOpacity>
       </View>
- 
+      <View style={styles.formWrapper}>
+
       <Text style={styles.title}>Create Workout Plan</Text>
- 
-      {/* Routine Title */}
-      <Text style={styles.label}>Title for Routine</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter routine title"
-        onChangeText={setRoutineTitle}
-        value={routineTitle}
-      />
- 
-      {/* Expected Time of Completion */}
-      <Text style={styles.label}>Expected Time of Completion</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter time (e.g., 1 hour)"
-        onChangeText={setExpectedTime}
-        value={expectedTime}
-      />
- 
-      {/* Workout Type Picker */}
-      <Text style={styles.label}>Type of Workout</Text>
-      <TouchableOpacity onPress={() => setShowTypePicker(true)} style={styles.input}>
-        <Text>{selectedType || 'Select Workout Type'}</Text>
-      </TouchableOpacity>
- 
-      {/* Modal Picker */}
-      <Modal
-        visible={showTypePicker}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={() => setShowTypePicker(false)}
-      >
-        <View style={styles.modalBackground}>
-          <View style={styles.modalContainer}>
-            <FlatList
-              data={workoutTypes}
-              keyExtractor={(item) => item}
-              renderItem={({ item }) => (
-                <TouchableOpacity onPress={() => handlePickerSelect(item)}>
-                  <Text style={styles.pickerItem}>{item}</Text>
-                </TouchableOpacity>
-              )}
+        {/* Routine Title */}
+        <Text style={styles.label}>Title for Routine</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter routine title"
+          onChangeText={setRoutineTitle}
+          value={routineTitle}
+        />
+  
+        {/* Expected Time of Completion */}
+        <Text style={styles.label}>Expected Time of Completion</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter time (e.g., 1 hour)"
+          onChangeText={setExpectedTime}
+          value={expectedTime}
+        />
+  
+        {/* Workout Type Picker */}
+        <Text style={styles.label}>Type of Workout</Text>
+        <TouchableOpacity onPress={() => setShowTypePicker(true)} style={styles.input}>
+          <Text>{selectedType || 'Select Workout Type'}</Text>
+        </TouchableOpacity>
+  
+        {/* Modal Picker */}
+        <Modal
+          visible={showTypePicker}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => setShowTypePicker(false)}
+        >
+          <View style={styles.modalBackground}>
+            <View style={styles.modalContainer}>
+              <FlatList
+                data={workoutTypes}
+                keyExtractor={(item) => item}
+                renderItem={({ item }) => (
+                  <TouchableOpacity onPress={() => handlePickerSelect(item)}>
+                    <Text style={styles.pickerItem}>{item}</Text>
+                  </TouchableOpacity>
+                )}
+              />
+              <Button title="Close" onPress={() => setShowTypePicker(false)} />
+            </View>
+          </View>
+        </Modal>
+  
+        {/* Date Picker (Workout Day) */}
+        <Text style={styles.label}>Workout Day (Weekdays)</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter workout day (e.g., Monday)"
+          onChangeText={setWorkoutDay}
+          value={workoutDay}
+        />
+  
+        {/* Strength Training */}
+        {selectedType === 'Strength Training' && (
+          <>
+            <Text style={styles.label}>Sets & Reps</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter sets and reps"
+              onChangeText={setSetsReps}
+              value={setsReps}
             />
-            <Button title="Close" onPress={() => setShowTypePicker(false)} />
+            <Text style={styles.label}>Weight Amount</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter weight (kg)"
+              onChangeText={setWeightAmount}
+              value={weightAmount}
+            />
+          </>
+        )}
+  
+        {/* Cardio */}
+        {selectedType === 'Cardio' && (
+          <>
+            <Text style={styles.label}>Duration</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter duration (minutes)"
+              onChangeText={setDuration}
+              value={duration}
+            />
+            <Text style={styles.label}>Distance</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter distance (km)"
+              onChangeText={setDistance}
+              value={distance}
+            />
+          </>
+        )}
+  
+        {/* Rest Intervals */}
+        <Text style={styles.label}>Rest Intervals</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter rest intervals (minutes)"
+          onChangeText={setRestIntervals}
+          value={restIntervals}
+        />
+  
+        {/* Estimated Calories Burned */}
+        <Text style={styles.label}>Overall Est. Calories Burned</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter estimated calories"
+          onChangeText={setEstCaloriesBurned}
+          value={estCaloriesBurned}
+        />
+  
+        {/* Create Button */}
+        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+          <Text style={styles.buttonText}>Create Plan</Text>
+        </TouchableOpacity>
+  
+        {/* AI Plan Generation Button */}
+        <TouchableOpacity style={styles.button} onPress={generateAiPlan}>
+          <Text style={styles.buttonText}>Generate Plan Using AI</Text>
+        </TouchableOpacity>
+  
+        {/* View Plan Button */}
+        <TouchableOpacity style={styles.button} onPress={() => alert('Viewing current plan')}>
+          <Text style={styles.buttonText}>View Plan</Text>
+        </TouchableOpacity>
+  
+        {/* AI Plan Modal */}
+        <Modal
+          visible={showAiModal}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => setShowAiModal(false)}
+        >
+          <View style={styles.modalBackground}>
+            <View style={styles.modalContainer}>
+              <Text>{aiPlan}</Text>
+              <Button title="Close" onPress={() => setShowAiModal(false)} />
+            </View>
           </View>
-        </View>
-      </Modal>
- 
-      {/* Date Picker (Workout Day) */}
-      <Text style={styles.label}>Workout Day (Weekdays)</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter workout day (e.g., Monday)"
-        onChangeText={setWorkoutDay}
-        value={workoutDay}
-      />
- 
-      {/* Strength Training */}
-      {selectedType === 'Strength Training' && (
-        <>
-          <Text style={styles.label}>Sets & Reps</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter sets and reps"
-            onChangeText={setSetsReps}
-            value={setsReps}
-          />
-          <Text style={styles.label}>Weight Amount</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter weight (kg)"
-            onChangeText={setWeightAmount}
-            value={weightAmount}
-          />
-        </>
-      )}
- 
-      {/* Cardio */}
-      {selectedType === 'Cardio' && (
-        <>
-          <Text style={styles.label}>Duration</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter duration (minutes)"
-            onChangeText={setDuration}
-            value={duration}
-          />
-          <Text style={styles.label}>Distance</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter distance (km)"
-            onChangeText={setDistance}
-            value={distance}
-          />
-        </>
-      )}
- 
-      {/* Rest Intervals */}
-      <Text style={styles.label}>Rest Intervals</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter rest intervals (minutes)"
-        onChangeText={setRestIntervals}
-        value={restIntervals}
-      />
- 
-      {/* Estimated Calories Burned */}
-      <Text style={styles.label}>Overall Est. Calories Burned</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter estimated calories"
-        onChangeText={setEstCaloriesBurned}
-        value={estCaloriesBurned}
-      />
- 
-      {/* Create Button */}
-      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>Create Plan</Text>
-      </TouchableOpacity>
- 
-      {/* AI Plan Generation Button */}
-      <TouchableOpacity style={styles.button} onPress={generateAiPlan}>
-        <Text style={styles.buttonText}>Generate Plan Using AI</Text>
-      </TouchableOpacity>
- 
-      {/* View Plan Button */}
-      <TouchableOpacity style={styles.button} onPress={() => alert('Viewing current plan')}>
-        <Text style={styles.buttonText}>View Plan</Text>
-      </TouchableOpacity>
- 
-      {/* AI Plan Modal */}
-      <Modal
-        visible={showAiModal}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={() => setShowAiModal(false)}
-      >
-        <View style={styles.modalBackground}>
-          <View style={styles.modalContainer}>
-            <Text>{aiPlan}</Text>
-            <Button title="Close" onPress={() => setShowAiModal(false)} />
-          </View>
-        </View>
-      </Modal>
+        </Modal>
+      </View>
     </ScrollView>
   );
 };
  
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff', // White background color
-    flex: 1, // Full screen height
+    backgroundColor: '#fff',
+    flex: 1,
+  },
+  
+  formWrapper: {
+    paddingHorizontal: 20,
+    paddingTop: 20,   
+    paddingBottom: 30,
   },
  
   // Full-Width Header
