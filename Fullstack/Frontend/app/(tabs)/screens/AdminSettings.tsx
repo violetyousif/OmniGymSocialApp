@@ -16,7 +16,7 @@ const AdminSettings = () => {
     );
   };
   /**
-   * Handles feedback redirection.
+   * Handle feedback redirection.
    * Future enhancement: navigate to a feedback submission screen
    */
   const handleFeedback = () => {
