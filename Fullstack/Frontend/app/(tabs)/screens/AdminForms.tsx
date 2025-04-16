@@ -31,7 +31,7 @@ const AdminForms = () => {
   const handleNavigateToArchivedWinners = () => {
     // Navigate to archived winners view (currently in AdminLeaderboard via tab)
     router.push('/(tabs)/screens/AdminLeaderboard');
-  };
+  }; 
 
   return (
     <View style={styles.container}>
