@@ -28,7 +28,7 @@ const Profile = () => {
         </TouchableOpacity>
  
         {/* Chat Icon - Aligned to Left */}
-        <TouchableOpacity style={styles.chatIcon} onPress={() => alert('Open Chat')}>
+        <TouchableOpacity style={styles.chatIcon} onPress={() => router.replace('/(tabs)/screens/Inbox')}>
           <FontAwesome name="comment" size={24} color="gray" />
         </TouchableOpacity>
       </View>
