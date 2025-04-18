@@ -10,11 +10,11 @@ import { createClient } from '@supabase/supabase-js'
 
 // Supabase url and anon key; connects to .env file in frontend
 export const supabase = createClient(
-  process.env.EXPO_PUBLIC_SUPABASE_URL || "https://dxhsxrtltaceipztlcns.supabase.co",
-  process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR4aHN4cnRsdGFjZWlwenRsY25zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI3OTIxMjgsImV4cCI6MjA1ODM2ODEyOH0.2y9zy4awtmSK9RdG7av3197MkKCQ-yEkfdCiLiPKSf0",
+  process.env.EXPO_PUBLIC_SUPABASE_URL || "",
+  process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || "",
   {
     auth: {
-      storage: AsyncStorage,
+      storage: AsyncStorage, 
       autoRefreshToken: true,
       persistSession: true,
       detectSessionInUrl: false,
