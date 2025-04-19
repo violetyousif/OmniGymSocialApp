@@ -9,8 +9,9 @@ import {
   StyleSheet,
   Dimensions,
   Image,
+  Platform,
+  StatusBar
 } from 'react-native';
-import { FontAwesome } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 
 const { width } = Dimensions.get('window');
@@ -56,10 +57,24 @@ const Inbox = () => {
     }
   };
 
+  const HEADER_HEIGHT = 80; // Adjust depending on your design
+  const HEADER_OFFSET = 
+    (Platform.OS === 'ios' ? StatusBar.currentHeight || 44 : StatusBar.currentHeight || 0) 
+    + HEADER_HEIGHT;
+
   return (
     <View style={styles.container}>
+
       {/* Fixed Header */}
-      <View style={styles.topBar}>
+      <View 
+        style={[
+          styles.topBar, 
+          { 
+            position: 'absolute', 
+            top: Platform.OS === 'ios' ? StatusBar.currentHeight || 44 : StatusBar.currentHeight || 0 
+          }
+        ]}
+      >
         <TouchableOpacity>
         </TouchableOpacity>
 
@@ -73,7 +88,7 @@ const Inbox = () => {
       </View>
 
       {/* Main Content */}
-      <View style={styles.mainContent}>
+      <View style={[styles.mainContent, { marginTop: HEADER_OFFSET }]}>
         <View style={styles.contactsContainer}>
           <FlatList
             data={Object.keys(messages)}
@@ -114,8 +129,6 @@ const Inbox = () => {
   );
 };
 
- 
-// Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -133,7 +146,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 7,
     borderBottomColor: '#E97451',
     elevation: 5,
-    
   },
 
   logoContainer: {
@@ -142,7 +154,6 @@ const styles = StyleSheet.create({
     right: 0,
     alignItems: 'center',
     zIndex: -1,
-    
   },
   logo: {
     width: 40,
@@ -153,7 +164,6 @@ const styles = StyleSheet.create({
 
   sideIcon: {
     zIndex: 1,
-    
   },
   logout: {
     fontSize: 14,
@@ -165,7 +175,6 @@ const styles = StyleSheet.create({
   mainContent: {
     flexDirection: 'row',
     flex: 1,
-    marginTop: 10,
   },
 
   contactsContainer: {
@@ -228,6 +237,4 @@ const styles = StyleSheet.create({
   },
 });
 
- 
 export default Inbox;
- 
