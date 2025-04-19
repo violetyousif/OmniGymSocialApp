@@ -78,7 +78,7 @@ def registerUser(request):
     elif gym_abbr == "LTF":
         serializer = LTFUserSerializer(data=request.data)
     else:
-        return Response({"error": "Invalid or missing gymAbbr. Must be 'PF' or 'LTF'."}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error": "Invalid or missing gym input."}, status=status.HTTP_400_BAD_REQUEST)
 
     if serializer.is_valid():
         serializer.save()
@@ -119,8 +119,8 @@ def verifyMembership(request):
 
     
     gym_abbr = gym.gymAbbr
-    gym_city = data.get("gymCity")
     gym_state = data.get("gymState")
+    gym_city = data.get("gymCity")
 
     # Step 2: Locate necessary gym DB
     db_map = {
@@ -135,14 +135,14 @@ def verifyMembership(request):
     # Step 3: Check if user exists
     # Using iexact to allow case-insensitive matching
     user = GymTable.objects.filter(
-        gymCity__iexact=gym_city,
-        memberID__iexact=member_id,
         gymAbbr__iexact=gym_abbr,
-        gymState__iexact=gym_state
+        gymState__iexact=gym_state,
+        gymCity__iexact=gym_city,
+        memberID__iexact=member_id
     ).first()
 
     if not user:
-        print(f"Member not found with ID: {member_id}, gymAbbr: {gym_abbr}, city: {gym_city}, state: {gym_state}")
+        print(f"Member not found with gymAbbr: {gym_abbr}, state: {gym_state}, city: {gym_city}, ID: {member_id}")
         return Response({"error": "Member not found."}, status=404)
 
     if not user:
@@ -153,8 +153,8 @@ def verifyMembership(request):
     return Response({
         "valid": True,
         "gymAbbr": escape(gym_abbr),
-        "gymCity": escape(gym_city),
         "gymState": escape(gym_state),
+        "gymCity": escape(gym_city),
         "firstName": escape(user.firstName),
         "lastName": escape(user.lastName)
     }, status=200)

@@ -42,6 +42,8 @@ class LTFUsers(models.Model):
     dateJoined = models.DateField(auto_now_add=True)
     activeAccnt = models.BooleanField(default=True)
     gymState = models.CharField(max_length=20)
+    auth_user_id = models.CharField(max_length=255, null=True, blank=True)
+
 
     class Meta:
         abstract = False
@@ -84,7 +86,7 @@ class PFUsers(models.Model):
     dateJoined = models.DateField(auto_now_add=True)
     activeAccnt = models.BooleanField(default=True)
     gymState = models.CharField(max_length=20)
-
+    auth_user_id = models.CharField(max_length=255, null=True, blank=True)
     class Meta:
         abstract = False
         db_table = 'PFUsers'

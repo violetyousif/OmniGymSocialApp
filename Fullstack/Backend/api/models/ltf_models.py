@@ -1,7 +1,6 @@
 # from django.db import models
 
 
-
 # class LTFUsers(models.Model):
 #     userID = models.UUIDField(primary_key=True)
 #     memberID = models.CharField(max_length=15)
