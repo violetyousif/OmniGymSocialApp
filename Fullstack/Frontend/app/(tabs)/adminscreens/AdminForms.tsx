@@ -20,17 +20,17 @@ const AdminForms = () => {
 
   const handleNavigateToEventForm = () => {
     // Navigate to the event form submission screen
-    router.push('/(tabs)/screens/AdminEvents');
+    router.push('/(tabs)/adminscreens/AdminEvents');
   };
 
   const handleNavigateToLeaderboardSubmissions = () => {
     // Navigate to leaderboard submissions (future screen)
-    router.push('/(tabs)/screens/LeaderboardSubmissions');
+    router.push('/(tabs)/adminscreens/LeaderboardSubmissions');
   };
 
   const handleNavigateToArchivedWinners = () => {
     // Navigate to archived winners view (currently in AdminLeaderboard via tab)
-    router.push('/(tabs)/screens/AdminLeaderboard');
+    router.push('/(tabs)/adminscreens/AdminLeaderboard');
   }; 
 
   return (

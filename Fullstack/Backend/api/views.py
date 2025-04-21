@@ -7,27 +7,24 @@
 
 # This file defines the API views for handling frontend requests using real Supabase data.
 
+from django.conf import settings
 from django.shortcuts import render
 
+import requests
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from django.utils import timezone  # Added to set uploadDate
-# from .models.pf_models import PFUsers, PlanetFitnessDB  # PFUsers model
-# from .models.ltf_models import LTFUsers, LifetimeFitnessDB
 from .models import AffilGyms, PlanetFitnessDB, LifetimeFitnessDB
-# from .models.globalOps_models import AffilGyms
 from .serializers import LTFUserSerializer, PFUserSerializer
 
 # PURPOSE: Control what data gets sent/received and create the views here
 from rest_framework import viewsets
-# from .models import Item
-# from .serializers import ItemSerializer
 
 # PURPOSE: Handles user registration and login
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
-# from .models import User
+
 
 # PURPOSE: Handles user registration and login
 # from django.http import JsonResponse
@@ -64,39 +61,79 @@ def loginUser(request):
     return Response({"error": "Invalid email or password"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-# PURPOSE: Handles user registration
-@api_view(['POST'])
-def registerUser(request):
-    """SRP: Handles only user registration
-    OCP: Can be extended for new gym types
-    DIP: Uses serializer abstractions"""
-    """Handles user registration for PF or LTF users based on gymAbbr"""
-    gym_abbr = request.data.get("gymAbbr")
-
-    if gym_abbr == "PF":
-        serializer = PFUserSerializer(data=request.data)
-    elif gym_abbr == "LTF":
-        serializer = LTFUserSerializer(data=request.data)
-    else:
-        return Response({"error": "Invalid or missing gym input."}, status=status.HTTP_400_BAD_REQUEST)
-
-    if serializer.is_valid():
-        serializer.save()
-        return Response({"message": "User registered successfully!"}, status=status.HTTP_201_CREATED)
-
-    print("Serializer errors:", serializer.errors)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
+# # PURPOSE: Handles user registration
 # @api_view(['POST'])
 # def registerUser(request):
-#     """Handles user registration"""
-#     serializer = UserSerializer(data=request.data)  # Ensure UserSerializer is imported
+#     """SRP: Handles only user registration
+#     OCP: Can be extended for new gym types
+#     DIP: Uses serializer abstractions"""
+#     """Handles user registration for PF or LTF users based on gymAbbr"""
+#     gym_abbr = request.data.get("gymAbbr")
+
+#     if gym_abbr == "PF":
+#         serializer = PFUserSerializer(data=request.data)
+#     elif gym_abbr == "LTF":
+#         serializer = LTFUserSerializer(data=request.data)
+#     else:
+#         return Response({"error": "Invalid or missing gym input."}, status=status.HTTP_400_BAD_REQUEST)
 
 #     if serializer.is_valid():
 #         serializer.save()
 #         return Response({"message": "User registered successfully!"}, status=status.HTTP_201_CREATED)
+
+#     print("Serializer errors:", serializer.errors)
 #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def registerUser(request):
+    """Handles user registration + Supabase Auth user creation"""
+    gym_abbr = request.data.get("gymAbbr")
+    email = request.data.get("email")
+    password = request.data.get("password")
+
+    if not all([email, password]):
+        return Response({"error": "Email and password are required."}, status=400)
+
+    # Step 1: Create Supabase Auth user
+    supabase_response = requests.post(
+        f"{settings.SUPABASE_URL}/auth/v1/admin/users",
+        # headers={
+        #     "apikey": settings.SUPABASE_SERVICE_ROLE_KEY,
+        #     "Authorization": f"Bearer {settings.SUPABASE_SERVICE_ROLE_KEY}",
+        #     "Content-Type": "application/json"
+        # },
+        json={
+            "email": email,
+            "password": password,
+            "email_confirm": True
+        }
+    )
+
+    if supabase_response.status_code != 200:
+        return Response({
+            "error": "Failed to create user in Supabase Auth",
+            "details": supabase_response.json()
+        }, status=500)
+
+    supabase_user_id = supabase_response.json()["user"]["id"]
+
+    # Step 2: Proceed with your regular serializer
+    user_data = request.data.copy()
+    user_data["auth_user_id"] = supabase_user_id
+
+    if gym_abbr == "PF":
+        serializer = PFUserSerializer(data=user_data)
+    elif gym_abbr == "LTF":
+        serializer = LTFUserSerializer(data=user_data)
+    else:
+        return Response({"error": "Invalid or missing gym input."}, status=400)
+
+    if serializer.is_valid():
+        serializer.save()
+        return Response({"message": "User registered successfully!"}, status=201)
+
+    return Response(serializer.errors, status=400)
+
 
 
 # PURPOSE: Verify membership for specific gym during registration
@@ -160,24 +197,6 @@ def verifyMembership(request):
     }, status=200)
 
 
-# PURPOSE: Get gym cities based on gym name
-# @api_view(["GET"])
-# def getGymCities(request):
-#     gym_name = request.query_params.get("gymName")
-
-#     if not gym_name:
-#         return Response({"error": "Missing gym name"}, status=400)
-
-#     cities = (
-#         AffilGyms.objects
-#         .filter(gymName=gym_name)
-#         .values_list("gymCity", flat=True)
-#         .distinct()
-#     )
-    
-#     return Response({"cities": list(cities)}, status=200)
-
-
 # PURPOSE: Get gym states based on gym name
 @api_view(["GET"])
 def getGymStates(request):
@@ -212,6 +231,37 @@ def getGymCities(request):
     )
     
     return Response({"cities": list(cities)}, status=200)
+
+
+
+# @api_view(['POST'])
+# def registerUser(request):
+#     """Handles user registration"""
+#     serializer = UserSerializer(data=request.data)  # Ensure UserSerializer is imported
+
+#     if serializer.is_valid():
+#         serializer.save()
+#         return Response({"message": "User registered successfully!"}, status=status.HTTP_201_CREATED)
+#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# PURPOSE: Get gym cities based on gym name
+# @api_view(["GET"])
+# def getGymCities(request):
+#     gym_name = request.query_params.get("gymName")
+
+#     if not gym_name:
+#         return Response({"error": "Missing gym name"}, status=400)
+
+#     cities = (
+#         AffilGyms.objects
+#         .filter(gymName=gym_name)
+#         .values_list("gymCity", flat=True)
+#         .distinct()
+#     )
+    
+#     return Response({"cities": list(cities)}, status=200)
+
 
 
 
