@@ -45,47 +45,33 @@ export default function TabsLayout() {
       }}
     >
       {/* Always show these 5 tabs for everyone */}
-      <Tabs.Screen
-        name="Home"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color, size }) => <Ionicons name="home-outline" size={size} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="Inbox"
-        options={{
-          title: 'Inbox',
-          tabBarIcon: ({ color, size }) => <Ionicons name="mail-outline" size={size} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="Settings"
-        options={{
-          title: 'Settings',
-          tabBarIcon: ({ color, size }) => <Ionicons name="settings-outline" size={size} color={color} />,
-        }}
-      />
       {isAdmin && (
         <Tabs.Screen
-          name="AdminHome"
+          name="Home"
           options={{
-            title: 'Memberships',
-            tabBarIcon: ({ color, size }) => <Ionicons name="card-outline" size={size} color={color} />,
+            title: 'Home',
+            tabBarIcon: ({ color, size }) => <Ionicons name="home-outline" size={size} color={color} />,
           }}
         />
       )}
-
       {isAdmin && (
         <Tabs.Screen
           name="AdminLeaderboard"
           options={{
             title: 'Leaderboard',
-            tabBarIcon: ({ color, size }) => <Ionicons name="barbell-outline" size={size} color={color} />,
+            tabBarIcon: ({ color, size }) => <Ionicons name="trophy-outline" size={size} color={color} />,
           }}
         />
       )}
-      
+      {isAdmin && (
+        <Tabs.Screen
+        name="AdminEvents"
+        options={{
+          title: 'Events',
+          tabBarIcon: ({ color, size }) => <Ionicons name="calendar-outline" size={size} color={color} />,
+        }}
+        />
+      )}
       {isAdmin && (
         <Tabs.Screen
           name="AdminForms"
@@ -95,6 +81,7 @@ export default function TabsLayout() {
           }}
         />
       )}
+
       {isAdmin && (
         <Tabs.Screen
           name="AdminSettings"
@@ -104,10 +91,6 @@ export default function TabsLayout() {
           }}
         />
       )}
-      
-      
-
-      
     </Tabs>
   );
 
