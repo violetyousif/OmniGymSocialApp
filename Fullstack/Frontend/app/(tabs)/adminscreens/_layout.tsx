@@ -23,6 +23,8 @@ export default function TabsLayout() {
 
   if (!userChecked) return null; // Wait for the auth check
 
+      {/* these Tabs should only visible if the user is an admin (use admin@example.com  as the email to test with password: admin12345) */}
+
   return (
     <Tabs
       screenOptions={{
@@ -58,26 +60,53 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="Profile"
-        options={{
-          title: 'Profile',
-          tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" size={size} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="Routine"
-        options={{
-          title: 'Routine',
-          tabBarIcon: ({ color, size }) => <Ionicons name="list-outline" size={size} color={color} />,
-        }}
-      />
-      <Tabs.Screen
         name="Settings"
         options={{
           title: 'Settings',
           tabBarIcon: ({ color, size }) => <Ionicons name="settings-outline" size={size} color={color} />,
         }}
       />
+      {isAdmin && (
+        <Tabs.Screen
+          name="AdminHome"
+          options={{
+            title: 'Memberships',
+            tabBarIcon: ({ color, size }) => <Ionicons name="card-outline" size={size} color={color} />,
+          }}
+        />
+      )}
+
+      {isAdmin && (
+        <Tabs.Screen
+          name="AdminLeaderboard"
+          options={{
+            title: 'Leaderboard',
+            tabBarIcon: ({ color, size }) => <Ionicons name="barbell-outline" size={size} color={color} />,
+          }}
+        />
+      )}
+      
+      {isAdmin && (
+        <Tabs.Screen
+          name="AdminForms"
+          options={{
+            title: 'Forms',
+            tabBarIcon: ({ color, size }) => <Ionicons name="document-outline" size={size} color={color} />,
+          }}
+        />
+      )}
+      {isAdmin && (
+        <Tabs.Screen
+          name="AdminSettings"
+          options={{
+            title: 'Settings',
+            tabBarIcon: ({ color, size }) => <Ionicons name="settings-outline" size={size} color={color} />,
+          }}
+        />
+      )}
+      
+      
+
       
     </Tabs>
   );

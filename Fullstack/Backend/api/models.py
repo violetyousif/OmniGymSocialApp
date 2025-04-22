@@ -27,7 +27,7 @@ class LTFUsers(models.Model):
     # OCP: This model is open for extension (can add new fields/methods)
     # but closed for modification (existing fields shouldn't change)
     id = models.BigAutoField(primary_key=True)
-    userID = models.UUIDField(primary_key=False)
+    # userID = models.UUIDField(primary_key=False)
     memberID = models.CharField(max_length=15)
     gymAbbr = models.CharField(max_length=5)
     gymCity = models.CharField(max_length=20)
@@ -42,6 +42,8 @@ class LTFUsers(models.Model):
     dateJoined = models.DateField(auto_now_add=True)
     activeAccnt = models.BooleanField(default=True)
     gymState = models.CharField(max_length=20)
+    auth_user_id = models.CharField(max_length=255, null=True, blank=True)
+
 
     class Meta:
         abstract = False
@@ -69,7 +71,7 @@ class PFUsers(models.Model):
     # ISP: This model is specific to Planet Fitness users
     # and does not include unrelated fields
     id = models.BigAutoField(primary_key=True)
-    userID = models.UUIDField(primary_key=False)
+    # userID = models.UUIDField(primary_key=False)
     memberID = models.CharField(max_length=15)
     gymAbbr = models.CharField(max_length=5)
     gymCity = models.CharField(max_length=20)
@@ -84,7 +86,7 @@ class PFUsers(models.Model):
     dateJoined = models.DateField(auto_now_add=True)
     activeAccnt = models.BooleanField(default=True)
     gymState = models.CharField(max_length=20)
-
+    auth_user_id = models.CharField(max_length=255, null=True, blank=True)
     class Meta:
         abstract = False
         db_table = 'PFUsers'

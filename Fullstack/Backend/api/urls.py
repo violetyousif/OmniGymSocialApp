@@ -21,7 +21,6 @@ urlpatterns = [
     path("getGymCities/", getGymCities),
     path("getGymStates/", getGymStates),
 
-
     
     #Klimans
     # path('register-pf-user/', register_pf_user, name='register_pf_user'),
