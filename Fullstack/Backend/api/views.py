@@ -70,18 +70,18 @@ def loginUser(request):
 #     DIP: Uses serializer abstractions"""
 #     """Handles user registration for PF or LTF users based on gymAbbr"""
 #     gym_abbr = request.data.get("gymAbbr")
-
+#
 #     if gym_abbr == "PF":
 #         serializer = PFUserSerializer(data=request.data)
 #     elif gym_abbr == "LTF":
 #         serializer = LTFUserSerializer(data=request.data)
 #     else:
 #         return Response({"error": "Invalid or missing gym input."}, status=status.HTTP_400_BAD_REQUEST)
-
+#
 #     if serializer.is_valid():
 #         serializer.save()
 #         return Response({"message": "User registered successfully!"}, status=status.HTTP_201_CREATED)
-
+#
 #     print("Serializer errors:", serializer.errors)
 #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
