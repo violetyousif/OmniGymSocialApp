@@ -76,14 +76,25 @@ const isValidTimeFormat = (str: string) => {
 //   return data.publicUrl;
 // };
 
+const base64ToUint8Array = (base64: string) => {
+  const binaryString = atob(base64);
+  const len = binaryString.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes;
+};
+
 const uploadImageToSupabase = async (uri: string, userId: string) => {
   try {
     const response = await fetch(uri);
-    const blob = await response.blob();
-    const extension = uri.split('.').pop()?.toLowerCase() || '';
+    // const blob = await response.blob();
+
+    const extension = uri.split('.').pop()?.toLowerCase() || 'jpg';
 
     const contentTypeMap: { [key: string]: string } = {
-      jpg: 'image/jpg',
+      jpg: 'image/jpeg',
       jpeg: 'image/jpeg',
       png: 'image/png',
       webp: 'image/webp',
@@ -91,14 +102,22 @@ const uploadImageToSupabase = async (uri: string, userId: string) => {
       bmp: 'image/bmp',
     };
 
-    const contentType = contentTypeMap[extension] || 'image/png';
-    // const contentType = 'image/*';
+    const contentType = contentTypeMap[extension] || 'image/jpeg'; // fallback just in case
 
+    const base64 = await FileSystem.readAsStringAsync(uri, {
+      encoding: FileSystem.EncodingType.Base64,
+    });
+    // const blob = await response.blob(); // Ensure blob is fully resolved before uploading
+    // console.log('Blob info:', blob.size, blob.type);
+    // if (!blob || blob.size === 0) {
+    //   throw new Error('Blob is empty. Image could not be loaded properly.');
+    // }
     const filePath = `${userId}/${Date.now()}.${extension}`;
+    const binaryData = base64ToUint8Array(base64);
 
     const { data, error } = await supabase.storage
       .from('avatars')
-      .upload(filePath, blob, {
+      .upload(filePath, binaryData, {
         contentType,
         upsert: true,
       });
@@ -108,22 +127,21 @@ const uploadImageToSupabase = async (uri: string, userId: string) => {
       Alert.alert('Error', 'Failed to upload image to Supabase.');
       return null;
     }
+
     console.log('Upload successful:', data);
 
     const { data: publicUrlData } = supabase.storage
       .from('avatars')
       .getPublicUrl(filePath);
-      if (!publicUrlData?.publicUrl) {
-        console.error('No public URL returned');
-        return null;
-      }
-    return publicUrlData.publicUrl;
-      
-  } catch (err) {
-    console.error('Upload Exception:', err);
+
+    return publicUrlData?.publicUrl;
+  } catch (err: any) {
+      console.error('Upload Exception:', err.message || err);
+      Alert.alert('Upload Error', err.message || 'Unknown error occurred during upload.');
     return null;
   }
 };
+
 
 const Settings = () => {
   const [userId, setUserId] = useState<string | null>(null);
