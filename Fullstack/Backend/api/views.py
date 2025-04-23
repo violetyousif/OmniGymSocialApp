@@ -11,12 +11,13 @@ from django.conf import settings
 from django.shortcuts import render
 
 import requests
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes  # Added for permission classes
 from rest_framework.response import Response
 from rest_framework import status
 from django.utils import timezone  # Added to set uploadDate
 from .models import AffilGyms, PlanetFitnessDB, LifetimeFitnessDB
 from .serializers import LTFUserSerializer, PFUserSerializer
+from datetime import datetime
 
 # PURPOSE: Control what data gets sent/received and create the views here
 from rest_framework import viewsets
@@ -24,19 +25,21 @@ from rest_framework import viewsets
 # PURPOSE: Handles user registration and login
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
+from rest_framework.permissions import IsAuthenticated
 
+from .utils import SUPABASE_HEADERS #, check_supabase_user_exists
 
 # PURPOSE: Handles user registration and login
-# from django.http import JsonResponse
-# from .models import AffilGyms, PlanetFitnessDB, LifetimeFitnessDB
-# from django.views.decorators.csrf import csrf_exempt
-# from django.http import JsonResponse
-# # from supabase import create_client
-# from .models import PFUsers, LifetimeFitnessDB, LTFUsers, PlanetFitnessDB
+    # from django.http import JsonResponse
+    # from .models import AffilGyms, PlanetFitnessDB, LifetimeFitnessDB
+    # from django.views.decorators.csrf import csrf_exempt
+    # from django.http import JsonResponse
+    # # from supabase import create_client
+    # from .models import PFUsers, LifetimeFitnessDB, LTFUsers, PlanetFitnessDB
 
-# class ItemViewSet(viewsets.ModelViewSet):
-#     queryset = Item.objects.all()
-#     serializer_class = ItemSerializer
+    # class ItemViewSet(viewsets.ModelViewSet):
+    #     queryset = Item.objects.all()
+    #     serializer_class = ItemSerializer
 
 
 # PURPOSE: Handles user login
@@ -61,7 +64,7 @@ def loginUser(request):
     return Response({"error": "Invalid email or password"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-# # PURPOSE: Handles user registration
+### ATTEMPT 1; PURPOSE: Handles user registration
 # @api_view(['POST'])
 # def registerUser(request):
 #     """SRP: Handles only user registration
@@ -69,39 +72,100 @@ def loginUser(request):
 #     DIP: Uses serializer abstractions"""
 #     """Handles user registration for PF or LTF users based on gymAbbr"""
 #     gym_abbr = request.data.get("gymAbbr")
-
+#
 #     if gym_abbr == "PF":
 #         serializer = PFUserSerializer(data=request.data)
 #     elif gym_abbr == "LTF":
 #         serializer = LTFUserSerializer(data=request.data)
 #     else:
 #         return Response({"error": "Invalid or missing gym input."}, status=status.HTTP_400_BAD_REQUEST)
-
+#
 #     if serializer.is_valid():
 #         serializer.save()
 #         return Response({"message": "User registered successfully!"}, status=status.HTTP_201_CREATED)
-
+#
 #     print("Serializer errors:", serializer.errors)
 #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+### ATTEMPT 2; PURPOSE: Handles user registration with Supabase Auth
+    # @api_view(['POST'])
+    # def registerUser(request):
+    #     """Handles user registration + Supabase Auth user creation"""
+    #     gym_abbr = request.data.get("gymAbbr")
+    #     email = request.data.get("email")
+    #     password = request.data.get("password")
+    #
+    #     if not all([email, password]):
+    #         return Response({"error": "Email and password are required."}, status=400)
+    #
+    #     # Step 1: Create Supabase Auth user
+    #     supabase_response = requests.post(
+    #         f"{settings.SUPABASE_URL}/auth/v1/admin/users",
+    #         headers={
+    #             "apikey": settings.SUPABASE_SERVICE_ROLE_KEY,
+    #             "Authorization": f"Bearer {settings.SUPABASE_SERVICE_ROLE_KEY}",
+    #             "Content-Type": "application/json"
+    #         },
+    #         json={
+    #             "email": email,
+    #             "password": password,
+    #             "email_confirm": True
+    #         }
+    #     )
+    #
+    #     if supabase_response.status_code not in [200, 201]:
+    #         return Response({
+    #             "error": "Failed to create user in Supabase Auth",
+    #             "details": supabase_response.json()
+    #         }, status=500)
+    #     # if supabase_response.status_code != 200:
+    #     #     return Response({
+    #     #         "error": "Failed to create user in Supabase Auth",
+    #     #         "details": supabase_response.json()
+    #     #     }, status=500)
+    #
+    #     supabase_user_id = supabase_response.json()["user"]["id"]
+    #
+    #     # Step 2: Proceed with your regular serializer
+    #     user_data = request.data.copy()
+    #     user_data["auth_user_id"] = supabase_user_id
+    #
+    #     if gym_abbr == "PF":
+    #         serializer = PFUserSerializer(data=user_data)
+    #     elif gym_abbr == "LTF":
+    #         serializer = LTFUserSerializer(data=user_data)
+    #     else:
+    #         return Response({"error": "Invalid or missing gym input."}, status=400)
+    #
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return Response({"message": "User registered successfully!"}, status=201)
+    #
+    #     return Response(serializer.errors, status=400)
+
+# PURPOSE: Handles user registration with Supabase Auth
 @api_view(['POST'])
 def registerUser(request):
+    # See all frontend data being submitted
+    print("Incoming request data:", request.data)
+
     """Handles user registration + Supabase Auth user creation"""
     gym_abbr = request.data.get("gymAbbr")
     email = request.data.get("email")
     password = request.data.get("password")
 
+    print("Email:", email)
+    print("Gym Abbr:", gym_abbr)
+    print("Password:", password)
+
     if not all([email, password]):
         return Response({"error": "Email and password are required."}, status=400)
 
-    # Step 1: Create Supabase Auth user
+    # Step 1: Attempt to create user in Supabase Auth
     supabase_response = requests.post(
         f"{settings.SUPABASE_URL}/auth/v1/admin/users",
-        # headers={
-        #     "apikey": settings.SUPABASE_SERVICE_ROLE_KEY,
-        #     "Authorization": f"Bearer {settings.SUPABASE_SERVICE_ROLE_KEY}",
-        #     "Content-Type": "application/json"
-        # },
+        headers=SUPABASE_HEADERS,
         json={
             "email": email,
             "password": password,
@@ -109,17 +173,53 @@ def registerUser(request):
         }
     )
 
-    if supabase_response.status_code != 200:
+    # Print Supabase response status and body
+    print("🔐 Supabase Auth response status:", supabase_response.status_code)
+    try:
+        print("🧾 Supabase Auth JSON:", supabase_response.json())
+    except Exception:
+        print("❌ Failed to parse Supabase Auth response as JSON")
+        print("📄 Raw response text:", supabase_response.text)
+        
+
+    # Handle duplicate email or other known client-side error
+    if supabase_response.status_code == 400:
+        error_data = supabase_response.json()
+        message = error_data.get("message", "").lower()
+        if "already registered" in message or "duplicate key" in message:
+            return Response({"error": "Email is already in use."}, status=409)
+        return Response({
+            "error": "Invalid request to Supabase Auth.",
+            "details": error_data
+        }, status=400)
+
+    # Handle unexpected errors
+    if supabase_response.status_code not in [200, 201]:
         return Response({
             "error": "Failed to create user in Supabase Auth",
             "details": supabase_response.json()
         }, status=500)
 
-    supabase_user_id = supabase_response.json()["user"]["id"]
 
-    # Step 2: Proceed with your regular serializer
+    # Step 2: Save user to local gym user table
+    supabase_user_id = supabase_response.json()["id"]
+    print("Supabase User ID:", supabase_user_id)
+
     user_data = request.data.copy()
+    user_data = request.data.copy()
+
+    # Convert MM/DD/YYYY to YYYY-MM-DD
+    birth_date_str = user_data.get("birthDate")
+    if birth_date_str:
+        try:
+            birth_date_obj = datetime.strptime(birth_date_str, "%m/%d/%Y")
+            user_data["birthDate"] = birth_date_obj.strftime("%Y-%m-%d")
+        except ValueError:
+            print("Invalid date format: Please use MM/DD/YYYY")
+            return Response({"error": "Invalid birthDate format. Use MM/DD/YYYY."}, status=400)
+
     user_data["auth_user_id"] = supabase_user_id
+    print("Final user_data passed to serializer:", user_data)
 
     if gym_abbr == "PF":
         serializer = PFUserSerializer(data=user_data)
@@ -130,8 +230,10 @@ def registerUser(request):
 
     if serializer.is_valid():
         serializer.save()
+        print("✅ User successfully saved to database.")
         return Response({"message": "User registered successfully!"}, status=201)
 
+    print("❌ Serializer errors:", serializer.errors)
     return Response(serializer.errors, status=400)
 
 
@@ -147,14 +249,12 @@ def verifyMembership(request):
         return Response({"error": "Gym name and member ID are required."}, status=400)
 
     # Step 1: Look up gym name in AffilGyms table
-    # gym = AffilGyms.objects.filter(gymName=gym_name).first()
     gym = AffilGyms.objects.filter(gymName=gym_name).first()
     print("Matched gyms:", gym)
 
     if not gym:
         return Response({"error": "Unable to locate gym."}, status=404)
 
-    
     gym_abbr = gym.gymAbbr
     gym_state = data.get("gymState")
     gym_city = data.get("gymCity")
@@ -231,6 +331,22 @@ def getGymCities(request):
     )
     
     return Response({"cities": list(cities)}, status=200)
+
+
+
+from rest_framework_simplejwt.token_blacklist.models import OutstandingToken, BlacklistedToken
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def logoutUser(request):
+    try:
+        tokens = OutstandingToken.objects.filter(user=request.user)
+        for token in tokens:
+            BlacklistedToken.objects.get_or_create(token=token)
+        return Response({"message": "User logged out from all sessions."}, status=200)
+    except:
+        return Response({"error": "Failed to log out."}, status=400)
+
 
 
 
