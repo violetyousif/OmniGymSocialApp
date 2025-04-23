@@ -15,20 +15,123 @@ import {
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import {supabase} from '../../../lib/supabase';
-import * as MediaLibrary from 'expo-media-library';
+import 'react-native-url-polyfill/auto';
+import * as FileSystem from 'expo-file-system';
 
 const isValidTimeFormat = (str: string) => {
   return /^\d{1,2}:\d{2}$/.test(str);
 };
 
+
+// const uploadImageToSupabase = async (fileUri: string, userId: string) => {
+//   const fileExt = fileUri.split('.').pop();
+//   const fileName = `${userId}_${Date.now()}.${fileExt}`;
+//   const fileType = mime.getType(fileUri) || 'image/png';
+
+//   const fileData = await FileSystem.readAsStringAsync(fileUri, {
+//     encoding: FileSystem.EncodingType.Base64,
+//   });
+
+//   const { data, error } = await supabase.storage
+//     .from('avatars')
+//     .upload(fileName, Buffer.from(fileData, 'base64'), {
+//       contentType: fileType,
+//       upsert: true,
+//     });
+
+//   if (error) {
+//     throw new Error(`Upload Error: ${error.message}`);
+//   }
+
+//   const { data: publicUrlData } = supabase
+//     .storage
+//     .from('avatars')
+//     .getPublicUrl(fileName);
+
+//   return publicUrlData.publicUrl;
+// };
+
+// const uploadToSupabase = async (uri: string, userId: string): Promise<string | null> => {
+//   const fileExt = uri.split('.').pop();
+//   const fileName = `${userId}_${Date.now()}.${fileExt}`;
+//   const filePath = `${fileName}`;
+
+//   const response = await fetch(uri);
+//   const blob = await response.blob();
+
+//   const { error: uploadError } = await supabase.storage
+//     .from('avatars')
+//     .upload(filePath, blob, {
+//       cacheControl: '3600',
+//       upsert: true,
+//       contentType: blob.type,
+//     });
+
+//   if (uploadError) {
+//     console.error('Upload Error:', uploadError.message);
+//     return null;
+//   }
+
+//   const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);
+//   return data.publicUrl;
+// };
+
+const uploadImageToSupabase = async (uri: string, userId: string) => {
+  try {
+    const response = await fetch(uri);
+    const blob = await response.blob();
+    const extension = uri.split('.').pop()?.toLowerCase() || '';
+
+    const contentTypeMap: { [key: string]: string } = {
+      jpg: 'image/jpg',
+      jpeg: 'image/jpeg',
+      png: 'image/png',
+      webp: 'image/webp',
+      gif: 'image/gif',
+      bmp: 'image/bmp',
+    };
+
+    const contentType = contentTypeMap[extension] || 'image/png';
+    // const contentType = 'image/*';
+
+    const filePath = `${userId}/${Date.now()}.${extension}`;
+
+    const { data, error } = await supabase.storage
+      .from('avatars')
+      .upload(filePath, blob, {
+        contentType,
+        upsert: true,
+      });
+
+    if (error) {
+      console.error('Upload Error:', error);
+      Alert.alert('Error', 'Failed to upload image to Supabase.');
+      return null;
+    }
+    console.log('Upload successful:', data);
+
+    const { data: publicUrlData } = supabase.storage
+      .from('avatars')
+      .getPublicUrl(filePath);
+      if (!publicUrlData?.publicUrl) {
+        console.error('No public URL returned');
+        return null;
+      }
+    return publicUrlData.publicUrl;
+      
+  } catch (err) {
+    console.error('Upload Exception:', err);
+    return null;
+  }
+};
+
 const Settings = () => {
   const [userId, setUserId] = useState<string | null>(null);
   const [email, setEmail] = useState<string | null>(null);
-
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');  
   const [caption, setCaption] = useState('');
-  const [profileImage, setProfileImage] = useState('');
+  const [profileImage, setProfileImage] = useState('Fullstack/Frontend/assets/images/avatarBlank.png');
   const [isPublic, setIsPublic] = useState(true);
   const [units, setUnits] = useState<'Imperial' | 'Metric'>('Imperial');
   const [fitnessGoal, setFitnessGoal] = useState('');
@@ -47,8 +150,6 @@ const Settings = () => {
     const fetchUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-
-
       setUserId(user.id);
       // Shows the user ID in the console
       // This is useful for debugging and ensuring that the user is authenticated
@@ -87,7 +188,7 @@ const Settings = () => {
 
       if (settings) {
         setCaption(settings.caption || '');
-        setProfileImage(settings.profileImg || 'https://via.placeholder.com/150');
+        setProfileImage(settings.profileImg || 'Fullstack/Frontend/assets/images/avatarBlank.png');
         setIsPublic(settings.profilePublic);
         setUnits(settings.units);
         setFitnessGoal(settings.fitnessGoal || '');
@@ -102,10 +203,18 @@ const Settings = () => {
   const togglePublic = () => setIsPublic(prev => !prev);
   const toggleUnits = () => setUnits(prev => (prev === 'Imperial' ? 'Metric' : 'Imperial'));
   
-  // if (isNaN(parseFloat(runningTime))) {
-  //   Alert.alert("Invalid Input", "Running Time must be a number");
-  //   return;
-  // }
+  /* Used to convert between units */
+  // For example, if the user is in Metric, convert from pounds to kilograms
+  const convertToDisplayUnits = (value: number | null) => {
+    if (value == null) return '';
+    return units === 'Metric' ? (value * 0.453592).toFixed(1) : value.toString();
+  };
+  // For example, if the user is in Imperial, convert from kilograms to pounds
+  const convertFromDisplayUnits = (input: string) => {
+    const val = parseFloat(input);
+    if (isNaN(val)) return null;
+    return units === 'Metric' ? val / 0.453592 : val;
+  };
   
   const updateSettings = async (updatePrivacy = isPublic) => {
     if (!email || !userId) return;
@@ -154,19 +263,6 @@ const Settings = () => {
 
   };
 
-  /* Used to convert between units */
-  // For example, if the user is in Metric, convert from pounds to kilograms
-  const convertToDisplayUnits = (value: number | null) => {
-    if (value == null) return '';
-    return units === 'Metric' ? (value * 0.453592).toFixed(1) : value.toString();
-  };
-  // For example, if the user is in Imperial, convert from kilograms to pounds
-  const convertFromDisplayUnits = (input: string) => {
-    const val = parseFloat(input);
-    if (isNaN(val)) return null;
-    return units === 'Metric' ? val / 0.453592 : val;
-  };
-
   const pickImage = async() => {
       try {
         
@@ -182,48 +278,103 @@ const Settings = () => {
           mediaTypes: ['images'],
           allowsEditing: true,
           aspect: [1, 1], 
-        // Square crop for avatar
           quality: 1,
         });
-        
-      if (!result.canceled && result.assets?.length > 0) {
+
+        if (!result.canceled && result.assets?.length > 0) {
           const selected = result.assets[0];
-          const fileType = selected.uri.split('.').pop()?.toLowerCase();
     
-          if (['jpg', 'jpeg', 'png'].includes(fileType || '')) {
-            setProfileImage(selected.uri);
-            Alert.alert('Success', 'Profile image updated!');
-          } else {
-            Alert.alert('Invalid Format', 'Only JPG and PNG formats are supported.');
+          const uploadedUrl = await uploadImageToSupabase(selected.uri, userId!);
+          if (uploadedUrl) {
+            setProfileImage(uploadedUrl);
+            Alert.alert('Success', 'Profile image uploaded successfully!');
           }
         }
-      } catch (err) {
-        console.error('Image picking error:', err);
-        Alert.alert('Error', 'Failed to select image.');
+      } catch (error) {
+        console.error('Image Picker Error:', error);
+        Alert.alert('Error', 'An error occurred while selecting the image.');
       }
-      //   if (!result.canceled) {
-          
-      //   // Call upload function
-      //     const updatedUser = await uploadAvatarAndUpdate(
-      //       userCollectionId,
-      //       user.$id, 
-      //     // Current user's ID
-      //       result.assets[0] 
-      //     // File object from ImagePicker
-      //     );
-  
-          
-      //   // Update the local state with the new avatar URL
-      //     setAvatarUri(updatedUser.avatar2);
-  
-      //     Alert.alert('Success', 'Avatar updated successfully!');
-      //     console.log('Updated User:', updatedUser);
-      //   }
-      // } catch (error) {
-      //   console.error('Error picking/uploading image:', error);
-      //   Alert.alert('Error', 'Something went wrong while uploading the image.');
-      // }
     };
+      // if (!result.canceled && result.assets?.length > 0) {
+      //     const selected = result.assets[0];
+      //     if (!result.canceled && result.assets?.length > 0) {
+      //       const image = result.assets[0];
+      //       const fileExt = image.uri.split('.').pop();
+      //       const fileName = `avatar-${Date.now()}.${fileExt}`;
+    
+      //       const file = {
+      //         uri: image.uri,
+      //         type: image.type ?? 'image/jpeg',
+      //         name: fileName,
+      //       };
+    
+      //       const { data, error: uploadError } = await supabase.storage
+      //         .from('avatars')
+      //         .upload(fileName, file, { cacheControl: '3600', upsert: true });
+    
+      //       if (uploadError) {
+      //         console.error('Upload Error:', uploadError);
+      //         Alert.alert('Error', 'Failed to upload image.');
+      //         return;
+      //       }
+    
+      //       const { data: publicUrlData } = supabase.storage
+      //         .from('avatars')
+      //         .getPublicUrl(fileName);
+    
+      //       const publicUrl = publicUrlData?.publicUrl;
+      //       if (publicUrl) {
+      //         setProfileImage(publicUrl);
+      //         await updateProfileImageInDB(publicUrl);
+      //         Alert.alert('Success', 'Image uploaded and saved!');
+      //       }
+      //     }
+      //   } catch (error) {
+      //     console.error('Image picking error:', error);
+      //     Alert.alert('Error', 'Image picker failed.');
+      //   }
+      // };    
+          //const publicUrl = await uploadToSupabase(selected.uri, userId!);
+          // const fileType = selected.uri.split('.').pop()?.toLowerCase();
+    
+          // if (['jpg', 'jpeg', 'png'].includes(fileType || '')) {
+          //   setProfileImage(selected.uri);
+          //   Alert.alert('Success', 'Profile image updated!');
+          // } else {
+          //   Alert.alert('Invalid Format', 'Only JPG and PNG formats are supported.');
+          // }
+          // if (publicUrl) {
+          //   setProfileImage(publicUrl);
+          //   Alert.alert('Success', 'Profile image updated!');
+          // } else {
+          //   Alert.alert('Upload Failed', 'Could not upload image to Supabase.');
+          // }
+
+                // Upload to Supabase Storage
+    //       if (userId) {
+    //         const publicUrl = await uploadImageToSupabase(selected.uri, userId);
+    //       } else {
+    //         Alert.alert('Error', 'User ID is not available.');
+    //       }
+
+    //       // Save public URL in DB
+    //       const { error } = await supabase
+    //         .from('PFUserSettings')
+    //         .update({ profileImg: publicUrl })
+    //         .eq('auth_user_id', userId);
+
+    //       if (error) {
+    //         Alert.alert('Error', 'Failed to update profile image URL in database.');
+    //       } else {
+    //         setProfileImage(publicUrl); // update UI
+    //         Alert.alert('Success', 'Profile image updated!');
+    //       }
+    //     }
+    //   } catch (err) {
+    //     console.error('Image picking error:', err);
+    //     Alert.alert('Error', 'Failed to select image.');
+    //   }
+    // };
 
   // const pickImageFromLibrary = async () => {
   //   const { status } = await MediaLibrary.requestPermissionsAsync();
@@ -247,10 +398,10 @@ const Settings = () => {
   
   
 
-  const formatRunningTimeWithUnit = (time: string) => {
-    const unit = units === 'Metric' ? '/km' : '/mi';
-    return time ? `${time}${unit}` : 'N/A';
-  };
+  // const formatRunningTimeWithUnit = (time: string) => {
+  //   const unit = units === 'Metric' ? '/km' : '/mi';
+  //   return time ? `${time}${unit}` : 'N/A';
+  // };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -274,7 +425,9 @@ const Settings = () => {
            <View style={styles.header}>
            {/* <TouchableOpacity style={styles.uploadWrapper} onPress={pickImageFromLibrary}> */}
            <TouchableOpacity style={styles.uploadWrapper} onPress={pickImage}>
-              <Image source={{ uri: profileImage }} style={styles.profileImage} />
+              <Image 
+              source={{ uri: profileImage || 'Fullstack/Frontend/assets/images/avatarBlank.png' }}
+              style={styles.profileImage} />
               <View style={styles.uploadOverlay}>
                 <Text style={styles.uploadText}>📷</Text>
               </View>
