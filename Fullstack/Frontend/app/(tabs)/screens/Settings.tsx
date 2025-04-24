@@ -23,59 +23,6 @@ const isValidTimeFormat = (str: string) => {
 };
 
 
-// const uploadImageToSupabase = async (fileUri: string, userId: string) => {
-//   const fileExt = fileUri.split('.').pop();
-//   const fileName = `${userId}_${Date.now()}.${fileExt}`;
-//   const fileType = mime.getType(fileUri) || 'image/png';
-
-//   const fileData = await FileSystem.readAsStringAsync(fileUri, {
-//     encoding: FileSystem.EncodingType.Base64,
-//   });
-
-//   const { data, error } = await supabase.storage
-//     .from('avatars')
-//     .upload(fileName, Buffer.from(fileData, 'base64'), {
-//       contentType: fileType,
-//       upsert: true,
-//     });
-
-//   if (error) {
-//     throw new Error(`Upload Error: ${error.message}`);
-//   }
-
-//   const { data: publicUrlData } = supabase
-//     .storage
-//     .from('avatars')
-//     .getPublicUrl(fileName);
-
-//   return publicUrlData.publicUrl;
-// };
-
-// const uploadToSupabase = async (uri: string, userId: string): Promise<string | null> => {
-//   const fileExt = uri.split('.').pop();
-//   const fileName = `${userId}_${Date.now()}.${fileExt}`;
-//   const filePath = `${fileName}`;
-
-//   const response = await fetch(uri);
-//   const blob = await response.blob();
-
-//   const { error: uploadError } = await supabase.storage
-//     .from('avatars')
-//     .upload(filePath, blob, {
-//       cacheControl: '3600',
-//       upsert: true,
-//       contentType: blob.type,
-//     });
-
-//   if (uploadError) {
-//     console.error('Upload Error:', uploadError.message);
-//     return null;
-//   }
-
-//   const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);
-//   return data.publicUrl;
-// };
-
 const base64ToUint8Array = (base64: string) => {
   const binaryString = atob(base64);
   const len = binaryString.length;
@@ -88,11 +35,7 @@ const base64ToUint8Array = (base64: string) => {
 
 const uploadImageToSupabase = async (uri: string, userId: string) => {
   try {
-    const response = await fetch(uri);
-    // const blob = await response.blob();
-
-    const extension = uri.split('.').pop()?.toLowerCase() || 'jpg';
-
+    const extension = uri.split('.').pop()?.toLowerCase() || 'jpeg';
     const contentTypeMap: { [key: string]: string } = {
       jpg: 'image/jpeg',
       jpeg: 'image/jpeg',
@@ -101,21 +44,15 @@ const uploadImageToSupabase = async (uri: string, userId: string) => {
       gif: 'image/gif',
       bmp: 'image/bmp',
     };
-
-    const contentType = contentTypeMap[extension] || 'image/jpeg'; // fallback just in case
+    const contentType = contentTypeMap[extension] || 'image/jpeg';
 
     const base64 = await FileSystem.readAsStringAsync(uri, {
       encoding: FileSystem.EncodingType.Base64,
     });
-    // const blob = await response.blob(); // Ensure blob is fully resolved before uploading
-    // console.log('Blob info:', blob.size, blob.type);
-    // if (!blob || blob.size === 0) {
-    //   throw new Error('Blob is empty. Image could not be loaded properly.');
-    // }
-    const filePath = `${userId}/${Date.now()}.${extension}`;
     const binaryData = base64ToUint8Array(base64);
 
-    const { data, error } = await supabase.storage
+    const filePath = `${userId}/${Date.now()}.${extension}`;
+    const { error } = await supabase.storage
       .from('avatars')
       .upload(filePath, binaryData, {
         contentType,
@@ -124,20 +61,16 @@ const uploadImageToSupabase = async (uri: string, userId: string) => {
 
     if (error) {
       console.error('Upload Error:', error);
-      Alert.alert('Error', 'Failed to upload image to Supabase.');
       return null;
     }
-
-    console.log('Upload successful:', data);
 
     const { data: publicUrlData } = supabase.storage
       .from('avatars')
       .getPublicUrl(filePath);
 
-    return publicUrlData?.publicUrl;
+    return publicUrlData?.publicUrl || null;
   } catch (err: any) {
-      console.error('Upload Exception:', err.message || err);
-      Alert.alert('Upload Error', err.message || 'Unknown error occurred during upload.');
+    console.error('Upload Exception:', err.message || err);
     return null;
   }
 };
@@ -149,7 +82,8 @@ const Settings = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');  
   const [caption, setCaption] = useState('');
-  const [profileImage, setProfileImage] = useState('Fullstack/Frontend/assets/images/avatarBlank.png');
+  // const [profileImage, setProfileImage] = useState('../../../assets/images/avatarBlank.png');
+  const [profileImage, setProfileImage] = useState<string | null>(null);
   const [isPublic, setIsPublic] = useState(true);
   const [units, setUnits] = useState<'Imperial' | 'Metric'>('Imperial');
   const [fitnessGoal, setFitnessGoal] = useState('');
@@ -163,6 +97,30 @@ const Settings = () => {
 
 // TEMP CODING: This will be changed to backend once demo is complete. Will also remove hardcoded table names to be dynamic.
 
+// Helper function to refresh user settings
+const refreshUserSettings = async (uid: string) => {
+  const { data: settings, error } = await supabase
+    .from('PFUserSettings')
+    .select('*')
+    .eq('auth_user_id', uid)
+    .single();
+
+  if (error) {
+    console.error('Failed to refresh settings:', error);
+    return;
+  }
+
+  if (settings) {
+    setCaption(settings.caption || '');
+    setProfileImage(settings.profileImg || '');
+    setIsPublic(settings.profilePublic);
+    setUnits(settings.units);
+    setFitnessGoal(settings.fitnessGoal || '');
+    setAge(settings.age);
+    setWilksScore(settings.wilks2Score);
+  }
+};
+
   // Fetch Supabase profile on load
   useEffect(() => {
     const fetchUser = async () => {
@@ -171,11 +129,11 @@ const Settings = () => {
       setUserId(user.id);
       // Shows the user ID in the console
       // This is useful for debugging and ensuring that the user is authenticated
-      console.log("🔐 Authenticated user ID:", user.id);
+      // console.log("Authenticated user ID:", user.id);
 
       const { data: pfUser } = await supabase
         .from('PFUsers')
-        .select('firstName, lastName, email')
+        .select('firstName, lastName, email, dateJoined')
         .eq('auth_user_id', user.id)
         .single();
 
@@ -183,6 +141,10 @@ const Settings = () => {
         setFirstName(pfUser.firstName);
         setLastName(pfUser.lastName);
         setEmail(pfUser.email);
+        if (pfUser.dateJoined) {
+          const yearJoined = new Date(pfUser.dateJoined).getFullYear().toString();
+          setJoined(yearJoined);
+        }
       }
       
       const { data: pfMetrics } = await supabase
@@ -206,7 +168,8 @@ const Settings = () => {
 
       if (settings) {
         setCaption(settings.caption || '');
-        setProfileImage(settings.profileImg || 'Fullstack/Frontend/assets/images/avatarBlank.png');
+        setProfileImage(settings.profileImg || '');
+        // console.log("Profile image loaded:", settings.profileImg);  // debug
         setIsPublic(settings.profilePublic);
         setUnits(settings.units);
         setFitnessGoal(settings.fitnessGoal || '');
@@ -271,8 +234,6 @@ const Settings = () => {
       Alert.alert('Success', 'Profile updated successfully');
     }
 
-    // console.log("Updating profilePublic:", isPublic);
-
     if (settingsError) {
       Alert.alert("Error", settingsError.message);
     } else {
@@ -281,171 +242,64 @@ const Settings = () => {
 
   };
 
-  const pickImage = async() => {
-      try {
-        
-        // Request permissions
-        const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (!permissionResult.granted) {
-          Alert.alert('Permission Denied', 'Please grant permission to access your media library.');
-          return;
-        }
-  
-        // Open the image picker
-        const result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ['images'],
-          allowsEditing: true,
-          aspect: [1, 1], 
-          quality: 1,
-        });
-
-        if (!result.canceled && result.assets?.length > 0) {
-          const selected = result.assets[0];
-    
-          const uploadedUrl = await uploadImageToSupabase(selected.uri, userId!);
-          if (uploadedUrl) {
-            setProfileImage(uploadedUrl);
-            Alert.alert('Success', 'Profile image uploaded successfully!');
-          }
-        }
-      } catch (error) {
-        console.error('Image Picker Error:', error);
-        Alert.alert('Error', 'An error occurred while selecting the image.');
+  const pickImage = async () => {
+    try {
+      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permissionResult.granted) {
+        Alert.alert('Permission Denied', 'Please grant permission to access your media library.');
+        return;
       }
-    };
-      // if (!result.canceled && result.assets?.length > 0) {
-      //     const selected = result.assets[0];
-      //     if (!result.canceled && result.assets?.length > 0) {
-      //       const image = result.assets[0];
-      //       const fileExt = image.uri.split('.').pop();
-      //       const fileName = `avatar-${Date.now()}.${fileExt}`;
-    
-      //       const file = {
-      //         uri: image.uri,
-      //         type: image.type ?? 'image/jpeg',
-      //         name: fileName,
-      //       };
-    
-      //       const { data, error: uploadError } = await supabase.storage
-      //         .from('avatars')
-      //         .upload(fileName, file, { cacheControl: '3600', upsert: true });
-    
-      //       if (uploadError) {
-      //         console.error('Upload Error:', uploadError);
-      //         Alert.alert('Error', 'Failed to upload image.');
-      //         return;
-      //       }
-    
-      //       const { data: publicUrlData } = supabase.storage
-      //         .from('avatars')
-      //         .getPublicUrl(fileName);
-    
-      //       const publicUrl = publicUrlData?.publicUrl;
-      //       if (publicUrl) {
-      //         setProfileImage(publicUrl);
-      //         await updateProfileImageInDB(publicUrl);
-      //         Alert.alert('Success', 'Image uploaded and saved!');
-      //       }
-      //     }
-      //   } catch (error) {
-      //     console.error('Image picking error:', error);
-      //     Alert.alert('Error', 'Image picker failed.');
-      //   }
-      // };    
-          //const publicUrl = await uploadToSupabase(selected.uri, userId!);
-          // const fileType = selected.uri.split('.').pop()?.toLowerCase();
-    
-          // if (['jpg', 'jpeg', 'png'].includes(fileType || '')) {
-          //   setProfileImage(selected.uri);
-          //   Alert.alert('Success', 'Profile image updated!');
-          // } else {
-          //   Alert.alert('Invalid Format', 'Only JPG and PNG formats are supported.');
-          // }
-          // if (publicUrl) {
-          //   setProfileImage(publicUrl);
-          //   Alert.alert('Success', 'Profile image updated!');
-          // } else {
-          //   Alert.alert('Upload Failed', 'Could not upload image to Supabase.');
-          // }
-
-                // Upload to Supabase Storage
-    //       if (userId) {
-    //         const publicUrl = await uploadImageToSupabase(selected.uri, userId);
-    //       } else {
-    //         Alert.alert('Error', 'User ID is not available.');
-    //       }
-
-    //       // Save public URL in DB
-    //       const { error } = await supabase
-    //         .from('PFUserSettings')
-    //         .update({ profileImg: publicUrl })
-    //         .eq('auth_user_id', userId);
-
-    //       if (error) {
-    //         Alert.alert('Error', 'Failed to update profile image URL in database.');
-    //       } else {
-    //         setProfileImage(publicUrl); // update UI
-    //         Alert.alert('Success', 'Profile image updated!');
-    //       }
-    //     }
-    //   } catch (err) {
-    //     console.error('Image picking error:', err);
-    //     Alert.alert('Error', 'Failed to select image.');
-    //   }
-    // };
-
-  // const pickImageFromLibrary = async () => {
-  //   const { status } = await MediaLibrary.requestPermissionsAsync();
-  //   if (status !== 'granted') {
-  //     Alert.alert('Permission required', 'Please allow media access to choose a profile image.');
-  //     return;
-  //   }
   
-  //   const media = await MediaLibrary.getAssetsAsync({
-  //     mediaType: 'photo',
-  //     first: 1, // You can load more and show custom UI
-  //     sortBy: ['creationTime'],
-  //   });
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+      });
   
-  //   if (media.assets.length > 0) {
-  //     setProfileImage(media.assets[0].uri);
-  //   } else {
-  //     Alert.alert('No photos', 'No images were found in your library.');
-  //   }
-  // };
+      if (!result.canceled && result.assets?.length > 0 && userId) {
+        const selected = result.assets[0];
+        const uploadedUrl = await uploadImageToSupabase(selected.uri, userId);
   
+        if (uploadedUrl) {
+          await supabase
+            .from('PFUserSettings')
+            .update({ profileImg: uploadedUrl })
+            .eq('auth_user_id', userId);
+  
+          // ✅ Refresh all settings to get the updated image
+          await refreshUserSettings(userId);
+        }
+      }
+    } catch (error) {
+      console.error('Image Picker Error:', error);
+      Alert.alert('Upload Error', 'Failed to select or upload image.');
+    }
+  };
   
 
-  // const formatRunningTimeWithUnit = (time: string) => {
-  //   const unit = units === 'Metric' ? '/km' : '/mi';
-  //   return time ? `${time}${unit}` : 'N/A';
-  // };
-
+  // const resolvedImageSource = profileImage && profileImage.startsWith('https')
+  //   ? { uri: profileImage }
+  //   : require('../../../assets/images/avatarBlank.png');
+  // console.log('Rendering image:', resolvedImageSource);
+  
   return (
     <SafeAreaView style={styles.safeArea}>
       {/* <ScrollView> */}
         <ScrollView contentContainerStyle={styles.scrollContent}>
 
          {/* Profile Header */}
-         {/* <View style={styles.noHorizontalPadding}>
-           <View style={styles.header}>
-           <TouchableOpacity style={styles.uploadWrapper} onPress={pickImageFromLibrary}>
-              <Image source={{ uri: profileImage }} style={styles.profileImage} />
-              <View style={styles.uploadOverlay}>
-                <Text style={styles.uploadText}>📷</Text>
-              </View>
-            </TouchableOpacity>
-             <Text style={styles.name}>{`${firstName} ${lastName}`}</Text>
-             <Text style={styles.caption}>{caption}</Text>
-           </View>
-         </View> */}
         <View style={styles.noHorizontalPadding}>
            <View style={styles.header}>
-           {/* <TouchableOpacity style={styles.uploadWrapper} onPress={pickImageFromLibrary}> */}
            <TouchableOpacity style={styles.uploadWrapper} onPress={pickImage}>
-              <Image 
-              source={{ uri: profileImage || 'Fullstack/Frontend/assets/images/avatarBlank.png' }}
-              style={styles.profileImage} />
+              <Image
+                source={
+                  profileImage?.startsWith('http')
+                    ? { uri: profileImage }
+                    : require('../../../assets/images/avatarBlank.png')
+                }
+                style={styles.profileImage}
+                />
               <View style={styles.uploadOverlay}>
                 <Text style={styles.uploadText}>📷</Text>
               </View>
@@ -612,209 +466,6 @@ const Settings = () => {
 
 export default Settings;
 
-// const Settings = () => {
-//   // States for profile information
-//   const [isPublic, setIsPublic] = useState(true);
-//   const [units, setUnits] = useState('Imperial');
-//   const [name, setName] = useState('Jane Doe');
-//   const [caption, setCaption] = useState('Fitness Enthusiast | Gym Lover | Stronger Every Day');
-//   const [profileImage, setProfileImage] = useState<string>('https://via.placeholder.com/150');
-
-//   // States for general information
-//   const [joined, setJoined] = useState('2018');
-//   const [age, setAge] = useState(30);
-//   const [fitnessGoal, setFitnessGoal] = useState('Build Muscle');
-//   const [wilksScore, setWilksScore] = useState(366);
-
-//   // States for metrics
-//   const [benchPress, setBenchPress] = useState(105);
-//   const [deadlift, setDeadlift] = useState(220);
-//   const [runningTime, setRunningTime] = useState('5:30 min/km');
-//   const [squats, setSquats] = useState(220);
-
-//   const togglePublic = () => setIsPublic(prev => !prev);
-//   const toggleUnits = () => setUnits(units === 'Imperial' ? 'SI' : 'Imperial');
-
-//   const pickImage = async () => {
-//     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-//     if (!permission.granted) {
-//       alert('Permission to access gallery is required!');
-//       return;
-//     }
-
-//     let result = await ImagePicker.launchImageLibraryAsync({
-//       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-//       allowsEditing: true,
-//       aspect: [1, 1],
-//       quality: 1,
-//     });
-
-//     if (!result.canceled && result.assets.length > 0) {
-//       const selected = result.assets[0];
-//       const fileType = selected.uri.split('.').pop()?.toLowerCase();
-//       if (fileType === 'png' || fileType === 'jpg' || fileType === 'jpeg') {
-//         setProfileImage(selected.uri);
-//       } else {
-//         alert('Only PNG or JPEG files are allowed.');
-//       }
-//     }
-//   };
-
-//   return (
-//     <SafeAreaView style={styles.safeArea}>
-//       <ScrollView contentContainerStyle={styles.scrollContent}>
-
-//         {/* Profile Header */}
-//         <View style={styles.noHorizontalPadding}>
-//           <View style={styles.header}>
-//             <TouchableOpacity style={styles.uploadWrapper} onPress={pickImage}>
-//               <Image source={{ uri: profileImage }} style={styles.profileImage} />
-//               <View style={styles.uploadOverlay}>
-//                 <Text style={styles.uploadText}>📷</Text>
-//               </View>
-//             </TouchableOpacity>
-//             <Text style={styles.name}>{name}</Text>
-//             <Text style={styles.caption}>{caption}</Text>
-//           </View>
-//         </View>
-
-//         {/* Units and Privacy Settings */}
-//         <View style={styles.section}>
-//           <Text style={styles.sectionTitle}>Units Converter</Text>
-//           <View style={styles.switchRow}>
-//             <Text style={styles.label}>Current: {units}</Text>
-//             <Switch value={units === 'SI'} onValueChange={toggleUnits} />
-//           </View>
-
-//           {/* iOS-only spacing */}
-//           {Platform.OS === 'ios' && <View style={{ height: 20 }} />}
-
-//           <Text style={styles.sectionTitle}>Privacy Settings</Text>
-//           <View style={styles.switchRow}>
-//             <Text style={styles.label}>{isPublic ? 'Public' : 'Private'}</Text>
-//             <Switch value={isPublic} onValueChange={togglePublic} />
-//           </View>
-//         </View>
-
-//         {/* Edit Profile Section */}
-//         <View style={styles.section}>
-//           <Text style={styles.sectionTitle}>Edit Profile</Text>
-
-//           <View style={styles.inputRow}>
-//             <Text style={styles.label}>Name:</Text>
-//             <TextInput
-//               style={styles.input}
-//               value={name}
-//               onChangeText={setName}
-//               placeholder="Enter your name"
-//             />
-//           </View>
-
-//           <View style={styles.inputRow}>
-//             <Text style={styles.label}>Caption:</Text>
-//             <TextInput
-//               style={styles.input}
-//               value={caption}
-//               onChangeText={setCaption}
-//               placeholder="Enter your caption"
-//             />
-//           </View>
-
-//           <View style={styles.inputRow}>
-//             <Text style={styles.label}>Joined Year:</Text>
-//             <TextInput
-//               style={styles.input}
-//               value={joined}
-//               onChangeText={setJoined}
-//               placeholder="Enter joined year"
-//             />
-//           </View>
-
-//           <View style={styles.inputRow}>
-//             <Text style={styles.label}>Age:</Text>
-//             <TextInput
-//               style={styles.input}
-//               value={String(age)}
-//               onChangeText={text => setAge(Number(text))}
-//               placeholder="Enter age"
-//               keyboardType="numeric"
-//             />
-//           </View>
-
-//           <View style={styles.inputRow}>
-//             <Text style={styles.label}>Fitness Goal:</Text>
-//             <TextInput
-//               style={styles.input}
-//               value={fitnessGoal}
-//               onChangeText={setFitnessGoal}
-//               placeholder="Enter fitness goal"
-//             />
-//           </View>
-
-//           <View style={styles.inputRow}>
-//             <Text style={styles.label}>Wilks Score:</Text>
-//             <TextInput
-//               style={styles.input}
-//               value={String(wilksScore)}
-//               onChangeText={text => setWilksScore(Number(text))}
-//               placeholder="Enter Wilks Score"
-//               keyboardType="numeric"
-//             />
-//           </View>
-
-//           <View style={styles.inputRow}>
-//             <Text style={styles.label}>Bench Press:</Text>
-//             <TextInput
-//               style={styles.input}
-//               value={String(benchPress)}
-//               onChangeText={text => setBenchPress(Number(text))}
-//               placeholder="Enter bench press weight"
-//               keyboardType="numeric"
-//             />
-//           </View>
-
-//           <View style={styles.inputRow}>
-//             <Text style={styles.label}>Deadlift:</Text>
-//             <TextInput
-//               style={styles.input}
-//               value={String(deadlift)}
-//               onChangeText={text => setDeadlift(Number(text))}
-//               placeholder="Enter deadlift weight"
-//               keyboardType="numeric"
-//             />
-//           </View>
-
-//           <View style={styles.inputRow}>
-//             <Text style={styles.label}>Running Time:</Text>
-//             <TextInput
-//               style={styles.input}
-//               value={runningTime}
-//               onChangeText={setRunningTime}
-//               placeholder="Enter running time"
-//             />
-//           </View>
-
-//           <View style={styles.inputRow}>
-//             <Text style={styles.label}>Squats:</Text>
-//             <TextInput
-//               style={styles.input}
-//               value={String(squats)}
-//               onChangeText={text => setSquats(Number(text))}
-//               placeholder="Enter squats weight"
-//               keyboardType="numeric"
-//             />
-//           </View>
-
-//           {/* Save Changes Button */}
-//           <TouchableOpacity style={styles.button} onPress={() => alert('Profile updated')}>
-//             <Text style={styles.buttonText}>Save Changes</Text>
-//           </TouchableOpacity>
-//         </View>
-
-//       </ScrollView>
-//     </SafeAreaView>
-//   );
-// };
 
 const styles = StyleSheet.create({
   safeArea: {

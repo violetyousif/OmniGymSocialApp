@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { 
-  View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Platform, StatusBar 
+  View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Platform, StatusBar, Modal 
 } from 'react-native';
 import { FontAwesome, Entypo } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -20,6 +20,7 @@ const Profile = () => {
   const [profile, setProfile] = useState<any>(null);
   const [settings, setSettings] = useState<any>(null);
   const [metrics, setMetrics] = useState<any>(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   
   useFocusEffect(
@@ -69,6 +70,23 @@ const Profile = () => {
     return `${time}${unit}`;
   };
   
+  // Handle image modal to view profile image
+  {settings?.profileImg && (
+    <Modal visible={isModalVisible} transparent={true}>
+      <View style={styles.modalContainer}>
+        <TouchableOpacity
+          style={styles.modalBackdrop}
+          onPress={() => setIsModalVisible(false)}
+        />
+        <Image
+          source={{ uri: settings.profileImg }}
+          style={styles.modalImage}
+          resizeMode="contain"
+        />
+      </View>
+    </Modal>
+  )}
+  
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ paddingTop: HEADER_OFFSET }}>
@@ -85,6 +103,16 @@ const Profile = () => {
       </View>
   
       <View style={styles.profileSection}>
+      <TouchableOpacity onPress={() => setIsModalVisible(true)}>
+        <Image
+          source={
+            settings?.profileImg
+              ? { uri: settings.profileImg }
+              : require('../../../assets/images/avatarBlank.png')
+            }
+            style={styles.profileImage}
+          />
+        </TouchableOpacity>
         <Text style={styles.name}>{profile ? `${profile.firstName} ${profile.lastName}` : 'Loading...'}</Text>
       </View>
   
@@ -164,6 +192,20 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
+  modalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  modalImage: {
+    width: '90%',
+    height: '80%',
+    borderRadius: 10,
+  },
   topBar: {
     width: '100%',
     flexDirection: 'row',
@@ -220,10 +262,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 10,
   },
-  // email: {
-  //   fontSize: 16,
-  //   color: 'gray',
-  // },
   infoSection: {
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -251,18 +289,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  // metricsContainer: {
-  //   justifyContent: 'center',
-  //   alignItems: 'center',
-  // },
   metricsContainer: {
     flexDirection: 'row',
     paddingVertical: 5,
   },
-  // metricItem: {
-  //   alignItems: 'center',
-  //   marginHorizontal: 20,
-  // },
   metricItem: {
     width: 80,
     height: 80,
@@ -278,10 +308,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
   },
-  // metricValue: {
-  //   fontSize: 14,
-  //   marginTop: 5,
-  // },
   metricValue: {
     position: 'absolute',
     bottom: 18,   // adjusts to position the label inside circle icons
