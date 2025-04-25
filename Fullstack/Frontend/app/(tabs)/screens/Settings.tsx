@@ -139,6 +139,8 @@ const Settings = () => {
   const [squatsReps, setSquatsReps] = useState<number | null>(0);
   const [runningTime, setRunningTime] = useState('');
   const [runningDist, setRunningDist] = useState<number | null>(0);
+  const [runningDistText, setRunningDistText] = useState<string>('');  // track raw input
+  
   const wilksScore = computeWilksScore({
       //Imperial in DB → Convert using toKg() for score
       gender: gender ?? 'Male',
@@ -225,7 +227,7 @@ const refreshUserSettings = async (uid: string) => {
         setSquats(pfMetrics.prSquatWeight);
         setSquatsReps(pfMetrics.prSquatReps);
         setRunningTime(pfMetrics.runningTime?.toString() || '');
-        setRunningDist(pfMetrics.runningDist?.toString() || '');
+        setRunningDist(pfMetrics.runningDist);
         // setWilksScore(pfMetrics.wilks2Score);
       }
 
@@ -244,7 +246,6 @@ const refreshUserSettings = async (uid: string) => {
         setFitnessGoal(settings.fitnessGoal || '');
         setAge(settings.age);
         setPrSong(settings.prSong || '');
-        // setWilksScore(settings.wilks2Score);
       }
     };
 
@@ -324,6 +325,12 @@ const refreshUserSettings = async (uid: string) => {
       })
       .eq('auth_user_id', userId);
   
+    console.log("Submitting to DB → runningDist:", runningDist, "typeof:", typeof runningDist);
+
+    const normalizedDist = runningDistText.replace(',', '.');
+    const parsedDist = parseFloat(runningDistText);
+    const newDist = isNaN(parsedDist) ? null : parsedDist;
+      
     const { error: metricsError } = await supabase
       .from('PFUserMetrics')
       .update({
@@ -336,11 +343,16 @@ const refreshUserSettings = async (uid: string) => {
         prSquatWeight: squats,
         prSquatReps: squatsReps,
         runningTime,
-        runningDist,
+        runningDist: newDist,
         wilks2Score: wilksScore,
       })
       .eq('auth_user_id', userId);
   
+      console.log('Sending to Supabase:', {
+        runningDist,
+        type: typeof runningDist,
+      });
+      
       // Update the Wilks score
       // await callWilksUpdate();
       // refresh state again with new Wilks
@@ -629,7 +641,7 @@ const refreshUserSettings = async (uid: string) => {
           </View>
 
 
-          {/* Running Distance */}
+          {/* Running Time and Distance */}
           <View style={styles.inputRow}>
             <Text style={styles.label}>Running Time:</Text>
             <TextInput
@@ -641,19 +653,29 @@ const refreshUserSettings = async (uid: string) => {
           </View>
           <View style={styles.inputRow}>
           <Text style={styles.label}>Running Distance:</Text>
-              <TextInput
-                style={styles.input}
-                value={runningDist !== null ? runningDist.toString() : ''}
-                onChangeText={(text) => setRunningDist(parseFloat(text))}
-                placeholder="Enter running distance"
-                keyboardType="numeric"
-              />
+            <TextInput
+              style={styles.input}
+              value={runningDistText}
+              onChangeText={(text) => {
+                setRunningDistText(text); // Store raw input
+                console.log("Running Dist (raw text):", text);
+              }}
+              onBlur={() => {
+                const normalized = runningDistText.replace(',', '.');
+                const parsed = parseFloat(normalized);
+                console.log("Parsed as:", parsed);
+                setRunningDist(isNaN(parsed) ? null : parsed);
+              }}
+              placeholder="Enter running distance"
+              keyboardType={Platform.OS === 'ios' ? 'decimal-pad' : 'numeric'}
+              inputMode="decimal"
+            />
             </View>
             <View style={[styles.inputRow, { paddingVertical: 10 }]}>
               <Text style={styles.label}>
                 Caculated Pace: 
                 <View style={{ width: 5 }} />  {/* Spacer */}
-                {calculatePace(runningTime, runningDist, units)}
+                {calculatePace(runningTime, parseFloat(runningDistText) || 0, units)}
               </Text>
             </View>
 
