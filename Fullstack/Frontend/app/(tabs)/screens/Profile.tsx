@@ -6,8 +6,9 @@ import { FontAwesome, Entypo } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { Dimensions } from 'react-native';
 import { supabase } from '../../../lib/supabase';
-import { Session } from '@supabase/supabase-js';
 import { useFocusEffect } from '@react-navigation/native';
+import FitnessRing from '../../../components/FitnessRings';
+import SoundCloud from '@/components/SoundCloud';
 
 
 const { width } = Dimensions.get('window');
@@ -21,6 +22,7 @@ const Profile = () => {
   const [settings, setSettings] = useState<any>(null);
   const [metrics, setMetrics] = useState<any>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [ringKey, setRingKey] = useState<number>(Date.now());
 
   
   useFocusEffect(
@@ -28,34 +30,34 @@ const Profile = () => {
       const fetchProfile = async () => {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
-  
+
         const { data: pfUser } = await supabase
           .from("PFUsers")
           .select("*")
           .eq("auth_user_id", user.id)
           .single();
-  
+
         const { data: pfSettings } = await supabase
           .from("PFUserSettings")
           .select("*")
           .eq("auth_user_id", user.id)
           .single();
-  
+
         const { data: pfMetrics } = await supabase
           .from("PFUserMetrics")
           .select("*")
           .eq("auth_user_id", user.id)
           .single();
-  
+
         setProfile(pfUser);
         setSettings(pfSettings);
         setMetrics(pfMetrics);
+        setRingKey(prev => prev + 1);  // Update the key to force a re-render for the graphs
       };
-  
+
       fetchProfile();
     }, [])
   );
-  
 
   const formatWeight = (weight: number | null) => {
     if (weight == null) return 'N/A';
@@ -69,118 +71,125 @@ const Profile = () => {
     const unit = settings.units === 'Metric' ? '/km' : '/mi';
     return `${time}${unit}`;
   };
-  
-  // Handle image modal to view profile image
-  {settings?.profileImg && (
-    <Modal visible={isModalVisible} transparent={true}>
-      <View style={styles.modalContainer}>
-        <TouchableOpacity
-          style={styles.modalBackdrop}
-          onPress={() => setIsModalVisible(false)}
-        />
-        <Image
-          source={{ uri: settings.profileImg }}
-          style={styles.modalImage}
-          resizeMode="contain"
-        />
-      </View>
-    </Modal>
-  )}
-  
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingTop: HEADER_OFFSET }}>
-      <View style={[styles.topBar, { position: 'absolute', top: Platform.OS === 'ios' ? StatusBar.currentHeight || 44 : StatusBar.currentHeight || 0 }]}>
-        <View style={styles.logoContainer}>
-          <Image source={require('../../../assets/images/OmniGymLogo.png')} style={styles.logo} />
+    <>
+      {/* Avatar Modal for Full-Screen Image */}
+      <Modal visible={isModalVisible} transparent animationType="fade">
+        <View style={styles.modalContainer}>
+          <TouchableOpacity style={styles.modalBackdrop} onPress={() => setIsModalVisible(false)} />
+          {settings?.profileImg && (
+            <Image
+              source={{ uri: settings.profileImg }}
+              style={styles.modalImage}
+              resizeMode="contain"
+            />
+          )}
         </View>
-        <TouchableOpacity onPress={() => router.replace('/(tabs)/Login')} style={styles.logoutContainer}>
-          <Text style={styles.logout}>LOGOUT</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.chatIcon} onPress={() => router.replace('/(tabs)/screens/Inbox')}>
-          <FontAwesome name="comment" size={24} color="gray" />
-        </TouchableOpacity>
-      </View>
-  
-      <View style={styles.profileSection}>
-      <TouchableOpacity onPress={() => setIsModalVisible(true)}>
-        <Image
-          source={
-            settings?.profileImg
-              ? { uri: settings.profileImg }
-              : require('../../../assets/images/avatarBlank.png')
-            }
-            style={styles.profileImage}
-          />
-        </TouchableOpacity>
-        <Text style={styles.name}>{profile ? `${profile.firstName} ${profile.lastName}` : 'Loading...'}</Text>
-      </View>
-  
-      {settings?.profilePublic ? (
-        <>
-          <View style={styles.infoSection}>
-            <View style={styles.infoItem}>
-              <Text style={styles.infoLabel}>Joined</Text>
-              <Text style={styles.infoValue}>{profile?.dateJoined?.split('-')[0] || 'N/A'}</Text>
-            </View>
-            <View style={styles.infoItem}>
-              <Text style={styles.infoLabel}>Age</Text>
-              <Text style={styles.infoValue}>{settings?.age || 'N/A'}</Text>
-            </View>
-            <View style={styles.infoItem}>
-              <Text style={styles.infoLabel}>Fitness Goal:</Text>
-              <Text style={styles.infoValue}>{settings?.fitnessGoal || 'N/A'}</Text>
-              <Text style={styles.openChat}>Open to Chat</Text>
-            </View>
-            <View style={styles.infoItem}>
-              <FontAwesome name="trophy" size={20} color="gold" />
-              <Text style={styles.infoValue}>{settings?.trophies || 0}</Text>
-            </View>
-            <View style={styles.infoItem}>
-              <Text style={styles.infoLabel}>Wilks2 Score</Text>
-              <Text style={styles.infoValue}>{settings?.wilks2Score || 'N/A'}</Text>
-            </View>
+      </Modal>
+
+      <ScrollView style={styles.container} contentContainerStyle={{ paddingTop: HEADER_OFFSET }}>
+        {/* Top Bar */}
+        <View style={[styles.topBar, { position: 'absolute', top: Platform.OS === 'ios' ? StatusBar.currentHeight || 44 : StatusBar.currentHeight || 0 }]}>
+          <View style={styles.logoContainer}>
+            <Image source={require('../../../assets/images/OmniGymLogo.png')} style={styles.logo} />
           </View>
-  
-          <View style={styles.metricsSection}>
+          <TouchableOpacity onPress={() => router.replace('/(tabs)/Login')} style={styles.logoutContainer}>
+            <Text style={styles.logout}>LOGOUT</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.chatIcon} onPress={() => router.replace('/(tabs)/screens/Inbox')}>
+            <FontAwesome name="comment" size={24} color="gray" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Profile Section */}
+        <View style={styles.profileSection}>
+          <TouchableOpacity onPress={() => setIsModalVisible(true)}>
+            <Image
+              source={
+                settings?.profileImg
+                  ? { uri: settings.profileImg }
+                  : require('../../../assets/images/avatarBlank.png')
+              }
+              style={styles.profileImage}
+            />
+          </TouchableOpacity>
+          <Text style={styles.name}>
+            {profile ? `${profile.firstName} ${profile.lastName}` : 'Loading...'}
+          </Text>
+          {settings?.caption && <Text style={styles.profileCaption}>{settings.caption}</Text>}
+        </View>
+
+        {settings?.profilePublic ? (
+          <>
+            {/* PR icons */}
+            <View style={styles.metricsSection}>
+              <ScrollView horizontal contentContainerStyle={styles.metricsContainer}>
+                <View style={styles.metricItem}>
+                  <Image source={require('../../../assets/images/benchpress.png')} style={styles.icons} />
+                  <Text style={styles.metricValue}>{formatWeight(metrics?.prBenchWeight)}</Text>
+                </View>
+                <View style={styles.metricItem}>
+                  <Image source={require('../../../assets/images/deadlift.png')} style={styles.icons} />
+                  <Text style={styles.metricValue}>{formatWeight(metrics?.prDeadliftWeight)}</Text>
+                </View>
+                <View style={styles.metricItem}>
+                  <Image source={require('../../../assets/images/squat.png')} style={styles.icons} />
+                  <Text style={styles.metricValue}>{formatWeight(metrics?.prSquatWeight)}</Text>
+                </View>
+                <View style={styles.metricItem}>
+                  <Image source={require('../../../assets/images/running.png')} style={styles.icons} />
+                  <Text style={styles.metricValue}>{formatRunningTimeWithUnit(metrics?.runningTime)}</Text>
+                </View>
+              </ScrollView>
+            </View>
+
+            {/* General Info Section */}
+            <View style={styles.infoSection}>
+              <View style={styles.infoItem}>
+                <Text style={styles.infoLabel}>Joined</Text>
+                <Text style={styles.infoValue}>{profile?.dateJoined?.split('-')[0] || 'N/A'}</Text>
+              </View>
+              <View style={styles.infoItem}>
+                <Text style={styles.infoLabel}>Age</Text>
+                <Text style={styles.infoValue}>{settings?.age || 'N/A'}</Text>
+              </View>
+              <View style={styles.infoItem}>
+                <Text style={styles.infoLabel}>Fitness Goal:</Text>
+                <Text style={styles.infoValue}>{settings?.fitnessGoal || 'N/A'}</Text>
+                <Text style={styles.openChat}>Open to Chat</Text>
+              </View>
+              <View style={styles.infoItem}>
+                <FontAwesome name="trophy" size={20} color="gold" />
+                <Text style={styles.infoValue}>{settings?.trophies || 0}</Text>
+              </View>
+              <View style={styles.infoItem}>
+                <Text style={styles.infoLabel}>Wilks2 Score</Text>
+                <Text style={styles.infoValue}>{metrics?.wilks2Score || 'N/A'}</Text>
+              </View>
+            </View>
+
+            {/* Fitness Rings Section */}
             <ScrollView horizontal contentContainerStyle={styles.metricsContainer}>
-              <View style={styles.metricItem}>
-                <Image source={require('../../../assets/images/benchpress.png')} style={styles.icons} />
-                <Text style={styles.metricValue}>{formatWeight(metrics?.prBenchWeight)}</Text>
-              </View>
-              <View style={styles.metricItem}>
-                <Image source={require('../../../assets/images/deadlift.png')} style={styles.icons} />
-                <Text style={styles.metricValue}>{formatWeight(metrics?.prDeadliftWeight)}</Text>
-              </View>
-              <View style={styles.metricItem}>
-                <Image source={require('../../../assets/images/squat.png')} style={styles.icons} />
-                <Text style={styles.metricValue}>{formatWeight(metrics?.prSquatWeight)}</Text>
-              </View>
-              <View style={styles.metricItem}>
-                <Image source={require('../../../assets/images/running.png')} style={styles.icons} />
-                <Text style={styles.metricValue}>{formatRunningTimeWithUnit(metrics?.runningTime)}</Text>
-              </View>
+            <View key={ringKey} style={styles.ringView}>
+              <FitnessRing value={7830} maxValue={10000} label="Steps" unit="steps" color="#FF6B35" />
+              <FitnessRing value={950} maxValue={1200} label="Calories" unit="kcal" color="#F35B04" />
+              <FitnessRing value={42} maxValue={60} label="Active Min" unit="min" color="#FF8C42" />
+            </View>
             </ScrollView>
+
+            {/* Soundcloud link player */}
+            {settings?.prSong && (
+              <SoundCloud trackUrl={settings.prSong} />
+            )}
+          </>
+        ) : (
+          <View style={{ alignItems: 'center', padding: 20 }}>
+            <Text style={{ fontStyle: 'italic', color: 'gray' }}>This profile is private.</Text>
           </View>
-  
-          <View style={styles.prSongSection}>
-            <Entypo name="controller-play" size={24} color="white" />
-            <Text style={styles.prSong}>
-              PR Song: {'\n'}
-              <Text style={styles.songTitle}>{settings?.prSong ? `"${settings.prSong}"` : '"No PR song set"'}</Text>
-            </Text>
-          </View>
-  
-          <View style={styles.graphSection}>
-            <Text style={styles.graphPlaceholder}>Graph Visualization</Text>
-          </View>
-        </>
-      ) : (
-        <View style={{ alignItems: 'center', padding: 20 }}>
-          <Text style={{ fontStyle: 'italic', color: 'gray' }}>This profile is private.</Text>
-        </View>
-      )}
-    </ScrollView>
+        )}
+      </ScrollView>
+    </>
   );
 };
 
@@ -262,6 +271,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 10,
   },
+  profileCaption: {
+    fontSize: 16,
+    color: 'gray',
+    marginTop: 5,
+  },
   infoSection: {
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -291,7 +305,6 @@ const styles = StyleSheet.create({
   },
   metricsContainer: {
     flexDirection: 'row',
-    paddingVertical: 5,
   },
   metricItem: {
     width: 80,
@@ -347,7 +360,27 @@ const styles = StyleSheet.create({
   graphPlaceholder: {
     fontSize: 16,
     color: 'gray',
-  }
+  },
+  ringContainer: {
+    alignItems: 'center',
+    margin: 16,
+    padding: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 100,
+    shadowColor: '#E97451',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 8,
+  },
+  ringView: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 8,
+  },
 });
 
 

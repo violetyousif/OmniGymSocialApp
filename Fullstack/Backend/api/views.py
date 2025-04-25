@@ -6,11 +6,11 @@
 # DIP: Views depend on abstractions (serializers/models)
 
 # This file defines the API views for handling frontend requests using real Supabase data.
-
+import requests
 from django.conf import settings
 from django.shortcuts import render
-
-import requests
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes  # Added for permission classes
 from rest_framework.response import Response
 from rest_framework import status
@@ -18,6 +18,7 @@ from django.utils import timezone  # Added to set uploadDate
 from .models import AffilGyms, PlanetFitnessDB, LifetimeFitnessDB
 from .serializers import LTFUserSerializer, PFUserSerializer
 from datetime import datetime
+from rest_framework_simplejwt.token_blacklist.models import OutstandingToken, BlacklistedToken
 
 # PURPOSE: Control what data gets sent/received and create the views here
 from rest_framework import viewsets
@@ -26,20 +27,12 @@ from rest_framework import viewsets
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from rest_framework.permissions import IsAuthenticated
+from .utils import SUPABASE_HEADERS
 
-from .utils import SUPABASE_HEADERS #, check_supabase_user_exists
-
-# PURPOSE: Handles user registration and login
-    # from django.http import JsonResponse
-    # from .models import AffilGyms, PlanetFitnessDB, LifetimeFitnessDB
-    # from django.views.decorators.csrf import csrf_exempt
-    # from django.http import JsonResponse
-    # # from supabase import create_client
-    # from .models import PFUsers, LifetimeFitnessDB, LTFUsers, PlanetFitnessDB
-
-    # class ItemViewSet(viewsets.ModelViewSet):
-    #     queryset = Item.objects.all()
-    #     serializer_class = ItemSerializer
+# PURPOSE: Handles wilks 2 score and PR metrics
+from django.utils.timezone import now
+from .models import PFUserMetrics  # TODO: Temporary! Rename later to UserMetrics and generalize
+import math
 
 
 # PURPOSE: Handles user login
@@ -230,10 +223,10 @@ def registerUser(request):
 
     if serializer.is_valid():
         serializer.save()
-        print("✅ User successfully saved to database.")
+        print("User successfully saved to database.")
         return Response({"message": "User registered successfully!"}, status=201)
 
-    print("❌ Serializer errors:", serializer.errors)
+    print("Serializer errors:", serializer.errors)
     return Response(serializer.errors, status=400)
 
 
@@ -314,7 +307,7 @@ def getGymStates(request):
 
     return Response({"states": list(states)}, status=200)
 
-
+# PURPOSE: Get gym cities based on gym name and state
 @api_view(["GET"])
 def getGymCities(request):
     gym_name = request.query_params.get("gymName")
@@ -334,8 +327,7 @@ def getGymCities(request):
 
 
 
-from rest_framework_simplejwt.token_blacklist.models import OutstandingToken, BlacklistedToken
-
+# PURPOSE: Handles user logout
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def logoutUser(request):
@@ -350,77 +342,55 @@ def logoutUser(request):
 
 
 
-# @api_view(['POST'])
-# def registerUser(request):
-#     """Handles user registration"""
-#     serializer = UserSerializer(data=request.data)  # Ensure UserSerializer is imported
+# PURPOSE: Update Wilks score for a user 
+# TODO: change so it's not PF specific afterwards
+# Brzycki formula for estimating 1-rep max
+def estimatePR(weight, reps):
+    return weight * (36 / (37 - reps)) if weight and reps else None
 
-#     if serializer.is_valid():
-#         serializer.save()
-#         return Response({"message": "User registered successfully!"}, status=status.HTTP_201_CREATED)
-#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+# Wilks coefficients (latest 2020 coefficients)
+COEFFICIENTS = {
+    'male': [-216.0475144, 16.2606339, -0.002388645, -0.00113732, 7.01863e-06, -1.291e-08],
+    'female': [594.31747775582, -27.23842536447, 0.82112226871, -0.00930733913, 4.731582e-05, -9.054e-08]
+}
 
-
-# PURPOSE: Get gym cities based on gym name
-# @api_view(["GET"])
-# def getGymCities(request):
-#     gym_name = request.query_params.get("gymName")
-
-#     if not gym_name:
-#         return Response({"error": "Missing gym name"}, status=400)
-
-#     cities = (
-#         AffilGyms.objects
-#         .filter(gymName=gym_name)
-#         .values_list("gymCity", flat=True)
-#         .distinct()
-#     )
+def calculateWilks(memberWeight, gender, totalLift):
+    gender = gender.lower()
+    if gender not in COEFFICIENTS or not memberWeight:
+        return None
     
-#     return Response({"cities": list(cities)}, status=200)
+    a, b, c, d, e, f = COEFFICIENTS[gender]
+    denom = a + b * memberWeight + c * memberWeight**2 + d * memberWeight**3 + e * memberWeight**4 + f * memberWeight**5
 
+    if denom == 0:
+        return None
+    return round(500 * totalLift / denom, 2)
 
+@api_view(['POST'])
+def updateWilksScore(request):
+    user_id = request.data.get('user_id')
+    if not user_id:
+        return Response({'error': 'user_id is required'}, status=400)
 
+    try:
+        userMetrics = PFUserMetrics.objects.get(auth_user_id=user_id)
 
-# @api_view(['POST'])
-# def register_pf_user(request):
-#     """
-#     Handles POST requests to register a new PFUser into the Supabase PFUsers table.
-#     """
-#     data = request.data
+        lifts = []
+        for lift in ['prBenchWeight', 'prDeadliftWeight', 'prSquatWeight']:
+            weight = getattr(userMetrics, lift)
+            reps = getattr(userMetrics, lift.replace('Weight', 'Reps')) or 1
+            if weight:
+                lifts.append(estimatePR(weight, reps))
 
-#     # Step 1: Ensure PlanetFitnessDB has this member first (FK requirement)
-#     member_exists = PlanetFitnessDB.objects.filter(
-#         memberID=data.get('memberID'),
-#         gymAbbr=data.get('gymAbbr'),
-#         gymCity=data.get('gymCity'),
-#         gymState=data.get('gymState')
-#     ).exists()
+        if len(lifts) < 3 or not userMetrics.memberWeight or not userMetrics.gender:
+            return Response({'message': 'Missing data for Wilks calculation.'}, status=400)
 
-#     if not member_exists:
-#         # Create the minimal matching record in PlanetFitnessDB
-#         PlanetFitnessDB.objects.create(
-#             memberID=data.get('memberID'),
-#             gymAbbr=data.get('gymAbbr'),
-#             gymCity=data.get('gymCity'),
-#             gymState=data.get('gymState'),
-#             firstName=data.get('firstName'),
-#             lastName=data.get('lastName'),
-#             uploadDate=timezone.now()
-#         )
+        totalPR = sum(lifts)
+        wilks = calculateWilks(userMetrics.memberWeight, userMetrics.gender, totalPR)
+        userMetrics.wilks2Score = wilks
+        userMetrics.save()
 
-#     # Step 2: Proceed with inserting into PFUsers
-#     serializer = PFUserSerializer(data=data)
-#     if serializer.is_valid():
-#         serializer.save()
-#         return Response({"message": "PFUser created successfully!"}, status=status.HTTP_201_CREATED)
-#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'wilksScore': wilks}, status=200)
 
-
-# @api_view(['GET'])
-# def list_pf_users(request):
-#     """
-#     Returns a list of all Planet Fitness users in the PFUsers table.
-#     """
-#     users = PFUser.objects.all()
-#     serializer = PFUserSerializer(users, many=True)
-#     return Response(serializer.data, status=status.HTTP_200_OK)
+    except PFUserMetrics.DoesNotExist:
+        return Response({'error': 'User metrics not found.'}, status=404)
