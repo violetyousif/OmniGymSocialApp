@@ -15,6 +15,7 @@ const AdminSettings = () => {
    */
     );
   };
+
   /**
    * Handle feedback redirection.
    * Future enhancement: navigate to a feedback submission screen
@@ -98,3 +99,5 @@ const styles = StyleSheet.create({
   
 
 export default AdminSettings;
+
+//#codebase

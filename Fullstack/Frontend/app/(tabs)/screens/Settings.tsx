@@ -22,6 +22,9 @@ import { computeWilksScore } from '../../../components/Wilks2Score';
 import GenderSelector from '../../../components/GenderSelector';
 
 
+// --- SRP: Helper functions below (like isValidTimeFormat and uploadImageToSupabase)
+// has a single responsibility (SRP) and is reusable. ---
+
 // Function to validate time format (MM:SS)
 const isValidTimeFormat = (str: string) => {
   return /^\d{1,2}:\d{2}$/.test(str);
@@ -804,3 +807,4 @@ const styles = StyleSheet.create({
 });
 
 
+//#codebase

@@ -103,26 +103,90 @@ const AdminLeaderboard = () => {
   );
 };
 
-
-//styling
+// styling
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#fff' },
-  heading: { fontSize: 24, fontWeight: 'bold', color: '#E97451', marginBottom: 20, textAlign: 'center' },
-  tabRow: { flexDirection: 'row', justifyContent: 'space-around', marginBottom: 20 },
-  tab: { padding: 10, borderRadius: 10, backgroundColor: '#ddd' },
-  activeTab: { backgroundColor: '#E97451' },
-  tabText: { color: 'white', fontWeight: 'bold' },
-  card: { flexDirection: 'row', backgroundColor: '#f4f4f4', padding: 10, borderRadius: 10, marginBottom: 10 },
-  rank: { fontSize: 18, fontWeight: 'bold', color: '#E97451', marginRight: 10 },
-  info: { flex: 1 },
-  email: { fontSize: 16, fontWeight: '500' },
-  score: { fontSize: 14, color: '#555' },
-  meta: { fontSize: 12, color: '#999' },
-  unauthorized: { textAlign: 'center', marginTop: 100, fontSize: 16, color: 'gray' },
-  monthSelector: { flexDirection: 'row', justifyContent: 'space-around', marginBottom: 20 },
-  monthButton: { padding: 8, borderRadius: 8, backgroundColor: '#eee' },
-  selectedMonth: { backgroundColor: '#E97451' },
-  monthText: { fontWeight: '600', color: '#333' },
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#fff',
+  },
+  heading: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#E97451',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  tabRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 20,
+  },
+  tab: {
+    padding: 10,
+    borderRadius: 10,
+    backgroundColor: '#ddd',
+  },
+  activeTab: {
+    backgroundColor: '#E97451',
+  },
+  tabText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  card: {
+    flexDirection: 'row',
+    backgroundColor: '#f4f4f4',
+    padding: 10,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  rank: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#E97451',
+    marginRight: 10,
+  },
+  info: {
+    flex: 1,
+  },
+  email: {
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  score: {
+    fontSize: 14,
+    color: '#555',
+  },
+  meta: {
+    fontSize: 12,
+    color: '#999',
+  },
+  unauthorized: {
+    textAlign: 'center',
+    marginTop: 100,
+    fontSize: 16,
+    color: 'gray',
+  },
+  monthSelector: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 20,
+  },
+  monthButton: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: '#eee',
+  },
+  selectedMonth: {
+    backgroundColor: '#E97451',
+  },
+  monthText: {
+    fontWeight: '600',
+    color: '#333',
+  },
 });
 
 export default AdminLeaderboard;
+
+//#codebase

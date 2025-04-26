@@ -15,6 +15,7 @@
  * I — Interface Segregation: Avoids unnecessary props or overloads
  * D — Dependency Inversion: Depends on Supabase client abstraction via `supabase.ts`
  */
+
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
 import { supabase } from '@/lib/supabase';
@@ -92,3 +93,5 @@ const styles = StyleSheet.create({
 });
 
 export default AdminHome;
+
+//#codebase

@@ -1,3 +1,7 @@
+// --- SRP: GenderSelector has a single responsibility of setting the gender of the user
+// --- ISP: GenderSelector only implements the methods it needs to
+
+// This file uses radio buttons to allow users to select their gender in settings
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
@@ -69,3 +73,5 @@ const styles = StyleSheet.create({
 });
 
 export default GenderSelector;
+
+//#codebase

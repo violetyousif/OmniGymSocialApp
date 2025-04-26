@@ -16,7 +16,7 @@ const LeaderboardSubmissions = () => {
   useEffect(() => {
     fetchSubmissions();
   }, []);
-
+  
   /**
    * Fetch all pending leaderboard submissions from Supabase.
    * Expected table structure:

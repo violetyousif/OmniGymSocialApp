@@ -59,6 +59,7 @@ const Profile = () => {
     }, [])
   );
 
+  // Format weight with unit
   const formatWeight = (weight: number | null) => {
     if (weight == null) return 'N/A';
     const unit = settings?.units === 'Metric' ? 'kg' : 'lb';
@@ -66,6 +67,7 @@ const Profile = () => {
     return `${convertedWeight} ${unit}`;
   };
 
+  // Format running time with unit
   const formatRunningTimeWithUnit = (time: string | null) => {
     if (!time || !settings?.units) return 'N/A';
     const unit = settings.units === 'Metric' ? '/km' : '/mi';
@@ -395,114 +397,4 @@ const styles = StyleSheet.create({
 });
 
 
-// const Profile = () => {
-//   const router = useRouter();
-
-//   const HEADER_HEIGHT = 80; // Your visual header height
-//   const HEADER_OFFSET = 
-//     (Platform.OS === 'ios' ? StatusBar.currentHeight || 44 : StatusBar.currentHeight || 0) 
-//     + HEADER_HEIGHT;
-
-//   return (
-//     <ScrollView style={styles.container} contentContainerStyle={{ paddingTop: HEADER_OFFSET }}>
-      
-//       {/* Fixed Header */}
-//       <View 
-//         style={[
-//           styles.topBar, 
-//           { 
-//             position: 'absolute', 
-//             top: Platform.OS === 'ios' ? StatusBar.currentHeight || 44 : StatusBar.currentHeight || 0 
-//           }
-//         ]}
-//       >
-//         <View style={styles.logoContainer}>
-//           <Image source={require('../../../assets/images/OmniGymLogo.png')} style={styles.logo} />
-//         </View>
-
-//         {/* Logout Button */}
-//         <TouchableOpacity onPress={() => router.replace('/(tabs)/Login')} style={styles.logoutContainer}>
-//           <Text style={styles.logout}>LOGOUT</Text>
-//         </TouchableOpacity>
-
-//         {/* Chat Icon */}
-//         <TouchableOpacity style={styles.chatIcon} onPress={() => router.replace('/(tabs)/screens/Inbox')}>
-//           <FontAwesome name="comment" size={24} color="gray" />
-//         </TouchableOpacity>
-//       </View>
-
-//       {/* Profile Section */}
-//       <View style={styles.profileSection}>
-//         <Text style={styles.name}>Abdulla Maruf</Text>
-//         <Text style={styles.email}>amaruf@example.com</Text>
-//       </View>
-
-//       {/* General Info Section */}
-//       <View style={styles.infoSection}>
-//         <View style={styles.infoItem}>
-//           <Text style={styles.infoLabel}>Joined</Text>
-//           <Text style={styles.infoValue}>2018</Text>
-//         </View>
-//         <View style={styles.infoItem}>
-//           <Text style={styles.infoLabel}>Age</Text>
-//           <Text style={styles.infoValue}>30</Text>
-//         </View>
-//         <View style={styles.infoItem}>
-//           <Text style={styles.infoLabel}>Fitness Goal:</Text>
-//           <Text style={styles.infoValue}>Build Muscle</Text>
-//           <Text style={styles.openChat}>Open to Chat</Text>
-//         </View>
-//         <View style={styles.infoItem}>
-//           <FontAwesome name="trophy" size={20} color="gold" />
-//           <Text style={styles.infoValue}>3</Text>
-//         </View>
-//         <View style={styles.infoItem}>
-//           <Text style={styles.infoLabel}>Wilks 2 Score</Text>
-//           <Text style={styles.infoValue}>366</Text>
-//         </View>
-//       </View>
-
-//       {/* PR Metrics Section */}
-//       <View style={styles.metricsSection}>
-//         <ScrollView horizontal contentContainerStyle={styles.metricsContainer}>
-//           <View style={styles.metricItem}>
-//             <Text style={styles.metricIcon}>🏋️‍♂️</Text>
-//             <Text style={styles.metricLabel}>Bench Press</Text>
-//             <Text style={styles.metricValue}>105 lb</Text>
-//           </View>
-//           <View style={styles.metricItem}>
-//             <Text style={styles.metricIcon}>🏋️‍♀️</Text>
-//             <Text style={styles.metricLabel}>Deadlift</Text>
-//             <Text style={styles.metricValue}>220 lb</Text>
-//           </View>
-//           <View style={styles.metricItem}>
-//             <Text style={styles.metricIcon}>🏃‍♂️</Text>
-//             <Text style={styles.metricLabel}>Running Time</Text>
-//             <Text style={styles.metricValue}>5:30 min/km</Text>
-//           </View>
-//           <View style={styles.metricItem}>
-//             <Text style={styles.metricIcon}>🤸‍♂️</Text>
-//             <Text style={styles.metricLabel}>Squats</Text>
-//             <Text style={styles.metricValue}>220 lb</Text>
-//           </View>
-//         </ScrollView>
-//       </View>
-
-//       {/* PR Song Section */}
-//       <View style={styles.prSongSection}>
-//         <Entypo name="controller-play" size={24} color="white" />
-//         <Text style={styles.prSong}>
-//           PR Song: {'\n'}
-//           <Text style={styles.songTitle}>"Goddess" by Written by Wolves</Text>
-//         </Text>
-//       </View>
-
-//       {/* Graph Placeholder */}
-//       <View style={styles.graphSection}>
-//         <Text style={styles.graphPlaceholder}>Graph Visualization</Text>
-//       </View>
-//     </ScrollView>
-//   );
-// };
-
-//export default Profile;
+//#codebase

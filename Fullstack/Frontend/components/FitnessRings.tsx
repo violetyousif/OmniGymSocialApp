@@ -1,3 +1,14 @@
+// This file contains a React Native component that renders a circular progress ring with animated text.
+
+// SOLID principle used:
+// --- Single Responsibility Principle (SRP)
+// The component is responsible for rendering the fitness ring and displaying the value and unit.
+// It does not handle any other logic or functionality, making it easier to maintain and test. ---
+
+// --- LSP: it can be replaced by any other component with the same props without breaking the functionality of the parent component.
+
+// It's also an example of encapsulation, as it encapsulates the logic for rendering the ring and the animated text within a single component.
+
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
@@ -94,110 +105,4 @@ const styles = StyleSheet.create({
   },
 });
 
-
-// import React, { useEffect } from 'react';
-// import { View, Text, StyleSheet } from 'react-native';
-// import { AnimatedCircularProgress } from 'react-native-circular-progress';
-// import AnimatedCounter from '../components/AnimatedCounter';
-// import Animated, {
-//   useSharedValue,
-//   useAnimatedProps,
-//   withTiming,
-// } from 'react-native-reanimated';
-
-// const AnimatedText = Animated.createAnimatedComponent(Text);
-
-// interface FitnessRingProps {
-//   value: number;
-//   maxValue: number;
-//   label: string;
-//   unit: string;
-//   color: string;
-// }
-
-// const FitnessRing = ({ value, unit }: { value: number; unit: string }) => {
-//   // const AnimatedCounter = ({ targetValue }: { targetValue: number }) => {
-//   //   const animatedValue = useSharedValue(0);
-//   //   useEffect(() => {
-//   //     animatedValue.value = withTiming(targetValue, { duration: 1000 });
-//   //   }, [targetValue]);
-
-//   //   return (
-//   //     <AnimatedText style={styles.valueText}>
-//   //       {Math.round(animatedValue.value)}
-//   //     </AnimatedText>
-//   //   );
-//   //};
-
-//   return (
-//     <View style={styles.ringContainer}>
-//       {/* Circular progress ring code here */}
-//       <AnimatedCounter targetValue={value} />
-//       <Text style={styles.unitText}>{unit}</Text>
-//     </View>
-//   );
-// };
-
-
-// // const FitnessRing = ({ value, maxValue, label, unit, color }: FitnessRingProps) => {
-// //   const percentage = (value / maxValue) * 100;
-
-// //   return (
-// //     <View style={styles.ringContainer}>
-// //       <AnimatedCircularProgress
-// //         size={120}
-// //         width={12}
-// //         fill={percentage}
-// //         tintColor={color}
-// //         backgroundColor="#eee"
-// //         arcSweepAngle={240}
-// //         rotation={240}
-// //         lineCap="round"
-// //         children={() => (
-// //           <View style={styles.centerContent}>
-// //             <Text style={styles.valueText}>{value}</Text>
-// //             <Text style={styles.unitText}>{unit}</Text>
-// //           </View>
-// //         )}
-// //       />
-// //       <Text style={styles.labelText}>{label}</Text>
-// //     </View>
-    
-// //   );
-// //};
-
-// export default FitnessRing;
-
-// const styles = StyleSheet.create({
-//   ringContainer: {
-//     alignItems: 'center',
-//     margin: 16,
-//     padding: 16,
-//     backgroundColor: 'rgba(255, 255, 255, 0.2)',
-//     borderRadius: 100,
-//     shadowColor: '#E97451',
-//     shadowOffset: { width: 0, height: 10 },
-//     shadowOpacity: 0.3,
-//     shadowRadius: 20,
-//     elevation: 8,
-//   },
-//   centerContent: {
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//   },
-//   valueText: {
-//     fontSize: 20,
-//     fontWeight: 'bold',
-//     color: '#2B2B2B',
-//   },
-//   unitText: {
-//     fontSize: 12,
-//     color: '#555',
-//   },
-//   labelText: {
-//     marginTop: 8,
-//     fontSize: 14,
-//     fontWeight: '600',
-//     color: '#333',
-//   },
-// });
+//#codebase

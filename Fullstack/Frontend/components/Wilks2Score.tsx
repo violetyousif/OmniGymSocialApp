@@ -1,3 +1,5 @@
+// --- SRP: Every component in this file has a single responsibility (SRP) and is reusable.
+
 // Brzycki formula to estimate 1RM
 export const calculateBrzycki1RM = (weight: number, reps?: number): number => {
     const actualReps = reps ?? 1;
@@ -63,3 +65,5 @@ export const calculateBrzycki1RM = (weight: number, reps?: number): number => {
   
     return Wilks2Score(gender, memberWeight, [bench1RM, squat1RM, deadlift1RM]);
   };
+
+  //#codebase

@@ -8,16 +8,6 @@ import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 
-// Import screen components
-// import SplashScreenComponent from './(tabs)/SplashScreen';
-// import WelcomeScreen from './(tabs)/Welcome';
-// import RegisterAccountScreen from './auth/RegisterAccount';
-// import RegisterGymScreen from './auth/RegisterGym';
-// import HomeScreen from './(tabs)/screens/Home';
-// import InboxScreen from './(tabs)/screens/Inbox';
-// import ProfileScreen from './(tabs)/screens/Profile';
-// import SettingsScreen from './(tabs)/screens/Settings';
-// import NotFoundScreen from './+not-found';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -84,3 +74,5 @@ export default function RootLayout() {
     </ThemeProvider>
   );
 }
+
+//#codebase

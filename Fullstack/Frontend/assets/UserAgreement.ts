@@ -1,3 +1,5 @@
+// User Agreement and Terms & Conditions for OmniGym Social App
+
 const userAgreementSections = [
     {
         title: "OmniGym Social App - User Agreement and Terms & Conditions",
@@ -82,3 +84,5 @@ const userAgreementSections = [
 ];
 
 export default userAgreementSections;
+
+////#codebase

@@ -10,6 +10,8 @@ SUPABASE_HEADERS = {
     "Content-Type": "application/json"
 }
 
+# --- SRP: One responsibility (test connection) ---
+# dedicated to testing the connection
 def test_supabase_connection():
     """Test Supabase Admin API access and print user list or error."""
     try:

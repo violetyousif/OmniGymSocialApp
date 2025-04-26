@@ -1,5 +1,6 @@
 
 // PAGE PURPOSE: This page connects to the Supabase DB and handles authentication.
+// --- DIP: Abstracts database interactions, allowing the rest of the app to depend on this abstraction.
 
 import { AppState } from "react-native"
 // Ensure the URL polyfill is loaded before importing any other modules that depend on it
@@ -21,7 +22,6 @@ export const supabase = createClient(
     },
   })
 
-
 // Tells Supabase Auth to continuously refresh the session automatically
 // if the app is in the foreground. When this is added, you will continue
 // to receive `onAuthStateChange` events with the `TOKEN_REFRESHED` or
@@ -34,3 +34,5 @@ AppState.addEventListener('change', (state) => {
       supabase.auth.stopAutoRefresh()
     }
   })
+
+//#codebase

@@ -9,3 +9,6 @@ const SplashScreen = () => (
 );
 
 export default SplashScreen;
+
+
+//#codebase
