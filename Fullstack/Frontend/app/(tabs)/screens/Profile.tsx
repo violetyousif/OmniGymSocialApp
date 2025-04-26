@@ -179,9 +179,12 @@ const Profile = () => {
             </ScrollView>
 
             {/* Soundcloud link player */}
-            {settings?.prSong && (
-              <SoundCloud trackUrl={settings.prSong} />
-            )}
+            <Text style={styles.prSongLabel}>PR Song:</Text>
+            <View style={styles.prSongSection}>
+                {settings?.prSong && (
+                  <SoundCloud trackUrl={settings.prSong} />
+                )}
+            </View>
           </>
         ) : (
           <View style={{ alignItems: 'center', padding: 20 }}>
@@ -334,11 +337,19 @@ const styles = StyleSheet.create({
     height: 80,
     resizeMode: 'contain',
   },
+  prSongLabel: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#585858',
+    marginLeft: 20,
+    marginTop: 10,
+  },
   prSongSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#333',
-    padding: 10,
+    borderColor: '#333',
+    marginVertical: -10,
+    paddingLeft: 10,
     marginHorizontal: 10,
     borderRadius: 8,
   },

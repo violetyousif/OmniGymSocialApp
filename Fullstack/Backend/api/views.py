@@ -38,9 +38,8 @@ import math
 # PURPOSE: Handles user login
 @api_view(['POST'])
 def loginUser(request):
-    """SRP: Handles only user login functionality
-    DIP: Depends on authentication abstraction"""
-    """Handles user login and returns a JWT token"""
+    # SRP: Handles only user login functionality
+    # Handles user login and returns a JWT token
     email = request.data.get('email')
     password = request.data.get('password')
 
