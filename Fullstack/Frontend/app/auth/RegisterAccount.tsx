@@ -8,6 +8,7 @@ import {
   Image,
   ScrollView,
   Platform,
+  Alert
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Checkbox } from "react-native-paper";
@@ -241,23 +242,15 @@ const RegisterAccount: React.FC = () => {
       }
 
       if (res.ok) {
-        alert("Registration successful!");
+        Alert.alert('Success', 'Registration successful!');
         router.push("../(tabs)/Login");
       } else {
         alert(result.error || JSON.stringify(result) || "Registration failed.");
       }
 
-      // const result = await res.json();
-  
-      // if (res.ok) {
-      //   alert("Registration successful!");
-      //   router.push("../(tabs)/Login");
-      // } else {
-      //   alert(result.error || "Registration failed.");
-      // }
     } catch (err) {
       console.error("Registration error:", err);
-      alert("Server error or no connection.");
+      Alert.alert('Error', "Server error or no connection.");
     }
     router.push("../(tabs)/Login"); // ROUTES TO THE NEXT PAGE (Back to login)
   };

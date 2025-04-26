@@ -1,8 +1,7 @@
 from django.db import models
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _  # for debugging
 
 # PURPOSE: Defines and creates the data structure models for each table
-
 class AffilGyms(models.Model):
     # SRP: This class has a single responsibility - representing affiliated gyms
     # and their properties. It doesn't handle user management or other concerns.
@@ -27,7 +26,7 @@ class LTFUsers(models.Model):
     # OCP: This model is open for extension (can add new fields/methods)
     # but closed for modification (existing fields shouldn't change)
     id = models.BigAutoField(primary_key=True)
-    userID = models.UUIDField(primary_key=False)
+    # userID = models.UUIDField(primary_key=False)
     memberID = models.CharField(max_length=15)
     gymAbbr = models.CharField(max_length=5)
     gymCity = models.CharField(max_length=20)
@@ -42,6 +41,8 @@ class LTFUsers(models.Model):
     dateJoined = models.DateField(auto_now_add=True)
     activeAccnt = models.BooleanField(default=True)
     gymState = models.CharField(max_length=20)
+    auth_user_id = models.CharField(max_length=255, null=True, blank=True)
+
 
     class Meta:
         abstract = False
@@ -69,7 +70,7 @@ class PFUsers(models.Model):
     # ISP: This model is specific to Planet Fitness users
     # and does not include unrelated fields
     id = models.BigAutoField(primary_key=True)
-    userID = models.UUIDField(primary_key=False)
+    # userID = models.UUIDField(primary_key=False)
     memberID = models.CharField(max_length=15)
     gymAbbr = models.CharField(max_length=5)
     gymCity = models.CharField(max_length=20)
@@ -84,7 +85,7 @@ class PFUsers(models.Model):
     dateJoined = models.DateField(auto_now_add=True)
     activeAccnt = models.BooleanField(default=True)
     gymState = models.CharField(max_length=20)
-
+    auth_user_id = models.CharField(max_length=255, null=True, blank=True)
     class Meta:
         abstract = False
         db_table = 'PFUsers'
@@ -106,6 +107,40 @@ class PlanetFitnessDB(models.Model):
         db_table = 'PlanetFitnessDB'
         managed = False
 
+class PFUserMetrics(models.Model):
+    GENDER_CHOICES = [
+        ('Male', 'Male'),
+        ('Female', 'Female'),
+    ]
+    # GENDER_CHOICES = PFUsers.gender
+
+    metricsID = models.BigAutoField(primary_key=True)
+    updatedDate = models.DateField(auto_now=True)
+    email = models.EmailField()
+    gender = models.CharField(max_length=10)
+    memberWeight = models.FloatField(null=True, blank=True)
+    height = models.CharField(max_length=100, null=True, blank=True)
+    prBenchWeight = models.FloatField(null=True, blank=True)
+    prBenchReps = models.SmallIntegerField(null=True, blank=True)
+    prDeadliftWeight = models.FloatField(null=True, blank=True)
+    prDeadliftReps = models.SmallIntegerField(null=True, blank=True)
+    prSquatWeight = models.FloatField(null=True, blank=True)
+    prSquatReps = models.SmallIntegerField(null=True, blank=True)
+    runningTime = models.CharField(max_length=20, null=True, blank=True)
+    runningDist = models.FloatField(null=True, blank=True)
+    wilks2Score = models.IntegerField(null=True, blank=True)
+    
+    auth_user_id = models.CharField(max_length=255, unique=True, null=True, blank=True)
+
+    class Meta:
+        db_table = 'UserMetrics'
+        constraints = [
+            models.UniqueConstraint(fields=['auth_user'], name='unique_auth_user_metrics')
+        ]
+    
+    # For debugging in console
+    def __str__(self):
+        return f"{self.email} - {self.updatedDate}"
 
 
 
