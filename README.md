@@ -14,8 +14,6 @@ An app to build a community for its gym members.
 
 <br><br>
 ---
----
-
 <br>
 
 
