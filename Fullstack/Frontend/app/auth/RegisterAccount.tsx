@@ -1,4 +1,5 @@
 
+// RegisterAccount.tsx
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -21,15 +22,6 @@ import { supabase } from '../../lib/supabase'
 import { BACKEND_URL } from "../../lib/config";
 import { useLocalSearchParams } from "expo-router";
 
-  /**
-   * 
-   * 
-   * 
-   *  JAVASCRIPT
-   * 
-   * 
-   * 
-   */
 
 const RegisterAccount: React.FC = () => {
   const router = useRouter();
@@ -256,15 +248,6 @@ const RegisterAccount: React.FC = () => {
     router.push("../(tabs)/Login"); // ROUTES TO THE NEXT PAGE (Back to login)
   };
 
-  /**
-   * 
-   * 
-   * 
-   *  TYPESCRIPT
-   * 
-   * 
-   * 
-   */
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
 
@@ -446,15 +429,6 @@ const RegisterAccount: React.FC = () => {
   );
 };
 
-  /**
-   * 
-   * 
-   * 
-   *  CSS
-   * 
-   * 
-   * 
-   */
 
 const styles = StyleSheet.create({
   // Scroll Container and main

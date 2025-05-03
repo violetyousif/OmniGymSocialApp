@@ -1,3 +1,4 @@
+// Welcome.tsx
 // Purpose: Welcome screen for the app, displays the logo and a brief description of the app.
 
 import React, { useEffect } from 'react';
@@ -11,7 +12,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useNavigation } from '@react-navigation/native';
-import { supabase } from '../../lib/supabase'
+// import { supabase } from '../../lib/supabase'
 
 // Get screen size
 const { width } = Dimensions.get('window'); 

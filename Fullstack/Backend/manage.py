@@ -1,5 +1,7 @@
-#!/usr/bin/env python
 """Django's command-line utility for administrative tasks."""
+
+## manage.py
+# PURPOSE: This file is the entry point for running administrative tasks in a Django project.
 import os
 import sys
 

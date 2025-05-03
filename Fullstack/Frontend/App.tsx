@@ -1,9 +1,10 @@
+// App.tsx
 import 'react-native-url-polyfill/auto';
 import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
-import { View } from 'react-native';
+// import { View } from 'react-native';
 import { supabase } from './lib/supabase';
 import { Session } from '@supabase/supabase-js';
 

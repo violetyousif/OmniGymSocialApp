@@ -7,12 +7,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+## server/settings.py
 from pathlib import Path
 import os
 from dotenv import load_dotenv
 from datetime import timedelta
 from urllib.parse import urlparse  # For parsing DATABASE_URL
-
 from datetime import timedelta # Moved to the top
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.

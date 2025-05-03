@@ -1,12 +1,11 @@
-# api/serializers.py
+## api/serializers.py
 
 from rest_framework import serializers
-# from .models.pf_models import PFUsers
-# from .models.ltf_models import LTFUsers
 from .models import PFUsers, LTFUsers
 # from .models import User
 # from .models import Item
-
+# from .models.pf_models import PFUsers
+# from .models.ltf_models import LTFUsers
 
 #PURPOSE: This tells Django REST Framework how to convert the Item Model to JSON and back
 # class ItemSerializer(serializers.ModelSerializer):

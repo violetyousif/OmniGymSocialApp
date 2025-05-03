@@ -1,8 +1,9 @@
+## api/admin.py
 from django.contrib import admin
+from .models import AffilGyms, PFUsers, PlanetFitnessDB, LifetimeFitnessDB, LTFUsers
 # from .models.pf_models import PFUsers, PlanetFitnessDB
 # from .models.ltf_models import LifetimeFitnessDB, LTFUsers
 # from .models.globalOps_models import AffilGyms
-from .models import AffilGyms, PFUsers, PlanetFitnessDB, LifetimeFitnessDB, LTFUsers
 # from .models import Item 
 
 # Register models for visibility in admin panel (optional)

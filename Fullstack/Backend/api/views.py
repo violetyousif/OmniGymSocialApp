@@ -5,6 +5,7 @@
 # ISP: Each view has a focused interface
 # DIP: Views depend on abstractions (serializers/models)
 
+## api/views.py
 # This file defines the API views for handling frontend requests using real Supabase data.
 import requests
 from django.conf import settings
@@ -32,7 +33,6 @@ from .utils import SUPABASE_HEADERS
 # PURPOSE: Handles wilks 2 score and PR metrics
 from django.utils.timezone import now
 from .models import PFUserMetrics  # TODO: Temporary! Rename later to UserMetrics and generalize
-import math
 
 
 # PURPOSE: Handles user login

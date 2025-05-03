@@ -1,3 +1,4 @@
+// Home.tsx
 import React, { useState } from 'react';
 import { 
   StyleSheet, 
@@ -13,8 +14,8 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { FontAwesome } from '@expo/vector-icons';
-import { supabase } from '../../../lib/supabase'
-import { Session } from '@supabase/supabase-js'
+// import { supabase } from '../../../lib/supabase'
+// import { Session } from '@supabase/supabase-js'
 
 const { width } = Dimensions.get('window');
 

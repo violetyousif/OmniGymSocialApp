@@ -1,4 +1,4 @@
-
+// Inbox.tsx
 import React, { useState } from 'react';
 import {
   View,

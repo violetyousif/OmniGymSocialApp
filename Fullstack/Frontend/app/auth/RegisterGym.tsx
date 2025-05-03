@@ -1,4 +1,4 @@
-
+// RegisterGym.tsx
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -33,23 +33,6 @@ const RegisterGym = () => {
   const [gymStateOptions, setGymStateOptions] = useState<{ key: string; value: string }[]>([]);
   
 
-  // useEffect(() => {
-  //   const testSupabasePermission = async () => {
-  //     const { data, error } = await supabase
-  //       .from("AffilGyms")
-  //       .select("*");
-  
-  //     if (error) {
-  //       console.log("Permission Error:", error.message);
-  //     } else {
-  //       console.log("Data:", data);
-  //     }
-  //   };
-  
-  //   testSupabasePermission();
-  //   return undefined; // Ensure no JSX or invalid return type
-
-  // Load gym names from AffilGyms table
   useEffect(() => {
     const fetchGyms = async () => {
       const { data, error } = await supabase
@@ -205,8 +188,6 @@ const RegisterGym = () => {
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Gym</Text>
           <SelectList
-            // setSelected={(val: string) => setSelectedGym(val)}
-            // data={(gymList as unknown) as {key: string, value: string}[]}
             setSelected={setSelectedGymName}
             data={gymOptions}
             save="key"
@@ -234,9 +215,9 @@ const RegisterGym = () => {
               borderRadius: 8, // border radius
               height: 50 // height
             }}
-            dropdownStyles={{ maxHeight: 300 }} // Increase this to show more items (you can go higher)
-            dropdownTextStyles={{ color: '#252422', fontSize: 16 }} // dropdown text color and size
-            inputStyles={{ color: '#252422', fontSize: 16 }} // placeholder text color and size
+            dropdownStyles={{ maxHeight: 300 }}     // Increase this if we want to show more items
+            dropdownTextStyles={{ color: '#252422', fontSize: 16 }}     // dropdown text color and size
+            inputStyles={{ color: '#252422', fontSize: 16 }}      // placeholder text color and size
           />
         </View>
 

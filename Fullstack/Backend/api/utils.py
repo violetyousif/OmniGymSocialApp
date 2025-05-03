@@ -1,3 +1,5 @@
+## api/utils.py
+# PURPOSE: This file contains utility functions for the API, such as testing the Supabase connection and checking if a user exists.
 import requests
 from django.conf import settings
 
