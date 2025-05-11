@@ -12,6 +12,7 @@ export default function TabsLayout() {
   useEffect(() => {
     const checkAdmin = async () => {
       const { data: { user } } = await supabase.auth.getUser();
+      console.log('LOGGED IN USER:', user); 
       if (user?.email === 'admin@example.com') {
         setIsAdmin(true);
       }
@@ -77,37 +78,6 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, size }) => <Ionicons name="settings-outline" size={size} color={color} />,
         }}
       />
-
-      {/* these tabs only if the user is an admin (use admin@example.com  as the email to test with password: admin12345) */}
-      {isAdmin && (
-        <Tabs.Screen
-          name="AdminLeaderboard"
-          options={{
-            title: 'Leaderboard',
-            tabBarIcon: ({ color, size }) => <Ionicons name="barbell-outline" size={size} color={color} />,
-          }}
-        />
-      )}
-      {isAdmin && (
-        <Tabs.Screen
-          name="Events"
-          options={{
-            title: 'Events',
-            tabBarIcon: ({ color, size }) => <Ionicons name="calendar-outline" size={size} color={color} />,
-          }}
-        />
-      )}
-      {isAdmin && (
-        <Tabs.Screen
-          name="ValidMemberships"
-          options={{
-            title: 'Memberships',
-            tabBarIcon: ({ color, size }) => <Ionicons name="card-outline" size={size} color={color} />,
-          }}
-        />
-      )}
-      
-
       
     </Tabs>
   );

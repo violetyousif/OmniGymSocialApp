@@ -1,199 +1,128 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { supabase } from '@/lib/supabase';
-import { Ionicons } from '@expo/vector-icons';
-
-/**
- * This file renders a leaderboard view for admin users.
- * It combines data from PFLeaderboard and LTFLeaderboard tables and ranks based on weight per rep.
- */
 
 const AdminLeaderboard = () => {
-  const [entries, setEntries] = useState<any[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [checked, setChecked] = useState(false);
+  const [entries, setEntries] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState<'male' | 'female' | 'archive'>('male');
+  const [selectedMonth, setSelectedMonth] = useState<string>('April 2025');
 
-
-// Run once on mount to check if current user is admin
+ /**
+   * Auth check — verifies if user is an admin via email.
+   * Used to gate access to leaderboard data and prevent unauthorized viewing.
+   */
   useEffect(() => {
     const checkAdmin = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      setIsAdmin(user?.email === 'admin@example.com');// Admin check is based on email
-      setChecked(true); 
+      setIsAdmin(user?.email === 'admin@example.com');
+      setChecked(true);
     };
     checkAdmin();
   }, []);
 
 
-   // If admin, fetch leaderboard entries from Supabase
+
+  /**
+   * Data Fetching — depends on selected tab (male, female, or archive).
+   * - Archive: Pull from 'ArchivedLeaderboards' table filtered by selectedMonth.
+   * - Male/Female: Pull from PFLeaderboard and LTFLeaderboard, then merge, score, and sort.
+   */
   useEffect(() => {
-    const fetchLeaderboard = async () => {
-      if (!isAdmin) return;
+    if (!isAdmin) return;
 
-      // Fetch Planet Fitness entries from Supabase
-      const { data: pfData, error: pfError } = await supabase.from('PFLeaderboard').select('*');
-
-      // Fetch Lifetime Fitness entries from Supabase
-      const { data: ltfData, error: ltfError } = await supabase.from('LTFLeaderboard').select('*');
-
-      if (pfError || ltfError) {
-        console.error('Error fetching leaderboard data:', pfError || ltfError);
-        return;
+    const fetchData = async () => {
+      if (activeTab === 'archive') {
+        const { data } = await supabase.from('ArchivedLeaderboards').select('*').eq('month', selectedMonth);
+        setEntries(data || []);
+      } else {
+        const gender = activeTab === 'male' ? 'Male' : 'Female';
+        const { data: pfData } = await supabase.from('PFLeaderboard').select('*').eq('gender', gender);
+        const { data: ltfData } = await supabase.from('LTFLeaderboard').select('*').eq('gender', gender);
+        const combined = [...(pfData || []), ...(ltfData || [])];
+        const scored = combined.map(e => ({ ...e, score: e.prWeight / e.prReps })).sort((a, b) => b.score - a.score);
+        setEntries(scored);
       }
-
-      // Combines both our gym entries
-      const allEntries = [...(pfData || []), ...(ltfData || [])];
-
-      // Calculates weight per rep score and sort descending
-      const withScore = allEntries
-        .filter(e => e.prWeight && e.prReps && e.prReps !== 0) // Filters out any invalid data
-        .map(e => ({
-          ...e,
-          score: e.prWeight / e.prReps, //main ranking metric
-        }))
-        .sort((a, b) => b.score - a.score); //Sorts by highest score first
-
-      // Update state with sorted entries
-      setEntries(withScore);
     };
 
-    fetchLeaderboard();
-  }, [isAdmin]);
-
-  /*useEffect(() => {
-    const fetchLeaderboard = async () => {
-      if (!isAdmin) return;
-  
-      // Simulate async delay
-      await new Promise((resolve) => setTimeout(resolve, 500));
-  
-      // Mock data structure based on your table
-      const mockData = [
-        {
-          email: 'john@mock.com',
-          prWeight: 300,
-          prReps: 3,
-          cntstCategory: 'Bench Press',
-          submissionDate: '2025-03-30',
-          leaderboardID: 1,
-        },
-        {
-          email: 'sara@mock.com',
-          prWeight: 250,
-          prReps: 2,
-          cntstCategory: 'Deadlift',
-          submissionDate: '2025-03-25',
-          leaderboardID: 2,
-        },
-      ];
-  
-      const withScore = mockData
-        .filter(e => e.prWeight && e.prReps && e.prReps !== 0)
-        .map(e => ({
-          ...e,
-          score: e.prWeight / e.prReps,
-        }))
-        .sort((a, b) => b.score - a.score);
-  
-      setEntries(withScore);
-    };
-  
-    fetchLeaderboard();
-  }, [isAdmin]);
-  */
+    fetchData();
+  }, [activeTab, selectedMonth, isAdmin]);
 
 
-
-
-
-
-
-
+  // Guard: If user check hasn't completed, don't render anything
   if (!checked) return null;
-
-  // If user is not admin, show unauthorized message (this will change, there for the time being)
-  if (!isAdmin) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.unauthorized}>You are not authorized to view this page.</Text>
-      </View>
-    );
-  }
-
-  // displays leaderboard entry
-  const renderItem = ({ item, index }: { item: any; index: number }) => (
+  if (!isAdmin) return <Text style={styles.unauthorized}>Not authorized</Text>;
+  /*
+  * Renders one leaderboard entry.
+  * Includes user email, score, category, and either submissionDate or month.
+  */
+  const renderItem = ({ item, index }: { item: any, index: number }) => (
     <View style={styles.card}>
       <Text style={styles.rank}>#{index + 1}</Text>
       <View style={styles.info}>
         <Text style={styles.email}>{item.email}</Text>
-        <Text style={styles.score}>Weight/Rep: {item.score.toFixed(2)}</Text>
-        <Text style={styles.meta}>{item.cntstCategory} | {item.submissionDate}</Text>
+        <Text style={styles.score}>Score: {item.score?.toFixed(2)}</Text>
+        <Text style={styles.meta}>{item.cntstCategory} | {item.submissionDate || item.month}</Text>
       </View>
     </View>
   );
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>Top Lifters</Text>
-      <FlatList
-        data={entries} // Data to display
-        keyExtractor={(item) => `${item.email}-${item.leaderboardID}`} // Unique key for React
-        renderItem={renderItem}
-      />
+      <Text style={styles.heading}>Admin Leaderboard</Text>
+
+      <View style={styles.tabRow}>
+        <TouchableOpacity style={[styles.tab, activeTab === 'male' && styles.activeTab]} onPress={() => setActiveTab('male')}>
+          <Text style={styles.tabText}>Male</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.tab, activeTab === 'female' && styles.activeTab]} onPress={() => setActiveTab('female')}>
+          <Text style={styles.tabText}>Female</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.tab, activeTab === 'archive' && styles.activeTab]} onPress={() => setActiveTab('archive')}>
+          <Text style={styles.tabText}>Archived</Text>
+        </TouchableOpacity>
+      </View>
+
+      {activeTab === 'archive' && (
+        <View style={styles.monthSelector}>
+          {['April 2025', 'March 2025', 'February 2025'].map(month => (
+            <TouchableOpacity
+              key={month}
+              onPress={() => setSelectedMonth(month)}
+              style={[styles.monthButton, selectedMonth === month && styles.selectedMonth]}
+            >
+              <Text style={styles.monthText}>{month}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
+
+      <FlatList data={entries} keyExtractor={(item, i) => `${item.email}-${i}`} renderItem={renderItem} />
     </View>
   );
 };
 
-export default AdminLeaderboard;
 
+//styling
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    paddingTop: 20,
-    paddingHorizontal: 15,
-  },
-  heading: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: '#E97451', 
-    marginBottom: 20,
-    alignSelf: 'center',
-  },
-  unauthorized: {
-    fontSize: 16,
-    color: 'gray',
-    textAlign: 'center',
-    marginTop: 40,
-  },
-  card: {
-    flexDirection: 'row',
-    backgroundColor: '#f4f4f4',
-    borderRadius: 12,
-    padding: 15,
-    marginBottom: 12,
-    alignItems: 'center',
-  },
-  rank: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginRight: 15,
-    color: '#E97451',
-  },
-  info: {
-    flex: 1,
-  },
-  email: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#333',
-  },
-  score: {
-    fontSize: 14,
-    color: '#777',
-  },
-  meta: {
-    fontSize: 12,
-    color: '#aaa',
-  },
+  container: { flex: 1, padding: 20, backgroundColor: '#fff' },
+  heading: { fontSize: 24, fontWeight: 'bold', color: '#E97451', marginBottom: 20, textAlign: 'center' },
+  tabRow: { flexDirection: 'row', justifyContent: 'space-around', marginBottom: 20 },
+  tab: { padding: 10, borderRadius: 10, backgroundColor: '#ddd' },
+  activeTab: { backgroundColor: '#E97451' },
+  tabText: { color: 'white', fontWeight: 'bold' },
+  card: { flexDirection: 'row', backgroundColor: '#f4f4f4', padding: 10, borderRadius: 10, marginBottom: 10 },
+  rank: { fontSize: 18, fontWeight: 'bold', color: '#E97451', marginRight: 10 },
+  info: { flex: 1 },
+  email: { fontSize: 16, fontWeight: '500' },
+  score: { fontSize: 14, color: '#555' },
+  meta: { fontSize: 12, color: '#999' },
+  unauthorized: { textAlign: 'center', marginTop: 100, fontSize: 16, color: 'gray' },
+  monthSelector: { flexDirection: 'row', justifyContent: 'space-around', marginBottom: 20 },
+  monthButton: { padding: 8, borderRadius: 8, backgroundColor: '#eee' },
+  selectedMonth: { backgroundColor: '#E97451' },
+  monthText: { fontWeight: '600', color: '#333' },
 });
+
+export default AdminLeaderboard;

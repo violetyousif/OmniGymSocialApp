@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { 
   StyleSheet, 
   Text, 
@@ -6,19 +6,26 @@ import {
   Image, 
   TouchableOpacity, 
   FlatList, 
-  Dimensions 
+  Dimensions, 
+  Platform, 
+  StatusBar, 
+  SafeAreaView 
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { FontAwesome } from '@expo/vector-icons';
 import { supabase } from '../../../lib/supabase'
 import { Session } from '@supabase/supabase-js'
 
-const { width, height } = Dimensions.get('window'); 
+const { width } = Dimensions.get('window');
 
 const HomeScreen = () => {
   const router = useRouter();
   const [user, setUser] = useState(null);
 
-  // content data
+  const HEADER_HEIGHT = 80;
+  const STATUSBAR_HEIGHT = Platform.OS === 'ios' ? 0 : StatusBar.currentHeight || 0;
+  const HEADER_OFFSET = STATUSBAR_HEIGHT + HEADER_HEIGHT;
+
   const contentData = [
     { id: '1', image: require('../../../assets/images/Orange.jpg'), link: '/(tabs)/exscreens/Leaderboard', label: 'Leaderboards' },
     { id: '2', image: require('../../../assets/images/Orange2.jpg'), link: '/(tabs)/exscreens/Events', label: 'Events' },
@@ -28,88 +35,93 @@ const HomeScreen = () => {
     { id: '6', image: require('../../../assets/images/Orange6.jpg'), link: '/(tabs)/screens/Inbox', label: 'Inbox' },
     { id: '7', image: require('../../../assets/images/Orange7.jpg'), link: '/(tabs)/screens/Routine', label: 'Routine' },
   ];
-  
-  
-  return (
-    <View style={styles.container}>
-      {/* Full-Width Header */}
-      <View style={styles.topBar}>
-        <View style={styles.logoContainer}>
-          <Image source={require('../../../assets/images/OmniGymLogo.png')} style={styles.logo} />
-        </View>
-        <TouchableOpacity onPress={() => router.replace('/(tabs)/Login')} style={styles.logoutContainer}>
-          <Text style={styles.logout}>LOGOUT</Text>
-        </TouchableOpacity>
-      </View>
 
-      {/* Content Grid */}
-      <View style={styles.contentContainer}>
-        <FlatList
-          data={contentData.slice(1)} 
-          keyExtractor={(item) => item.id}
-          numColumns={2}
-          columnWrapperStyle={styles.row}
-          ListHeaderComponent={
-          <TouchableOpacity 
-            style={styles.largeBox} 
-            onPress={() => contentData[0].link ? router.push(contentData[0].link as any) : console.warn(`No link for large box`)}
-          >
-            <View style={styles.imageWrapper}>
-              <Image source={contentData[0].image} style={styles.boxImage} />
-              <Text style={styles.overlayText}>{contentData[0].label}</Text>
-            </View>
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FFF" />
+
+      <View style={styles.container}>
+        {/* Full-Width Header */}
+        <View style={[styles.topBar, { paddingTop: STATUSBAR_HEIGHT }]}>
+          <TouchableOpacity style={styles.chatIcon} onPress={() => router.replace('/(tabs)/screens/Inbox')}>
+            <FontAwesome name="comment" size={24} color="gray" />
           </TouchableOpacity>
-          }
-          renderItem={({ item }) => (
-            <TouchableOpacity 
-              style={styles.smallBox} 
-              onPress={() => item.link ? router.push(item.link as any) : console.warn(`No link for box ${item.id}`)}
-            >
-              <View style={styles.imageWrapper}>
-                <Image source={item.image} style={styles.boxImageSmall} />
-                <Text style={styles.overlayText}>{item.label}</Text>
-              </View>
-            </TouchableOpacity>
-          )}
-          
-        />
+
+          <View style={styles.logoContainer}>
+            <Image source={require('../../../assets/images/OmniGymLogo.png')} style={styles.logo} />
+          </View>
+
+          <TouchableOpacity onPress={() => router.replace('/(tabs)/Login')} style={styles.logoutContainer}>
+            <Text style={styles.logout}>LOGOUT</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Content Grid */}
+        <View style={[styles.contentContainer, { marginTop: HEADER_OFFSET }]}>
+          <FlatList
+            data={contentData.slice(1)}
+            keyExtractor={(item) => item.id}
+            numColumns={2}
+            columnWrapperStyle={styles.row}
+            ListHeaderComponent={
+              <TouchableOpacity 
+                style={styles.largeBox} 
+                onPress={() => contentData[0].link ? router.push(contentData[0].link as any) : console.warn(`No link for large box`)}
+              >
+                <View style={styles.imageWrapper}>
+                  <Image source={contentData[0].image} style={styles.boxImage} />
+                  <Text style={styles.overlayText}>{contentData[0].label}</Text>
+                </View>
+              </TouchableOpacity>
+            }
+            renderItem={({ item }) => (
+              <TouchableOpacity 
+                style={styles.smallBox} 
+                onPress={() => item.link ? router.push(item.link as any) : console.warn(`No link for box ${item.id}`)}
+              >
+                <View style={styles.imageWrapper}>
+                  <Image source={item.image} style={styles.boxImageSmall} />
+                  <Text style={styles.overlayText}>{item.label}</Text>
+                </View>
+              </TouchableOpacity>
+            )}
+          />
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
-// Fixed Styles 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#FFF', // Ensures white behind StatusBar
+  },
   container: {
     flex: 1,
     backgroundColor: '#333333',
   },
-  
-  // Full-Width Header
   topBar: {
-    width: '100%', 
+    width: '100%',
+    backgroundColor: '#FFF',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 18,
+    elevation: 5,
+    borderBottomWidth: 7,
+    borderBottomColor: '#E97451',
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#FFF', 
-    paddingVertical: 18,
-    elevation: 5, 
-    borderBottomWidth: 7,
-    borderBottomColor: '#E97451', 
+    zIndex: 10,
   },
-
-  // Spacing Below Header
-  contentContainer: {
-    flex: 1,
-    marginTop: 100, 
-    paddingHorizontal: 10,
+  chatIcon: {
+    position: 'absolute',
+    left: 20,
+    bottom: 10,
   },
-
-  // Centered Logo
   logoContainer: {
     flex: 1,
     alignItems: 'center',
@@ -119,8 +131,6 @@ const styles = StyleSheet.create({
     height: 40,
     resizeMode: 'contain',
   },
-
-  // Logout Button
   logoutContainer: {
     position: 'absolute',
     right: 20,
@@ -131,16 +141,16 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'black',
   },
-
-  // Grid Layout Fixes
+  contentContainer: {
+    flex: 1,
+    paddingHorizontal: 10,
+  },
   row: {
     justifyContent: 'space-between',
     marginBottom: 30,
   },
-  
-  // Large Box
   largeBox: {
-    width: width * .95,
+    width: width * 0.95,
     height: 180,
     backgroundColor: '#aaa',
     borderRadius: 20,
@@ -148,8 +158,6 @@ const styles = StyleSheet.create({
     marginTop: 15,
     alignSelf: 'center',
   },
-  
-  // Small Boxes
   smallBox: {
     width: width * 0.46,
     height: 100,
@@ -157,22 +165,12 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 10,
   },
-
-  // Images Inside Boxes
-  boxImage: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 10,
-    resizeMode: 'cover',
-  },
-
   imageWrapper: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
   },
-  
   overlayText: {
     position: 'absolute',
     color: '#fff',
@@ -184,23 +182,18 @@ const styles = StyleSheet.create({
     textShadowRadius: 2,
     zIndex: 2,
   },
-  
-  boxImageLarge: {
+  boxImage: {
     width: '100%',
     height: '100%',
-    borderRadius: 20,
+    borderRadius: 10,
     resizeMode: 'cover',
   },
-  
   boxImageSmall: {
     width: '100%',
     height: '100%',
     borderRadius: 10,
     resizeMode: 'cover',
   },
-  
-  
-  
 });
 
 export default HomeScreen;

@@ -44,6 +44,10 @@ const LoginScreen = () => {
   const [isTouchedPassword, setIsTouchedPassword] = useState(false);
   const [isValidPassword, setIsValidPassword] = useState<boolean | undefined>();
 
+  const [forgotPasswordVisible, setForgotPasswordVisible] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+
+
   // Email Validation Regex
   const validateEmail = (email: string) => {
     return email.match(
@@ -72,36 +76,6 @@ const LoginScreen = () => {
     setIsValidPassword(validatePassword(text));
   };
 
-  // const handleLogin = () => {
-  //   // TODO: Replace with real SQL authentication logic
-  //   // Example of how SQL authentication might look (Commented Out)
-  //   /*
-  //   fetch('https://your-sql-api.com/login', {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //     body: JSON.stringify({
-  //       email,
-  //       password,
-  //     }),
-  //   })
-  //   .then(response => response.json())
-  //   .then(data => {
-  //     if (data.success) {
-  //       router.replace('/(tabs)/Profile');
-  //     } else {
-  //       alert('Invalid login credentials');
-  //     }
-  //   })
-  //   .catch(error => {
-  //     console.error('Error:', error);
-  //   });
-  //   */
-  //   // Temporary front-end test: Redirect to Profile
-  //   router.replace('/(tabs)/screens/Profile'); 
-  // };
-  
   const handleLogin = async () => {
     // Mark fields as touched to show errors if needed
     setIsTouchedEmail(true);
@@ -133,7 +107,15 @@ const LoginScreen = () => {
       alert("Something went wrong. Please try again.");
     }
   };
-  
+  /* SUPABASE RESET PASSWORD
+  const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail);
+  if (error) {
+    alert('Error: ' + error.message);
+  } else {
+    alert('Password reset email sent!');
+    setForgotPasswordVisible(false);
+  }
+  */
 
   return (
     <SafeAreaProvider>
@@ -199,10 +181,41 @@ const LoginScreen = () => {
               </TouchableOpacity>
               {/* Register and Forgot Password */}
               <Text style={styles.default}>Don't have an account? <Text onPress={() => router.push('../auth/RegisterGym')} style={styles.registerText}>Register</Text></Text>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => setForgotPasswordVisible(true)}>
                 <Text style={styles.registerText}>Forgot Password?</Text>
               </TouchableOpacity>
             </View>
+            {forgotPasswordVisible && (
+              <View style={styles.modalOverlay}>
+
+                <View style={styles.modalContent}>
+
+                  <TouchableOpacity onPress={() => setForgotPasswordVisible(false)} style={styles.closeButton}>
+                    <Text style={styles.closeButtonText}>✕</Text>
+                  </TouchableOpacity>
+
+                  <Text style={styles.modalTitle}>Reset Password</Text>
+                  <Text style={styles.modalText}>Enter your email to receive a reset link:</Text>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Email"
+                    keyboardType="email-address"
+                    value={forgotEmail}
+                    onChangeText={setForgotEmail}
+                  />
+                  <TouchableOpacity
+                    style={[styles.ButtonStyle, { marginTop: 10 }]}
+                    onPress={() => {
+                      // TODO: Add Supabase password reset here
+                      alert('Reset link sent to: ' + forgotEmail);
+                      setForgotPasswordVisible(false);
+                    }}
+                  >
+                    <Text style={styles.buttonText}>Send Reset Link</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
           </View>
         </TouchableWithoutFeedback>
       </SafeAreaView>
@@ -341,6 +354,47 @@ form: {
     justifyContent: "center",
     alignItems: "center",
   },
+  modalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  modalContent: {
+    width: '80%',
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  modalText: {
+    fontSize: 16,
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    padding: 5,
+    zIndex: 1,
+  },
+  closeButtonText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  
 });
 
 export default LoginScreen;

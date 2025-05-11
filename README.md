@@ -10,147 +10,95 @@ An app to build a community for its gym members.
 
    - _Omni2.html_ is the omnigym intro site and will describe omnigym's purpose. (Refer to footnote for terms.)
 
+>Preview Overview and Video Demonstration [Here](https://youtu.be/OLkpUOrBD4s?si=bic9qn0tcaKdr27t)
+
 <br><br>
 ---
----
-<br><br><br>
+<br>
+
 
 # Setup Guide
 
-This guide walks you through setting up the **Frontend (React Native + Expo)** and **Backend (Django + Supabase)** environments for the Omnigym Social App project. It is compatible with both **iOS and Android** platforms.
-
----
-
-## Installing OmniGymSocialApp Project
-To begin, you will download the github repo and open it in the VSCode or your preferred code editor.
-
-1. **Clone the Repository**
-   ```bash
-   git clone https://github.com/yourusername/OmniGymSocialApp.git
-   cd OmniGymSocialApp
-   ```
+This guide walks you through setting up the **Frontend (React Native + Expo)** and **Backend (Django + Supabase)** environments for the Omnigym Social App project. It's cross-platform and supports both **iOS and Android**.
 
 ---
 
 ## 📦 Prerequisites
 
-### Install Node.js (Recommended via Node.js site)
-Node.js includes npm (Node Package Manager), which is essential for managing frontend dependencies.
+Before you begin, install the following tools based on your platform:
 
-- Download and install from [nodejs.org](https://nodejs.org/en)
-- Verify installation:
-```bash
-node -v
-npm -v
-```
+### Required for All Platforms:
+- [Node.js](https://nodejs.org/) (includes npm)
+- [Python 3.11+](https://www.python.org/downloads/)
+- Git ([Download](https://git-scm.com/))
+- Expo CLI (optional): `npm install -g expo-cli`
 
----
+### 💻 Platform-Specific Requirements:
+<br>
 
-## 🍺 (Optional) Install Homebrew (MacOS/WSL)
-
-Only needed if you plan to use it for other tools like `watchman`. Node.js installation via Node.js site is sufficient for this project.
-
-### macOS
-```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zshrc
-eval "$(/opt/homebrew/bin/brew shellenv)"
-```
-
-### Windows (WSL recommended)
-```bash
-wsl --install -d Ubuntu
-```
-After reboot:
-```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> ~/.bashrc
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-```
+| Tool / Requirement              | Windows                                | macOS / WSL (Linux)                         | Notes                                                                 |
+|--------------------------------|-----------------------------------------|---------------------------------------------|-----------------------------------------------------------------------|
+| **Node.js**                    | ✅ [nodejs.org](https://nodejs.org)     | ✅ [nodejs.org](https://nodejs.org)         | Required for React Native / Expo                                      |
+| **Expo CLI** / `npx expo`     | ✅ `npx expo start`                     | ✅ `npx expo start`                         | No need to install globally; CLI optional                            |
+| **Watchman**                  | ❌ Not needed                           | ✅ `brew install watchman` (macOS only)     | Improves live reload; not supported on Windows                        |
+| **Python 3.11+**              | ✅ [python.org](https://python.org)     | ✅ `brew install python@3.11` (optional)    | Required for Django backend                                           |
+| **Pip + Virtualenv**          | ✅ Included with Python                 | ✅ Included / install via brew              | For managing backend dependencies                                     |
+| **PostgreSQL** (Supabase)     | ❌ Supabase handles DB remotely         | ❌ Supabase handles DB remotely             | No local installation needed                                          |
+| **Android Studio**            | ✅ Required for emulator testing        | ✅ Required for Android testing             | iOS testing on Mac only                                               |
+| **iOS Simulator**             | ❌ Not available                        | ✅ Xcode required from App Store            | iOS development requires macOS                                        |
+| **Git**                       | ✅ [git-scm.com](https://git-scm.com)   | ✅ Included or install via Homebrew         | For cloning the project repository                                    |
+| **Homebrew**                  | ❌ Not applicable                       | ✅ `/bin/bash -c "$(curl ...)"`          | Optional; helpful for installing tools like Watchman or Python       |
 
 ---
 
-## 🚀 Running the Frontend (React Native + Expo)
+# 🚀 Project Installation
+After completing and verifying the above is installed for your operating system, proceed with the steps below.
 
-### Docs and Tools
-- [Expo Setup Guide](https://docs.expo.dev/get-started/set-up/)
-- [Watchman Install (macOS)](https://facebook.github.io/watchman/docs/install#macos)
+## 1. Clone the Repository
+```bash
+git clone https://github.com/yourusername/OmniGymSocialApp.git
+cd OmniGymSocialApp
+```
 
-### Recommended VSCode Extensions
-- Expo Tools
-- React Native Tools
-
-### Initial Setup
+## 2. Frontend Setup (React Native + Expo)
 ```bash
 cd Fullstack/Frontend
-
 npm install
-```
-
-### Optional Tools
-```bash
-# macOS only (for fast refresh on file changes)
-brew install watchman
-```
-
-### Install Required Packages
-```bash
-npm install @react-native-community/datetimepicker@8.2.0             @react-native-picker/picker@2.9.0             expo-constants@~17.0.8             expo-router@~4.0.19             expo@~52.0.38             jest-expo@~52.0.6             react-native-select-dropdown             react-native-url-polyfill
-
-npx expo install expo-file-system                  @supabase/supabase-js                  @react-native-async-storage/async-storage
-
-npm audit fix
-```
-
-### Running the App
-```bash
-npx expo start          # Starts Expo server
+npx expo start         # Starts Expo server
+# OR:
 npx expo start --clear  # Clears cache and starts server
 ```
 
-### Open on Simulator
-- iOS (Mac only): Press `i` – Requires Xcode installed from Mac App Store.
-- Android: Press `a` – Requires Android Studio + Emulator configured.
-- Exit: `Ctrl + C`
+### Optional (macOS only):
+```bash
+brew install watchman   # Fast refresh for React Native
+```
 
 ---
 
-## 🛠️ Backend Setup (Django + Supabase)
-
-### Virtual Environment
+## 3. Backend Setup (Django + Supabase)
 ```bash
-cd omnigymsocialapp/Fullstack/Backend
-
+cd ../Backend
 python -m venv venv
-# macOS
+# macOS / Linux:
 source venv/bin/activate
-# Windows
+# Windows:
 venv\Scripts\activate
 ```
 
-### Install Dependencies
-If you have a `requirements.txt`:
+### Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
-Or manually:
-```bash
-pip install django djangorestframework djangorestframework-simplejwt             python-dotenv psycopg2-binary
-```
 
-### Start Django Project
-```bash
-django-admin startproject server .
-python manage.py runserver
-```
-
-### Migrate Database
+### Migrate database and run server:
 ```bash
 python manage.py makemigrations
 python manage.py migrate
+python manage.py runserver
 ```
 
-### Create Superuser
+### Create a superuser:
 ```bash
 python manage.py createsuperuser
 ```
@@ -159,29 +107,23 @@ python manage.py createsuperuser
 
 ## 🔐 Supabase Integration
 
-### Install Required Packages
-```bash
-pip install psycopg2 python-dotenv
-```
-
-### Setup `.env` File
-Create a `.env` file in the backend folder with:
-```
+### Create `.env` file in the `Backend/` folder:
+```dotenv
 SUPABASE_DB_URL=your_supabase_database_url
 SUPABASE_API_KEY=your_supabase_service_role_key
 ```
 
-### Test Connection
+> 💡 Replace values with actual credentials from your Supabase dashboard. Tables can be found below.
+
+### Test Supabase Connection
 ```bash
 python test_connection.py
 ```
-
-More info: [Supabase Arrays Guide](https://supabase.com/docs/guides/database/arrays)
+More info: [Supabase Guide](https://supabase.com/docs/guides/database/overview)
 
 <br><br>
 ---
 ---
-<br><br><br>
 
 # OMNIGYM APP PAGES
 ### Login Page:
@@ -229,12 +171,12 @@ _All the following info is required to successfully register or else an error is
 1. Leaderboards: _Promotes engagement between gym members and fitness motivation._
      - Submit PRs and proof (image + video evidence) to leaderboard for review
           - Will have separate female and male leaderboard PRs:
-             - Sumo Deadlifting
-             - Conventional Deadlifting
-             - Running Time Average
+             - Sumo/Conventional Deadlifting
+             - Pace Time
              - Bench press
              - Squat
-          - Implement weight classes or a mathematical ratio of              
+          - Implement Bryzkie formula to calculate one-rep maximum values.
+          - Use value with body weight and gender to calculate Wilks 2020 score.           
           - _Optional: Gym's can incentivize competition by applying a credit amount for winner(s) for that month_
      - Create personalized competitions amongst friends
      - Archived leaderboards
@@ -242,7 +184,7 @@ _All the following info is required to successfully register or else an error is
      - Share plans with others
      - Create plans
         - "Add exercise" button
-        - Gif demonstrations
+        - Gif demonstrations (unavailable)
         - Title of workout routine
            - i.e.: "Back and Bi's", "Upperbody", "Legs", "Glutes"
         - _Optional:_ set days of the week (Su,M,T,W,Th,F,S) or exact dates (02/23/2025)
@@ -271,6 +213,10 @@ _All the following info is required to successfully register or else an error is
 6. Settings
      - Decide if profile is public or private
      - Change/update metrics
+     - General information
+     - Wilk's Score
+         - Only if all 3 options for lifting PR's are filled out with weight and reps
+         - Lifting coefficients: Wilk's score https://strengthlevel.com/wilks-calculator#wilksScoreResults
 7. Events
      - Local events (i.e. Spartan race, fitness competitions)
      - Gym location events (i.e. Daddy daughter dances, V-Day dance, pickleball match)
@@ -279,8 +225,11 @@ _All the following info is required to successfully register or else an error is
         - Check-ins
 8. Support
      - Feedback form
-     - Technical help (includes contact info)
-     - Account help (e.g.: If user changes gyms, they can submit a ticket to change gyms in account)
+     - Support Form (e.g.: If user changes gyms, they can submit a ticket to change gyms in account)
+  
+**Note:** <br>
+[Lift Weight + reps] or [time + dist] for PR exercises is necessary when calculating their Wilks 2 scores with the coefficient formulas.<br>
+Gender and user's weight is also necessary, so "other" or NULL should result in an error.
 
 <br><br>
 ---
@@ -303,11 +252,11 @@ _All the following info is required to successfully register or else an error is
 11. Birthdate
 12. Phone Number
 
-**User Metrics (optional):**
-  1. Height
+**User Settings Metrics (optional):**
+  1. Gender
   2. Weight
   3. Fitness Goal (string)
-  4. Display Trophies (yes/no)
+  4. Caption
   5. Deadlift PR:
      - Weight(lbs or kg)
      - reps (max 10)
@@ -317,15 +266,10 @@ _All the following info is required to successfully register or else an error is
   8. Squats PR:
      - Weight(lbs or kg)
      - reps (max 10)
-  10. running time PR: time & distance
-  11. Wilk's Score
+  10. running time Pace: use time & distance
+  11. Wilk's 2020 Score
       - Only if all 3 options for lifting PR's are filled out with weight and reps
       - Lifting coefficients: Wilk's score https://strengthlevel.com/wilks-calculator#wilksScoreResults
-
-**Note:** <br>
-[Lift Weight + reps] or [time + dist] for PR exercises is necessary when calculating their Wilks 2 scores with the coefficient formulas.<br>
-Gender and user's weight is also necessary, so "other" or NULL should result in an error.
-
 
 
 
@@ -334,49 +278,77 @@ Gender and user's weight is also necessary, so "other" or NULL should result in 
 ----------------------------------------------------
 -- ---------------- ALL GYMS: ----------------------
 ----------------------------------------------------
--- **PURPOSE: Gym support system
-CREATE TABLE OmnigymSupport (
-   ticketID SERIAL PRIMARY KEY,
-   memberID TEXT NOT NULL,
-   gymabbr VARCHAR(3) NOT NULL,
-   category TEXT CHECK (category IN ('Feedback', 'Technical Help', 'Account Help')),
-   description TEXT NOT NULL,
-   status VARCHAR(15) CHECK (status IN ('Open', 'In Progress', 'Resolved')) DEFAULT 'Open'
-);
+-- PURPOSE: Gym support system
+create table public."OmnigymSupport" (
+  "ticketID" bigint generated by default as identity not null,
+  email text not null,
+  "timeSent" timestamp without time zone not null default (now() AT TIME ZONE 'utc'::text),
+  "memberID" character varying null,
+  "gymAbbr" public.ABBR null,
+  "tcktCategory" public.CATEGORY not null,
+  "inputMsg" text not null,
+  status public.TCKTSTATUS not null,
+  "gymName" text null,
+  auth_user_id uuid not null,
+  auth_gym_id uuid not null,
+  constraint OmnigymSupport_pkey primary key ("ticketID"),
+  constraint OmnigymSupport_auth_gym_id_key unique (auth_gym_id),
+  constraint OmnigymSupport_auth_user_id_key unique (auth_user_id),
+  constraint OmnigymSupport_auth_gym_id_fkey foreign KEY (auth_gym_id) references auth.users (id) on delete set null,
+  constraint OmnigymSupport_auth_user_id_fkey foreign KEY (auth_user_id) references auth.users (id) on delete set null
+) TABLESPACE pg_default;
 
--- **PURPOSE: Stores affiliated gyms and their details
-CREATE TABLE affilGyms (
-    gymID SERIAL PRIMARY KEY,
-    gymAbbr VARCHAR(3) NOT NULL,
-    gymName VARCHAR(20) NOT NULL,
-    gymCity VARCHAR(20) NOT NULL,
-    gymState VARCHAR(2) NOT NULL
-);
-
+-- PURPOSE: Stores affiliated gyms and their details
+create table public."AffilGyms" (
+  "gymID" bigint generated by default as identity not null,
+  "gymName" text not null,
+  "gymCity" text not null,
+  "gymState" text not null,
+  "gymAbbr" text not null,
+  "gymEmail" text not null,
+  constraint affilgyms_pkey primary key ("gymID"),
+  constraint AffilGyms_gymEmail_key unique ("gymEmail"),
+  constraint AffilGyms_gymID_key unique ("gymID"),
+  constraint unique_gym_location unique ("gymAbbr", "gymCity", "gymState")
+) TABLESPACE pg_default;
 
 ----------------------------------------------------
 -- --------- GYM-SPECIFIC ADMIN ACCESS -------------
 ----------------------------------------------------
--- **PURPOSE: Gym-specific events; This will be viewed on events page for each gym-specific user
-CREATE TABLE LTFEvents (
-   eventID SERIAL PRIMARY KEY,
-   gymCity VARCHAR(20),
-   eventName VARCHAR(30) NOT NULL,
-   eventDate VARCHAR(25),
-   eventType VARCHAR(20) CHECK (eventType IN ('Local', 'Gym-Specific')),
-   eventLocation VARCHAR(20) NOT NULL,
-   uploadDate TIMESTAMP DEFAULT CURRENT_DATE,
-   FOREIGN KEY (gymCity) REFERENCES LTFUsers(gymCity)
-);
+-- PURPOSE: Gym-specific events; This will be viewed on events page for each gym-specific user
+create table public."PFEvents" (
+  "eventID" integer not null default nextval('ltfevents_eventid_seq'::regclass),
+  "gymAbbr" public.ABBR not null,
+  "gymCity" text null,
+  "eventName" text not null,
+  "eventDate" date null,
+  "eventType" public.HOST null,
+  "eventLocation" text null,
+  "uploadDate" timestamp without time zone not null default now(),
+  "gymState" text not null,
+  "eventDesc" text null,
+  constraint PFEvents_pkey primary key ("eventID"),
+  constraint ltfevents_eventtype_check check (
+    (
+      "eventType" = any (array['Local'::"HOST", 'Gym-Hosted'::"HOST"])
+    )
+  )
+) TABLESPACE pg_default;
 
--- **PURPOSE: Table uploading/updating current active members by admin
-CREATE TABLE LifetimeFitnessDB (
-   gymCity VARCHAR(20) NOT NULL,
-   memberID VARCHAR(15) PRIMARY KEY,
-   lastName VARCHAR(20) NOT NULL,
-   firstName VARCHAR(20) NOT NULL,
-   uploadDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+-- PURPOSE: Table uploading/updating current active members by admin
+create table public."PlanetFitnessDB" (
+  "databaseID" integer not null default nextval('lifetimefitnessdb_databaseid_seq'::regclass),
+  "gymCity" character varying(20) not null,
+  "gymAbbr" public.ABBR not null,
+  "memberID" character varying(15) not null,
+  "lastName" text not null,
+  "firstName" text not null,
+  "uploadDate" timestamp without time zone not null default now(),
+  "gymState" character varying not null,
+  constraint PlanetFitnessDB_pkey primary key ("databaseID"),
+  constraint PlanetFitnessDB_memberID_key unique ("memberID"),
+  constraint pf_unique_gymabbr_memberid_city_state unique ("gymAbbr", "memberID", "gymCity", "gymState")
+) TABLESPACE pg_default;
 
 ----------------------------------------------------
 -- ----- GYM-SPECIFIC USERS (LTF example): ---------
@@ -384,135 +356,174 @@ CREATE TABLE LifetimeFitnessDB (
 -- During login, customers will need to be asked affiliated gym again to locate proper database
 -- Then we won't need to have a separate accounts table to locate them each.
 
--- **PURPOSE: Each gym gets a separate table for its members 
-CREATE TABLE LTFUsers (
-   userID SERIAL PRIMARY KEY,
-   memberID VARCHAR(15) UNIQUE NOT NULL,
-   gymAbbr VARCHAR(3) NOT NULL,
-   gymCity VARCHAR(20) NOT NULL,
-   lastName VARCHAR(20) NOT NULL,
-   firstName VARCHAR(20) NOT NULL,
-   email VARCHAR(30) UNIQUE NOT NULL,
-   password VARCHAR(20) NOT NULL,
-   dob VARCHAR(10) NOT NULL,
-   phoneNum VARCHAR(12) NOT NULL,
-   gender VARCHAR(6) CHECK (gender IN ('Male', 'Female', 'Other')) NOT NULL,
-   termsAccepted BOOLEAN DEFAULT FALSE,
-   dateJoined DATE DEFAULT CURRENT_DATE,
-   activeAccnt BOOLEAN DEFAULT TRUE
-);
+-- PURPOSE: Each gym gets a separate table for its members 
+create table public."PFUsers" (
+  id bigint generated by default as identity not null,
+  "memberID" character varying(15) not null,
+  "gymAbbr" public.ABBR not null,
+  "gymCity" character varying(20) not null,
+  "lastName" text not null,
+  "firstName" text not null,
+  email text not null,
+  "birthDate" text not null,
+  "phoneNum" character varying(12) not null default ''::character varying,
+  gender public.genderaccnt not null,
+  "termsAccepted" boolean not null default false,
+  "dateJoined" date not null,
+  "activeAccnt" boolean not null default true,
+  "gymState" character varying not null,
+  auth_user_id uuid null,
+  password text not null default ''::text,
+  constraint PFUsers_pkey primary key (id),
+  constraint PFUsers_memberID_key unique ("memberID"),
+  constraint PFUsers_email_key unique (email),
+  constraint PFUsers_auth_user_id_key unique (auth_user_id),
+  constraint pfusers_auth_user_id_fkey foreign KEY (auth_user_id) references auth.users (id) on delete set null,
+  constraint PFUsers_memberID_gymAbbr_gymCity_gymState_fkey foreign KEY ("memberID", "gymAbbr", "gymCity", "gymState") references "PlanetFitnessDB" ("memberID", "gymAbbr", "gymCity", "gymState"),
+  constraint PFUsers_auth_user_id_fkey foreign KEY (auth_user_id) references auth.users (id) on delete set null,
+  constraint ltfusers_gender_check check (
+    (
+      (gender)::text = any (
+        array[
+          ('Male'::character varying)::text,
+          ('Female'::character varying)::text,
+          ('Other'::character varying)::text
+        ]
+      )
+    )
+  )
+) TABLESPACE pg_default;
 
--- PURPOSE: **PURPOSE: Stores user settings per gym
-CREATE TABLE LTFUserSettings (
-   settingsID SERIAL PRIMARY KEY,
-   memberID VARCHAR(15) UNIQUE,
-   profilePublic BOOLEAN DEFAULT TRUE,
-   caption VARCHAR(50),
-   units VARCHAR(8) CHECK (units IN ('Metric', 'Imperial')) DEFAULT 'Imperial',
-   fitnessGoal VARCHAR(30),
-   age INTEGER,
-   wilks2Score DOUBLE PRECISION DEFAULT NULL,
-   prSong VARCHAR(50),
-   trophies BOOLEAN DEFAULT TRUE,
-   FOREIGN KEY (memberID) REFERENCES LTFUsers(memberID)
-);
+-- PURPOSE: Stores user settings per gym
+create table public."PFUserSettings" (
+  "settingsID" bigint generated by default as identity not null,
+  email character varying not null,
+  "profilePublic" boolean not null default true,
+  caption character varying null,
+  units public.UNITS not null default 'Imperial'::"UNITS",
+  "fitnessGoal" character varying null,
+  age smallint null,
+  "prSong" character varying null,
+  trophies smallint null,
+  "profileImg" text null,
+  auth_user_id uuid not null,
+  constraint PFUserSettings_pkey primary key ("settingsID"),
+  constraint PFUserSettings_auth_user_id_key unique (auth_user_id),
+  constraint PFUserSettings_auth_user_id_fkey foreign KEY (auth_user_id) references auth.users (id) on delete set null,
+  constraint PFUserSettings_email_fkey foreign KEY (email) references "PFUsers" (email)
+) TABLESPACE pg_default;
 
--- **PURPOSE: Stores fitness metrics (can be used eventually for Wilks 2 score)
-CREATE TABLE LTFMemMetrics (
-   metricsID SERIAL PRIMARY KEY,
-   memberID VARCHAR(15),
-   gender VARCHAR(6) CHECK (gender IN ('Male', 'Female')) NOT NULL,
-   memberWeight DOUBLE PRECISION,
-   height DOUBLE PRECISION,
-   prBenchWeight DOUBLE PRECISION,
-   prBenchReps INTEGER,
-   prDeadliftWeight DOUBLE PRECISION,
-   prDeadliftReps INTEGER,
-   prSquatWeight DOUBLE PRECISION,
-   prSquatReps INTEGER,
-   runningTime VARCHAR(8),
-   runningDist DOUBLE PRECISION,
-   FOREIGN KEY (memberID) REFERENCES LTFUsers(memberID)
-);
+-- PURPOSE: Stores fitness metrics (can be used eventually for Wilks 2 score)
+create table public."PFUserMetrics" (
+  "metricsID" bigint generated by default as identity not null,
+  "updatedDate" date not null,
+  email text not null,
+  gender public.GENDERCNTST not null,
+  "memberWeight" real null,
+  height character varying null,
+  "prBenchWeight" real null,
+  "prBenchReps" smallint null,
+  "prDeadliftWeight" real null,
+  "prDeadliftReps" smallint null,
+  "prSquatWeight" real null,
+  "prSquatReps" smallint null,
+  "runningTime" text null,
+  "runningDist" double precision null,
+  "wilks2Score" integer null,
+  auth_user_id uuid not null,
+  constraint PFUserMetrics_pkey primary key ("metricsID"),
+  constraint PFUserMetrics_auth_user_id_key unique (auth_user_id),
+  constraint PFUserMetrics_auth_user_id_fkey foreign KEY (auth_user_id) references auth.users (id) on delete set null,
+  constraint PFUserMetrics_email_fkey foreign KEY (email) references "PFUsers" (email)
+) TABLESPACE pg_default;
 
--- **PURPOSE: Leaderboard for gym-specific competitions. 
+-- PURPOSE: Leaderboard for gym-specific competitions. 
 -- Only approved submissions should be displayed on page.
-CREATE TABLE LTFLeaderboard (
-    leaderboardID SERIAL PRIMARY KEY,
-    memberID VARCHAR(15),
-    category VARCHAR(15) CHECK (category IN ('Deadlift', 'Bench Press', 'Squat', 'Running Time')),
-    memberWeight DOUBLE PRECISION,
-    prWeight DOUBLE PRECISION,
-    prReps INTEGER CHECK (prReps BETWEEN 1 AND 10),
-    submissionDate DATE DEFAULT CURRENT_DATE,
-    proofVideo BYTEA,
-    approved BOOLEAN DEFAULT FALSE,
-    FOREIGN KEY (memberID) REFERENCES LTFUsers(memberID)
-);
+create table public."PFLeaderboard" (
+  "leaderboardID" bigint generated by default as identity not null,
+  "submissionDate" date not null,
+  email text not null,
+  "cntstCategory" public.CATEGORY not null,
+  "memberWeight" real null,
+  "prWeight" real null,
+  "prReps" smallint null,
+  "proofVideo" character varying null,
+  approved boolean not null default false,
+  "permToPostVid" boolean null default true,
+  auth_user_id uuid not null,
+  constraint PFLeaderboard_pkey primary key ("leaderboardID"),
+  constraint PFLeaderboard_auth_user_id_key unique (auth_user_id),
+  constraint PFLeaderboard_auth_user_id_fkey foreign KEY (auth_user_id) references auth.users (id) on delete set null,
+  constraint PFLeaderboard_email_fkey foreign KEY (email) references "PFUsers" (email)
+) TABLESPACE pg_default;
 
 -- PURPOSE: Stores archived winners 
-CREATE TABLE LTFArchivedLeaderboards (
-    leaderboardID SERIAL PRIMARY KEY,
-    memberID VARCHAR(15),
-    category VARCHAR(15) CHECK (category IN ('Deadlift', 'Bench Press', 'Squat', 'Running Time')),
-    prWeight DOUBLE PRECISION,
-    prReps INTEGER,
-    submissionDate TEXT,
-    archivedDate DATE DEFAULT CURRENT_DATE,
-    FOREIGN KEY (memberID) REFERENCES LTFUsers(memberID)
-);
+create table public."PFArchivedLeaderboards" (
+  "leaderboardID" bigint generated by default as identity not null,
+  email text not null,
+  "archivedMonth" date null,
+  "submissionDate" date null,
+  "cntstCategory" public.PRCATEGORY null,
+  "prWeight" real null,
+  "prReps" smallint null,
+  "gymAbbr" text null,
+  auth_user_id uuid not null,
+  constraint PFArchivedLeaderboards_pkey primary key ("leaderboardID"),
+  constraint PFArchivedLeaderboards_auth_user_id_key unique (auth_user_id),
+  constraint PFArchivedLeaderboards_auth_user_id_fkey foreign KEY (auth_user_id) references auth.users (id) on delete set null,
+  constraint PFArchivedLeaderboards_email_fkey foreign KEY (email) references "PFUsers" (email)
+) TABLESPACE pg_default;
 
 -- PURPOSE: Messaging system (Inbox) (research how to create inbox db)
-CREATE TABLE LTFMessages (
-   messageID SERIAL PRIMARY KEY,
-   senderID VARCHAR(15) NOT NULL,
-   receiverID VARCHAR(20) NOT NULL,
-   messageText TEXT NOT NULL,
-   messageDate DATE DEFAULT CURRENT_DATE,
-   FOREIGN KEY (senderID) REFERENCES LTFUsers(memberID),
-   FOREIGN KEY (receiverID) REFERENCES LTFUsers(memberID)
-);
+create table public."PFMessages" (
+  "messageID" bigint generated by default as identity not null,
+  "userEmail" text not null,
+  "receiverEmail" text not null,
+  "messageDate" timestamp without time zone not null default now(),
+  "messageText" text not null,
+  sender_user_id uuid not null,
+  receiver_user_id uuid not null,
+  constraint PFMessages_pkey primary key ("messageID"),
+  constraint PFMessages_receiver_user_id_key unique (receiver_user_id),
+  constraint PFMessages_sender_user_id_key unique (sender_user_id),
+  constraint PFMessages_receiverEmail_fkey foreign KEY ("receiverEmail") references "PFUsers" (email),
+  constraint PFMessages_sender_user_id_fkey foreign KEY (sender_user_id) references auth.users (id) on delete set null,
+  constraint PFMessages_userEmail_fkey foreign KEY ("userEmail") references "PFUsers" (email),
+  constraint PFMessages_receiver_user_id_fkey foreign KEY (receiver_user_id) references auth.users (id) on delete set null
+) TABLESPACE pg_default;
 
 -- PURPOSE: Stores workout plans
-CREATE TABLE LTFWorkoutPlans (
-    planID SERIAL PRIMARY KEY,
-    memberID VARCHAR(15),
-    title VARCHAR(15) NOT NULL,
-    dayOfWeek VARCHAR(7),
-    exactDate VARCHAR(10),
-    FOREIGN KEY (memberID) REFERENCES LTFUsers(memberID)
-);
+create table public."PFWorkoutPlans" (
+  "planID" bigint generated by default as identity not null,
+  email text not null,
+  title text not null,
+  "dayOfWeek" public.DAYOFWEEK null,
+  "exactDate" date null,
+  created timestamp without time zone null default now(),
+  auth_user_id uuid not null,
+  constraint PFWorkoutPlans_pkey primary key ("planID"),
+  constraint PFWorkoutPlans_auth_user_id_key unique (auth_user_id),
+  constraint PFWorkoutPlans_title_key unique (title),
+  constraint PFWorkoutPlans_auth_user_id_fkey foreign KEY (auth_user_id) references auth.users (id) on delete set null,
+  constraint PFWorkoutPlans_email_fkey foreign KEY (email) references "PFUsers" (email)
+) TABLESPACE pg_default;
 
 -- PURPOSE: Stores exercises linked to a workout plan
-CREATE TABLE LTFExercises (
-   exerciseID SERIAL PRIMARY KEY,
-   planID INTEGER NOT NULL,
-   exerciseName VARCHAR(30) NOT NULL,
-   sets INTEGER,
-   reps INTEGER,
-   weightAmnt DOUBLE PRECISION,
-   duration VARCHAR(8),
-   distance DOUBLE PRECISION,
-   FOREIGN KEY (planID) REFERENCES LTFWorkoutPlans(planID)
-);
-
-
-----------------------------------------------------
--- -------------- NECESSARY FUNCTIONS --------------
-----------------------------------------------------
--- **PURPOSE: If a member is found in the uploaded list, their account remains active.
-UPDATE LTFUsers 
-SET activeAccnt = TRUE
-WHERE memberID IN (SELECT memberID FROM LifetimeFitnessDB);
-
--- **PURPOSE: If a member is missing from the new upload, their account is deactivated (FALSE).
-UPDATE LTFUsers 
-SET activeAccnt = FALSE 
-WHERE memberID NOT IN (SELECT memberID FROM LifetimeFitnessDB);
-
--- **PURPOSE: Backend call when logging user in to verify they are active and credentials are accurate.
-SELECT * FROM LTFUsers 
-WHERE email = $1 AND password = $2 AND activeAccnt = TRUE;
+create table public."PFExercises" (
+  "exerciseID" bigint generated by default as identity not null,
+  "planID" bigint not null,
+  "exerciseName" text not null,
+  sets smallint null,
+  reps smallint null,
+  "weightAmnt" real null,
+  duration real null,
+  distance real null,
+  auth_user_id uuid not null,
+  constraint PFExercises_pkey primary key ("exerciseID"),
+  constraint PFExercises_auth_user_id_key unique (auth_user_id),
+  constraint PFExercises_auth_user_id_fkey foreign KEY (auth_user_id) references auth.users (id) on delete set null,
+  constraint PFExercises_planID_fkey foreign KEY ("planID") references "PFWorkoutPlans" ("planID")
+) TABLESPACE pg_default;
 
 ```
 

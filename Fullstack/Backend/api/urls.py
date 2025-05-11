@@ -8,6 +8,7 @@ from rest_framework_simplejwt.views import TokenRefreshView
 # from .views import ItemViewSet
 from .views import registerUser, loginUser, verifyMembership, getGymCities, getGymStates
 from rest_framework.routers import DefaultRouter
+from .views import updateWilksScore
 
 router = DefaultRouter()
 # router.register(r'items', ItemViewSet)
@@ -20,8 +21,7 @@ urlpatterns = [
     path("verifyMembership/", verifyMembership),
     path("getGymCities/", getGymCities),
     path("getGymStates/", getGymStates),
-
-
+    path('updateWilksScore/', updateWilksScore, name='update_wilks'),
     
     #Klimans
     # path('register-pf-user/', register_pf_user, name='register_pf_user'),
