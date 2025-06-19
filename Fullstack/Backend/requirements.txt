@@ -18,7 +18,7 @@ requests==2.32.3
 SQLAlchemy==2.0.38
 sqlparse==0.5.3
 typing_extensions==4.12.2
-urllib3==2.3.0
+urllib3==2.5.0
 # Werkzeug==2.3.7
 
 
